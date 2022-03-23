@@ -106,14 +106,47 @@ volumes:
   * ports: 컨테이너에서 사용되는 포트와 호스트의 포트를 매핑 (외부로 노출할 포트를 지정) HOST_PORT:CONTAINER_PORT
   * volumes: 호스트 디렉토리와 컨테이너 디렉토리를 매핑 => 컨테이너의 해당 디렉토리에서 호스트의 디렉토리를 참조 할 수 있게된다. (EX. 호스트 디렉토리의 dbdata 디렉토리를 컨테이너의 /var/lib/mysql 디렉토리에서 참조 가능)
 
+## Github Actions
+
+> Github Actions란 워크플로우를 자동화하도록 도와주는 Github에서 제공하는 도구.
+> > 테스트, 빌드, 배포 등 다양한 작업들을 자동화하여 처리해줌.
+
+> .github/workflows 폴더 내에 .yml 파일을 추가하여 등록하거나 Github 저장소에서 등록 가능(워크플로우 템플릿을 추천해줌)
+
+```
+name: Deploy to EC2
+on: [push]
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@master
+
+    - name: create env file
+      run: |
+        touch .env
+        echo "${{ secrets.ENV_VARS }}" >> .env     
+```        
+
+* Evnets: on: [push] => 워크 플로우를 실행하는 특정 활동이나 규칙. 이 코드에선 커밋이 push 될 때마다 워크플로우 실행
+* 워크플로우는 하나 이상의 jobs, 그보다 작은단위인 steps, actions로 이루어져 있으며 각 jobs들은 새로운 가상 환경에서 실행.
+
+> 워크플로우를 실행 시 중요한 정보들은 Github secret으로 저장하여 환경 변수로 사용 가능 
+
 ## 실행 플로우
 
 ![스크린샷 2022-03-24 오전 1 46 35](https://user-images.githubusercontent.com/59060780/159752231-c6d619f0-70b2-421c-97b8-3920f1cee1f2.png)
 
 > 로컬환경에서 작성된 코드를 깃에 푸쉬 -> Github actions가 푸쉬된 코드를 서버에 띄우고 deploy.sh 실행 -> 실행된 deploy.sh가 docker-compose.prod.yml 파일을 통해 web, nginx 컨테이너를 빌드 후 실행
 
+### git에 푸쉬 후 Github actions가 빌드
 
+![스크린샷 2022-03-24 오전 1 57 09](https://user-images.githubusercontent.com/59060780/159754281-77cd98b7-51c4-4d1d-b88c-05071ad8d00a.png)
 
+### 빌드 후 실행 (Ec2 DNS 주소로 접속)
 
-
+![스크린샷 2022-03-24 오전 2 01 33](https://user-images.githubusercontent.com/59060780/159755075-c4675ec6-4993-4269-8a9b-bac88865f52e.png)
 
