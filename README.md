@@ -29,13 +29,83 @@
 > 새로운 파일이 추가되면 새로운 Layer가 생성되고 도커는 여러 개의 Layer를 묶어서 하나의 파일시스템으로 만들어줌.
 >> EX. nginx 이미지가 A + nginx의 집합이라면 WebApp 이미지는 A + nginx의 집합에 soruce 이미지를 추가한 A + nginx + source Layer로 구성된다.  
 
-## 도커의 원리
+## Docker-compose과 Dockerfile
 
-EC2에서 서버를 만들면 Ubuntu OS로 인스턴스가 생성되지만 내부에는 프로그래머가 로컬에서 작업하는데 필요한 여러 환경들 (Ex. python, git, 여러 라이브러리 파일들)이 존재하지 않는다.
-또 로컬환경과 배포환경이 다른 경우에도 여러가지 문제가 발생 할 수 있다.
+> Dockerfile: 하나의 이미지를 만들기 위한 과정 (docker가 실행)
 
-=> 이러한 문제점들을 Docker가 해결해줌.
+```
+FROM python:3.8.3-alpine
+ENV PYTHONUNBUFFERED 1
 
-* Docker는 어떤 OS에서도 같은 환경을 만들어줌.
+RUN mkdir /app
+WORKDIR /app
+
+# dependencies for psycopg2-binary
+RUN apk add --no-cache mariadb-connector-c-dev
+RUN apk update && apk add python3 python3-dev mariadb-dev build-base && pip3 install mysqlclient && apk del python3-dev mariadb-dev build-base
+
+
+# By copying over requirements first, we make sure that Docker will cache
+# our installed requirements rather than reinstall them on every build
+COPY requirements.txt /app/requirements.txt
+RUN pip install -r requirements.txt
+
+# Now copy in our code, and run it
+COPY . /app/
+```
+
+> docker-compose: 이미지를 여러개 띄워서 서로 연결해주고 컨테이너 외부의 호스트와의 연결 방법 그리고 파일 시스템을 어떻게 공유할지 제어해주는 것
+
+```
+version: '3'
+services:
+
+  db:
+    container_name: db
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_PASSWORD: mysql
+    expose:
+      - 3306
+    ports:
+      - "3307:3306"
+    env_file:
+      - .env
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  web:
+    container_name: web
+    build: .
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      DATABASE_NAME: mysql
+      DATABASE_USER: 'root'
+      DATABASE_PASSWORD: mysql
+      DATABASE_PORT: 3306
+      DATABASE_HOST: db
+      DJANGO_SETTINGS_MODULE: django_docker.settings.dev
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+volumes:
+  app:
+  dbdata:
+  ```
+  
+  * imgae: 컨테이너가 실행될때 필요한 이미지를 정의 => db컨테이너가 실행 될 때 mysql:5.7 이미지를 사용
+  * command: 컨테이너 실행 후 실행할 명령어들을 정의.
+  * environment: 각 컨테이너에서 쓸 환경변수들을 지정
+  * ports: 컨테이너에서 사용되는 포트와 호스트의 포트를 매핑 (외부로 노출할 포트를 지정) HOST_PORT:CONTAINER_PORT
+  * volumes: 호스트 디렉토리와 컨테이너 디렉토리를 매핑 => 컨테이너의 해당 디렉토리에서 호스트의 디렉토리를 참조 할 수 있게된다. (EX. 호스트 디렉토리의 dbdata 디렉토리를 컨테이너의 /var/lib/mysql 디렉토리에서 참조 가능)
+
+
 
 
