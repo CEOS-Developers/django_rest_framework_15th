@@ -106,6 +106,14 @@ volumes:
   * ports: 컨테이너에서 사용되는 포트와 호스트의 포트를 매핑 (외부로 노출할 포트를 지정) HOST_PORT:CONTAINER_PORT
   * volumes: 호스트 디렉토리와 컨테이너 디렉토리를 매핑 => 컨테이너의 해당 디렉토리에서 호스트의 디렉토리를 참조 할 수 있게된다. (EX. 호스트 디렉토리의 dbdata 디렉토리를 컨테이너의 /var/lib/mysql 디렉토리에서 참조 가능)
 
+## 실행 플로우
+
+![스크린샷 2022-03-24 오전 1 46 35](https://user-images.githubusercontent.com/59060780/159752231-c6d619f0-70b2-421c-97b8-3920f1cee1f2.png)
+
+> 로컬환경에서 작성된 코드를 깃에 푸쉬 -> Github actions가 푸쉬된 코드를 서버에 띄우고 deploy.sh 실행 -> 실행된 deploy.sh가 docker-compose.prod.yml 파일을 통해 web, nginx 컨테이너를 빌드 후 실행
+
+
+
 
 
 
