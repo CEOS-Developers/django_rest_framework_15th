@@ -19,14 +19,17 @@
       같은 이미지에서 여러개의 컨테이너 생성 가능, 컨테이너가 바뀌거나 삭제되어도 이미지는 변하지 않음.
       docker는 layer의 개념 사용. 유니온 파일 시스템을 이용하여 여러개의 레이어를 하나의 파일 시스템으로 사용할 수 있게 해줌.
       </p>
-      <li><h2><strong>What is benefit of using docker</strong></h2></li>
-      <ul>
+      <li><h2><strong>What is benefit and weakness of using docker</strong></h2></li>
+    <p><h5><strong>benefit</strong></h5><ul>
         <li>구성 단순화 - 하나의 Configuration으로 모든 플랫폼에서 실행할 수 있음. 하나의 docker 이미지를 다른 곳에서도 사용 가능</li>
         <li>코드 관리 - 일관된 환경 제공(docker 이미지의 불변성!)</li?
         <li>개발 생산성 향상 - 개발 환경과 운영 환경의 차이점 최소화. Vm에 비해 사용 자원이 적어 여러가지 서비스 실행 가능</li>
         <li>애플리케이션 격리</li>
         <li>빠른 배포</li>
-      </ul>
+      </ul></p>
+  </p><h5><strong>weaknesses of Docker</strong></h5>
+  수많은 컨테이너와 컨테이너화 된 앱들을 관리하고 오케스트레이션(컴퓨터 시스템과 애플리케이션, 서비스의 자동화된 설정, 관리, 조정)이 어려워짐
+  -> 컨테이너의 그룹화가 필요함 -> <strong>쿠버네티스</strong>
   <h2><li><strong>about 2nd seminar - docker & docker-compose, github action</strong></li></h2>
       <strong>Docker</strong> -> Dockerfile을 실행시켜줌, Dockerfile은 하나의 이미지를 만들기 위한 과정(이미지에 대해서는 위에서 이미 설명한 대로 !)<br>
       <strong>docker-compose</strong> -> docker-compose.yml을 실행시켜줌 , 이미지를 여러개 띄워서 서로 네트워크도 만들어주고 컨테이너의 밖의 호스트와도 어떻게 연결할지, 파일 시스템은 어떻게 공유할지(volumes) 제어해주는것이 docker-compose<br><br>
@@ -36,7 +39,6 @@
         <li>Test code</li>
         <li>배포 - 서버에 새로운 버전, 기능 등 배포</li>
         <li>자동화 하고싶은 스크립트</li>
-        <li>
       </ul>
     </ol>
   </body>
