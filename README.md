@@ -27,9 +27,17 @@
         <li>애플리케이션 격리</li>
         <li>빠른 배포</li>
       </ul>
-  <h3><li><strong>about 2nd seminar - docker & docker-compose, github action </h3></li></strong>
+  <h2><li><strong>about 2nd seminar - docker & docker-compose, github action</strong></li></h2>
       <strong>Docker</strong> -> Dockerfile을 실행시켜줌, Dockerfile은 하나의 이미지를 만들기 위한 과정(이미지에 대해서는 위에서 이미 설명한 대로 !)<br>
-      <strong>docker-compose</strong> -> docker-compose.yml을 실행시켜줌 , 이미지를 여러개 띄워서 서로 네트워크도 만들어주고 컨테이너의 밖의 호스트와도 어떻게 연결할지, 파일 시스템은 어떻게 공유할지(volumes) 제어해주는것이 docker-compose
+      <strong>docker-compose</strong> -> docker-compose.yml을 실행시켜줌 , 이미지를 여러개 띄워서 서로 네트워크도 만들어주고 컨테이너의 밖의 호스트와도 어떻게 연결할지, 파일 시스템은 어떻게 공유할지(volumes) 제어해주는것이 docker-compose<br><br>
+  <h4>github action이 해주는 일 - <strong>Workflow의 자동화</strong></h4>
+  Workflow의 종류    
+    <ul>
+        <li>Test code</li>
+        <li>배포 - 서버에 새로운 버전, 기능 등 배포</li>
+        <li>자동화 하고싶은 스크립트</li>
+        <li>
+      </ul>
     </ol>
   </body>
   
