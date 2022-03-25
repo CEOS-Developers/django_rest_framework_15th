@@ -44,7 +44,12 @@
       <strong>github action 사용 예시</strong><br><a href="https://fe-developers.kakaoent.com/2022/220106-github-actions/",target="__blank", title="usage of github action">카카오웹툰의 깃허브 액션 사용예</a>
       <br>
     이번 세미나에서 진행한 배포의 흐름
-    <img src="Users\jihoo\OneDrive\바탕 화면\ceos15">
+    <ol>
+    <li>Github Actions가 우리의 코드를 서버에 올리고 deploy.sh를 실행</li>
+    <li>deploy.sh는 docker-compose를 실행</li>
+    <li>docker-compose는 web이라는 컨테이너와 nginx라는 컨테이너를 빌드하고 실행</li>
+    <li>web 컨테이너는 Dockerfile.prod를 기준으로 빌드</li>
+    </ol>
     </ol>
   </body>
   
