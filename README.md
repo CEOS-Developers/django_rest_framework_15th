@@ -28,7 +28,7 @@
         <li>빠른 배포</li>
       </ul></p>
   </p><h5><strong>weaknesses of Docker</strong></h5>
-  수많은 컨테이너와 컨테이너화 된 앱들을 관리하고 오케스트레이션(컴퓨터 시스템과 애플리케이션, 서비스의 자동화된 설정, 관리, 조정)이 어려워짐
+  수많은 컨테이너와 컨테이너화 된 앱들의 관리 및 오케스트레이션(컴퓨터 시스템과 애플리케이션, 서비스의 자동화된 설정, 관리, 조정)이 어려워짐
   -> 컨테이너의 그룹화가 필요함 -> <strong><a href = "https://www.redhat.com/ko/topics/containers/what-is-kubernetes", title="kubernetes">쿠버네티스</a></strong>
   <h2><li><strong>about 2nd seminar - docker & docker-compose, github action</strong></li></h2>
       <strong>Docker</strong> -> Dockerfile을 실행시켜줌, Dockerfile은 하나의 이미지를 만들기 위한 과정(이미지에 대해서는 위에서 이미 설명한 대로 !)<br>
