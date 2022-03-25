@@ -25,11 +25,11 @@
       </p>
       <li><h2><strong>What is benefit and weakness of using docker</strong></h2></li>
     <p><h4><strong>benefit</strong></h4><ul>
-        <li>구성 단순화 - 하나의 Configuration으로 모든 플랫폼에서 실행할 수 있음. 하나의 docker 이미지를 다른 곳에서도 사용 가능</li>
-        <li>코드 관리 - 일관된 환경 제공(docker 이미지의 불변성!)</li?
-        <li>개발 생산성 향상 - 개발 환경과 운영 환경의 차이점 최소화. Vm에 비해 사용 자원이 적어 여러가지 서비스 실행 가능</li>
-        <li>애플리케이션 격리</li>
-        <li>빠른 배포</li>
+    <li><strong>구성 단순화</strong> - 하나의 Configuration으로 모든 플랫폼에서 실행할 수 있음. 하나의 docker 이미지를 다른 곳에서도 사용 가능</li>
+    <li><strong>코드 관리</strong> - 일관된 환경 제공(docker 이미지의 불변성!)</li?
+    <li><strong>개발 생산성 향상</strong> - 개발 환경과 운영 환경의 차이점 최소화. Vm에 비해 사용 자원이 적어 여러가지 서비스 실행 가능</li>
+    <li><strong>애플리케이션 격리</strong></li>
+    <li><strong>빠른 배포</strong></li>
       </ul></p>
   </p><h4><strong>weaknesses of Docker</strong></h4>
   수많은 컨테이너와 컨테이너화 된 앱들의 관리 및 오케스트레이션(컴퓨터 시스템과 애플리케이션, 서비스의 자동화된 설정, 관리, 조정)이 어려워짐
