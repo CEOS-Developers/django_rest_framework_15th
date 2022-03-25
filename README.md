@@ -44,7 +44,7 @@
       <strong>github action 사용 예시</strong><br><a href="https://fe-developers.kakaoent.com/2022/220106-github-actions/",target="__blank", title="usage of github action">카카오웹툰의 깃허브 액션 사용예</a>
       <br>
     이번 세미나에서 진행한 배포의 흐름
-    <img src="\Users\jihoo\OneDrive\바탕 화면\ceos15">
+    <img src="C:\Users\jihoo\OneDrive\바탕 화면\ceos15">
     </ol>
   </body>
   
