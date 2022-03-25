@@ -33,8 +33,32 @@ ex) `docker run --name ws1 httpd`를 하면 ws1이라는 이름을 가진 httpd 
 현재 실행 중인 컨테이너는 삭제할 수 없으므로 stop을 하고 삭제해야한다.  
 `docker rmi image_name`을 이용해 이미지를 삭제할 수 있다.  
 
-##
+##Network
+도커를 이용하면 웹서버가 컨테이너에 설치된다.
+이 컨테이너가 설치된 운영체제를 Host라고 한다.  
 
+<img src="img_docker.png" width="650"/>  
+
+`docker run -p 8000:80 httpd` 를 사용하면 호스트의 8000번 포트와 컨테이너의 80번 포트가 연결된다.  
+-p는 publish의 줄임말이다. 위의 경우 localhost:8000으로 접속해야한다.   
+이 과정을 port forwarding 이라고 한다.  
+
+##명령어 실행
+`docker exec container_name COMMAND` 를 사용할 수 있다.  
+`docker exec ws1 pwd`는 ws1이라는 컨테이너 안에서 pwd를 실행한 것과 같다.  
+
+`docker exec -it container_name /bin/sh`을 통해 shell을 실행시킬 수 있다.  
+컨테이너와 연결을 유지하면서 지속적으로 명령어를 실행하고 싶을 때 이용한다.  
+사용자가 입력한 명령어를 shell이 받아서 os에게 전달해주는 것이다.  
+
+-i는 interactive, -t는 tty의 약자이다.  
+gui환경에서 cli를 눌렀을 때와 같은 효과이다.  
+
+`exit`를 하면 컨테이너에서 나올 수 있다.  
+sh는 기능이 부족하므로 /bin/bash를 히용해 bash shell을 사용해도 된다.  
+하지만 bash shell이 없을 수도 있으므로 이 경우에는 sh를 사용하면 된다.  
+컨테이너에는 nano, vim 에디터가 기본적으로 없다.
+`apt update` `apt install nano` 를 이용하면 nano를 설치할 수 있다.  
 
 ###참고자료
 https://www.youtube.com/playlist?list=PLuHgQVnccGMDeMJsGq2O-55Ymtx0IdKWf
