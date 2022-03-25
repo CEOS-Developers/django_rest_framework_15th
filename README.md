@@ -21,3 +21,23 @@
 ![MainImage-2](https://user-images.githubusercontent.com/68195241/160120608-0232c880-a56e-46dd-b912-8e64e35a5280.jpg)
 - 여러개의 컨테이너를 하나로 묶어주는 역할을 하는 툴 (for 다중 컨테이너 도커 애플리케이션)
 - YAML(.yml) 파일로 작성됨 -> YAML 파일을 읽어 하나의 명령어로 모든 서비스 실행
+
+
+## Github Actions
+***
+![Continuous-Deployment-con-GitHub-Actions](https://user-images.githubusercontent.com/68195241/160120267-8a25411d-0ad2-414f-84c2-48f955bf2746.png)
+- Github에서 공식적으로 제공하는 CI/CD 툴
+- Workflow 자동화툴
+
+### CI/CD
+> '빌드 -> 저장소에 전달 -> 배포' 까지의 과정
+- CI (Continuous Integration)
+  * 테스트, 빌드, Dockerizing, 저장소에 전달
+  * 프로덕션 환경으로 서비스를 배포할 수 있도록 준비하는 프로세스
+- CD (Continuous Delivery)
+  * 배포
+  * 프로덕션 환경으로 서비스를 배포할 수 있도록 준비하는 프로세스
+
+### Workflow
+- 하나 이상의 Job으로 구성되고, Event에 의해 예약되거나 트리거될 수 있는 자동화된 절차
+- YAML 파일로 작성 + ```.git/workflows```에 저장
