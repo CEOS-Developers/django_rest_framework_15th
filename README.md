@@ -19,6 +19,7 @@
       컨테이너 실행에 필요한 모든 파일과 설정값을 포함하는 파일이 <strong>이미지</strong>로 무상태성, 불변성을 가짐
       같은 이미지에서 여러개의 컨테이너 생성 가능, 컨테이너가 바뀌거나 삭제되어도 이미지는 변하지 않음.
       docker는 layer의 개념 사용. 유니온 파일 시스템을 이용하여 여러개의 레이어를 하나의 파일 시스템으로 사용할 수 있게 해줌.
+      <img src="https://user-images.githubusercontent.com/63634505/129429515-b639f8c7-d123-46b6-b303-3a3313819be3.png">
       </p>
       <li><h2><strong>What is benefit and weakness of using docker</strong></h2></li>
     <p><h4><strong>benefit</strong></h4><ul>
