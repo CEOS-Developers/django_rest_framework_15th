@@ -1,11 +1,11 @@
-CEOS 14기 백엔드 스터디 모델링 및 drf 연습을 위한 레포  
-
-#Docker
-도커는 리눅스 운영체제의 기술이다. 도커 위에서 돌아가는 컨테이너, 그리고 컨테이너 안에서 돌아가는 각각의 앱들은 리눅스에서 돌아가는 앱들이다.
-리눅스가 아닌 경우, 가상머신을 통해 리눅스를 설치할 수 있다. 그런데 이 과정이 까다롭기 때문에 도커가 자동으로 가상머신을 만들어주고 그 위에 리눅스를 설치해준다.
+# Docker
+도커는 리눅스 운영체제의 기술이다.  
+도커 위에서 돌아가는 컨테이너, 그리고 컨테이너 안에서 돌아가는 각각의 앱들은 리눅스에서 돌아가는 앱들이다.  
+리눅스가 아닌 경우, 가상머신을 통해 리눅스를 설치할 수 있다.  
+그런데 이 과정이 까다롭기 때문에 도커가 자동으로 가상머신을 만들어주고 그 위에 리눅스를 설치해준다.  
 가상머신을 만들어가면서 도커를 사용하는 이유는 도커가 주는 편리성이 어마무시하기 때문이다.  
 
-##용어
+## 용어
 app store와 비슷하게 docker hub에서 필요한 sw를 다운받게 된다.  
 program과 비슷하게 docker hub에서 다운 받은 것을 image라고 부른다.  
 process와 비슷하게 image를 실제로 실행하는 것을 container라고 부른다.  
@@ -14,13 +14,13 @@ process와 비슷하게 image를 실제로 실행하는 것을 container라고 �
 도커허브에서 이미지를 다운받는 것을 **pull**이라고 한다.  
 이미지를 실행시키는 행위는 **run**이라고 한다.
 
-##pull
+## pull
 `docker pull image_name` 을 사용하면 registry로 부터 이미지를 다운받을 수 있다.  
 ex) `docker pull httpd`
 
 `docker images`를 사용하면 설치된 이미지들을 볼 수 있다.
 
-##run
+## run
 `docker run image_name`를 사용하면 이미지를 기반으로 컨테이너가 생성된다.  
 `docker ps`라는 명령어를 사용하면 컨테이너에 대한 정보를 볼 수 있다.  
 
@@ -33,7 +33,7 @@ ex) `docker run --name ws1 httpd`를 하면 ws1이라는 이름을 가진 httpd 
 현재 실행 중인 컨테이너는 삭제할 수 없으므로 stop을 하고 삭제해야한다.  
 `docker rmi image_name`을 이용해 이미지를 삭제할 수 있다.  
 
-##Network
+## Network
 도커를 이용하면 웹서버가 컨테이너에 설치된다.
 이 컨테이너가 설치된 운영체제를 Host라고 한다.  
 
@@ -43,7 +43,7 @@ ex) `docker run --name ws1 httpd`를 하면 ws1이라는 이름을 가진 httpd 
 -p는 publish의 줄임말이다. 위의 경우 localhost:8000으로 접속해야한다.   
 이 과정을 port forwarding 이라고 한다.  
 
-##명령어 실행
+## 명령어 실행
 `docker exec container_name COMMAND` 를 사용할 수 있다.  
 `docker exec ws1 pwd`는 ws1이라는 컨테이너 안에서 pwd를 실행한 것과 같다.  
 
@@ -57,8 +57,8 @@ gui환경에서 cli를 눌렀을 때와 같은 효과이다.
 `exit`를 하면 컨테이너에서 나올 수 있다.  
 sh는 기능이 부족하므로 /bin/bash를 히용해 bash shell을 사용해도 된다.  
 하지만 bash shell이 없을 수도 있으므로 이 경우에는 sh를 사용하면 된다.  
-컨테이너에는 nano, vim 에디터가 기본적으로 없다.
+컨테이너에는 nano, vim 에디터가 기본적으로 없다.  
 `apt update` `apt install nano` 를 이용하면 nano를 설치할 수 있다.  
 
-###참고자료
+## 참고자료
 https://www.youtube.com/playlist?list=PLuHgQVnccGMDeMJsGq2O-55Ymtx0IdKWf
