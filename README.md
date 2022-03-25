@@ -19,7 +19,16 @@
       같은 이미지에서 여러개의 컨테이너 생성 가능, 컨테이너가 바뀌거나 삭제되어도 이미지는 변하지 않음.
       docker는 layer의 개념 사용. 유니온 파일 시스템을 이용하여 여러개의 레이어를 하나의 파일 시스템으로 사용할 수 있게 해줌.
       </p>
-      <li><h3><strong>how to use Docker</strong></h3></li>
+      <li><h2><strong>What is benefit of using docker</strong></h2></li>
+      <ul>
+        <li>구성 단순화 - 하나의 Configuration으로 모든 플랫폼에서 실행할 수 있음. 하나의 docker 이미지를 다른 곳에서도 사용 가능</li>
+        <li>코드 관리 - 일관된 환경 제공(docker 이미지의 불변성!)</li?
+        <li>개발 생산성 향상 - 개발 환경과 운영 환경의 차이점 최소화. Vm에 비해 사용 자원이 적어 여러가지 서비스 실행 가능</li>
+        <li>애플리케이션 격리</li>
+        <li>빠른 배포</li>
+      </ul>
+        
+      
     </ol>
   </body>
   
