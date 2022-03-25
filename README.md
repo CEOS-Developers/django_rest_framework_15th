@@ -20,7 +20,6 @@
       docker는 layer의 개념 사용. 유니온 파일 시스템을 이용하여 여러개의 레이어를 하나의 파일 시스템으로 사용할 수 있게 해줌.
       </p>
       <li><h3><strong>how to use Docker</strong></h3></li>
-    
     </ol>
   </body>
   
