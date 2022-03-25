@@ -41,7 +41,7 @@
         <li>배포 - 서버에 새로운 버전, 기능 등 배포</li>
         <li>자동화 하고싶은 스크립트</li>
       </ul>
-      <strong>github action 사용 예시</strong><br><a href="https://fe-developers.kakaoent.com/2022/220106-github-actions/",target="__blank", title="usage of github action">카카오웹툰의 깃허브 액션 사용예</a>
+      <p><strong>github action 사용 예시</strong><br><a href="https://fe-developers.kakaoent.com/2022/220106-github-actions/",target="__blank", title="usage of github action">카카오웹툰의 깃허브 액션 사용예</a></p>
      <br><br>
     <p><h4><strong>이번 세미나에서 진행한 배포의 흐름</strong></h4>
     <ol>
