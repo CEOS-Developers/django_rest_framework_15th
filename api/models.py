@@ -1,3 +1,3 @@
 from django.db import models
 
-# Create your models here.
+# 2022-03-28, Modeling Instagram Data
