@@ -14,7 +14,7 @@
       그 후 CPU의 HVM을 이용해 KVM(Kernal Virtual Machine)과 반가상화 방식의 Xen 등장, 그러나 이것도 결국 추가적인 os설치를 이용한 가상화로써 성능 하락
       <br><br>
       이를 개선하기 위해 <strong>프로세스를 격리하는 방식</strong>이 등장, 이 방식을 리눅스에서 <strong>리눅스 컨테이너</strong> 라고 부름.
-      (현재의 docker는 lxc(linux container가 아닌  libcontainer라는 자체 컨테이너 사용함)
+      (현재의 docker는 lxc(linux container)가 아닌  libcontainer라는 자체 컨테이너 사용함)
       단순히 프로세스를 격리함으로 가볍고 빠름. 성능적으로도 거의 손실 없음
       컨테이너 실행에 필요한 모든 파일과 설정값을 포함하는 파일이 <strong>이미지</strong>로 무상태성, 불변성을 가짐
       같은 이미지에서 여러개의 컨테이너 생성 가능, 컨테이너가 바뀌거나 삭제되어도 이미지는 변하지 않음.
