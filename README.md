@@ -1,4 +1,3 @@
-[2주차 스터디]
 ## Week 2: 도커-깃허브 액션을 이용한 자동배포
 
 ### 도커
@@ -103,30 +102,29 @@ Actions 탭에서 실행하거나 master에 push 한 뒤 잠시 기다리면 다
 - 좋아요 취소
 
 ### 모델 설명
-<img width=75% src="https://user-images.githubusercontent.com/63996052/160384055-0edaa6fa-ed15-4afc-98e9-82f3982fc34a.png">
+<img width=75% src="https://user-images.githubusercontent.com/63996052/160455319-d78202da-6445-4bbb-a9a9-f59aec71d8fe.png">
 
-**[User]**
-- 장고에서 기본으로 제공하는 auth_user와 OneToOne Link with User Model (Profile) (OneToOneField)
-- 이름, 사용자 이름(아이디), 비밀번호, 웹사이트, 소개 컬럼
-- 생성 날짜, 업데이트 날짜, 삭제 여부
+**[Profile]**
+- 장고에서 기본으로 제공하는 auth_user와 OneToOne Link with User Model (OneToOneField)
+- 이름, 사용자 이름(아이디), 비밀번호 등의 정보는 User 테이블 참조
+- 휴대전화 번호, 웹사이트, 소개 컬럼
 - 사진, 영상 업로드 기능에만 집중하기 위해 유저의 다른 정보들은 생략
 
 **[Post]**
 - User와 1:N 관계, user_id (Foreignkey)
-- 내용 컬럼, 생성 날짜, 업데이트 날짜, 삭제 여부
+- 내용 컬럼, 생성 날짜, 삭제 여부
 
 **[File]**
 - Post와 1:N 관계, post_id (Foreignkey)
 - 타입(이미지/비디오), 해당 파일의 url 주소 컬럼
-- 생성 날짜, 업데이트 날짜, 삭제 여부
 
 **[Like]**
 - User와 N:M, Post와 N:M 관계 (ManyToManyField)
-- 삭제 여부
+- 생성 날짜, 삭제 여부
 
 **[Comment]**
 - User와 N:M, Post와 N:M 관계 (ManyToManyField)
-- 생성 날짜, 업데이트 날짜, 삭제 여부 
+- 내용 컬럼, 생성 날짜, 삭제 여부 
 
 ### ORM 적용해보기
 1. 데이터베이스에 해당 모델 객체 3개 넣기
