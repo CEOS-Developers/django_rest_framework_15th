@@ -29,8 +29,6 @@
 > 새로운 파일이 추가되면 새로운 Layer가 생성되고 도커는 여러 개의 Layer를 묶어서 하나의 파일시스템으로 만들어줌.
 >> EX. nginx 이미지가 A + nginx의 집합이라면 WebApp 이미지는 A + nginx의 집합에 soruce 이미지를 추가한 A + nginx + source Layer로 구성된다.  
 
-
-
 ## 도커의 원리
 
 EC2에서 서버를 만들면 Ubuntu OS로 인스턴스가 생성되지만 내부에는 프로그래머가 로컬에서 작업하는데 필요한 여러 환경들 (Ex. python, git, 여러 라이브러리 파일들)이 존재하지 않는다.
