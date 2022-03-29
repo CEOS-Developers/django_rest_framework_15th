@@ -102,7 +102,7 @@ Actions 탭에서 실행하거나 master에 push 한 뒤 잠시 기다리면 다
 - 좋아요 취소
 
 ### 모델 설명
-<img width=75% src="https://user-images.githubusercontent.com/63996052/160455319-d78202da-6445-4bbb-a9a9-f59aec71d8fe.png">
+<img width=75% src="https://user-images.githubusercontent.com/63996052/160544304-65b9f2bf-bd1f-46da-aa8a-aa45e7a2421a.png">
 
 **[Profile]**
 - 장고에서 기본으로 제공하는 auth_user와 OneToOne Link with User Model (OneToOneField)
@@ -127,9 +127,49 @@ Actions 탭에서 실행하거나 master에 push 한 뒤 잠시 기다리면 다
 - 내용 컬럼, 생성 날짜, 삭제 여부 
 
 ### ORM 적용해보기
+임의의 User를 하나 생성하고, 해당 유저를 ForeignKey 필드로 포함하는 Post 모델을 선택하여 진행
+  
 1. 데이터베이스에 해당 모델 객체 3개 넣기
+
+ **ORM 쿼리**
+ ```
+ one = Post.objects.create(content="첫번째 게시글", user_id=1)
+ two = Post.objects.create(content="두번째 게시글", user_id=1)
+ thr = Post.objects.create(content="세번째 게시글", user_id=1)
+ ```
+ **결과화면**
+ ![image](https://user-images.githubusercontent.com/63996052/160549121-7526685d-f6ee-4687-b943-50aefb88db65.png)
+
+  
 2. 삽입한 객체들을 쿼리셋으로 조회해보기 (단, 객체들이 객체의 특성을 나타내는 구분가능한 이름으로 보여야 함)
+
+ **ORM 쿼리**
+ ```
+ Post.objects.all()
+ ```
+ **결과화면**
+ ![image](https://user-images.githubusercontent.com/63996052/160549260-11b31257-cc3a-49a9-b90f-8fdb0e66d3bf.png)
+
+  
 3. filter 함수 사용해보기
+
+ **ORM 쿼리**
+ ```
+ Post.objects.filter(id=2)
+ Post.objects.filter(user_id=1)
+ Post.objects.filter(content="첫번째 게시글")
+ ```
+**결과화면**
+  ![image](https://user-images.githubusercontent.com/63996052/160549484-dbe25899-da79-474b-92ea-f07cfda51ae8.png)
 
 
 ### 회고
+장고와 같이 모델링하는 환경을 처음 접해보기 때문에, 데이터베이스를 설계하는 과정에서 다양한 고민이 있었다.
+
+이전에 해오던 대로 soft delete를 사용하는 것이 맞는지, CharField, TextField를 되도록이면 null=true 상태로 작성하지 않는 것이 맞는지 고민했다.
+
+또 인스타그램의 사진, 영상 등록이라는 주요 기능만을 고려하기 위해 많은 컬럼을 쳐내는 과정이 있었다.
+
+예를 들면 수정 시점은 기록할 필요가 없다고 느껴 updated_at과 같은 값을 사용하지 않았는데, 유의미한 데이터만 남았기를 바란다.
+
+마지막으로 깃허브 액션 확인 결과 제대로 배포되지 않음을 확인하여 이를 해결해야할 것 같다.
