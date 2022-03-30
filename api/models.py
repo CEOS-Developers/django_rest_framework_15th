@@ -29,6 +29,15 @@ class Follower(models.Model):
     status = models.CharField(max_length=20, default='valid')
 
 
+class Location(models.Model):
+    name = models.TextField()
+    latitude = models.TextField()
+    longitude = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=20, default='valid')
+
+
 class Post(models.Model):
     POST_TYPE = (
         ("po", "Post"),
@@ -37,6 +46,7 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     script = models.TextField(blank=True, null=True)
     type = models.CharField(max_length=20, choices=POST_TYPE)
+    location = models.ForeignKey(Location, on_delete=models.PROTECT, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, default='valid')
@@ -53,16 +63,6 @@ class Image(models.Model):
 class Movie(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     url = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=20, default='valid')
-
-
-class Location(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    name = models.TextField()
-    latitude = models.TextField()
-    longitude = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, default='valid')
