@@ -8,8 +8,8 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=20, blank=True, null=True)
     nickname = models.CharField(max_length=30)
-    profile_scripts = models.TextField()
-    profile_image = models.ImageField()
+    profile_scripts = models.TextField(blank=True, null=True)
+    profile_image = models.ImageField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)  # 해당 레코드 생성 시 현재 시간 자동 저장
     updated_at = models.DateTimeField(auto_now=True)  # 해당 레코드 갱신 시 현재 시간 자동 저장
     status = models.CharField(max_length=20, default='valid')
