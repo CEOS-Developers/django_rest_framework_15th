@@ -149,3 +149,84 @@ jobs:
 ### 빌드 후 실행 (Ec2 DNS 주소로 접속)
 
 ![스크린샷 2022-03-24 오전 2 01 33](https://user-images.githubusercontent.com/59060780/159755075-c4675ec6-4993-4269-8a9b-bac88865f52e.png)
+
+
+---------
+
+## 인스타그램 모델링
+
+### mysql 세팅 및 Django와 연동
+
+![image](https://user-images.githubusercontent.com/59060780/160875221-57b03d71-56c4-41f0-a249-736d927a8627.png)
+
+> mysql 설치 및 CEOS DB 생성
+>> settings/dev.py에서 생성한 데이터베이스 정보로 설정 변경(보안을 위해 .env 파일에 작성)
+
+* mysqlclient를 설치하려 했지만 오류발생 => homebrew에서 mysql 재설치 후 다시 설치하니 성공
+
+
+### 모델링 (ERD 설계)
+
+#### ERD 설계
+
+![image](https://user-images.githubusercontent.com/59060780/160880621-9b794f28-08cb-416d-b663-3f5ee05f8950.png)
+
+> 유저, 게시물 (사진, 동영상) 중심으로 ERD를 설계했다.
+
+* User: Django에서 기본으로 제공하는 유저 모델 사용
+* Profile: User 테이블과 OnetoOne으로 연결, 인스타그램 개인 프로필에 필요한 정보들
+* Following, Follower: 기존에는 한 테이블로 팔로워, 팔로잉 두 컬럼을 한 번에 관리하려 했으나 Django에서 migrate시 오류 발생 => 각각의 테이블로 나눠서 구현 (User 테이블과 일대다 관계)
+* Post: 인스타그램에서 사용자가 올리는 릴스와 포스팅하는 게시글 테이블. Image, Movie 테이블을 생성하여 각각의 테이블에 게시물 식별번호를 외래키로 주어 연걸 (User:Post = 1:N, Post:(Image,Movie) = 1:N)
+* Liking, Comment, Location: Post 테이블에 필요한 추가 테이블들. Location 테이블은 Post 테이블과 1:1관계로 Lcation의 pk를 Post 테이블에 외래키로 저장. Liking, Comment 테이블은 Post와 User의 중간 테이블로 각각의 pk들을 외래키로 가짐
+* Story, ViewingStory: 인스타그램의 스토리는 게시글과는 다른 메커니즘을 갖고있는 것으로 판단해서 새로운 테이블로 생성. 따로 스토리 조회 데이터를 저장하는 ViewingStory 테이블을 만들어 User 테이블과 연결하고 컬럼으로 좋아요 여부까지 저장.
+
+
+#### models.py 작성
+
+* 예시
+
+```
+#api/models.py
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=20, blank=True, null=True)
+    nickname = models.CharField(max_length=30)
+    profile_scripts = models.TextField(blank=True, null=True)
+    profile_image = models.ImageField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)  # 해당 레코드 생성 시 현재 시간 자동 저장
+    updated_at = models.DateTimeField(auto_now=True)  # 해당 레코드 갱신 시 현재 시간 자동 저장
+    status = models.CharField(max_length=20, default='valid')
+    
+```
+
+#### migrate 파일 생성
+
+```
+$ python manage.py makemigrations api
+$ python manage.py migrate api
+```
+> python manage.py makemigrations --name {지정할 이름} {앱 이름} 명령어를 사용하면 migration 파일 이름을 바꿔서 저장 가능
+
+* migration이란? : 모델의 변경 내역을 DB 스키마에 저장하는 방법. => DB 스키마를 git처럼 버전을 나누어서 관리를 용이하게 해주는 시스템
+
+#### ORM 사용해보기
+> User 테이블의 인스턴스 3개 생성
+
+![image](https://user-images.githubusercontent.com/59060780/160882149-3c19ad46-5fb9-40c7-8d49-57c10c47d11b.png)
+
+> User 테이블 인스턴스 3개를 각각 외래키로 갖는 Post 테이블 인스턴스 3개 생성
+
+
+![image](https://user-images.githubusercontent.com/59060780/160882359-b5049a21-ec82-4072-8f6f-154d0ba64fe4.png)
+
+> 삽입한 Post 테이블 인스턴스들 조회
+
+![image](https://user-images.githubusercontent.com/59060780/160882636-e35875f4-c44c-4188-889c-7a9e2a15d0e1.png)
+
+![image](https://user-images.githubusercontent.com/59060780/160882653-bc06f979-2476-4478-9419-748fa37fa7ce.png)
+
+> filter 사용해서 조회
+
+![image](https://user-images.githubusercontent.com/59060780/160882713-1a0562c4-50a4-433f-b8c7-3b3afc108e25.png)
+
