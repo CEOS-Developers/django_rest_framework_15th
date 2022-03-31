@@ -1,7 +1,7 @@
 #### CEOS 15기 백엔드 스터디 (2) 모델링 및 drf 연습을 위한 레포
 
 ---
-# Docker
+# 2. Docker
 
 
 ## 'Docker file', 'Docker-image', 'Docker-container' 
@@ -45,4 +45,9 @@
 #### docker-compose.yml
 ![A2C3D26E-1D1A-4068-9462-C8719AA225A4](https://user-images.githubusercontent.com/77188666/160082978-dfc08651-c3e5-471d-b4e0-8ba07daf7b45.jpeg)
 ---
+
+---
+# 3. Instagram Data Modeling
+
+
 
