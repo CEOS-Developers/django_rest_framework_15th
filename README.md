@@ -1,4 +1,4 @@
-# Docker
+# 2주차 : Docker
 도커는 리눅스 운영체제의 기술이다.  
 도커 위에서 돌아가는 컨테이너, 그리고 컨테이너 안에서 돌아가는 각각의 앱들은 리눅스에서 돌아가는 앱들이다.  
 리눅스가 아닌 경우, 가상머신을 통해 리눅스를 설치할 수 있다.  
@@ -62,3 +62,32 @@ sh는 기능이 부족하므로 /bin/bash를 히용해 bash shell을 사용해�
 
 ## 참고자료
 https://www.youtube.com/playlist?list=PLuHgQVnccGMDeMJsGq2O-55Ymtx0IdKWf
+
+
+# 3주차 : 모델링과 Django ORM
+- null=True와 blank=True
+    - 둘 다 default 값은 False
+    - null=True는 DB 필드 값이 NULL로 저장 (NULL)
+    - blank=True는 필드가 폼에서 빈 채로 저장 (빈 문자열 '')
+    - CharField와 TextField는 예외. 아무 값을 입력하지 않으면 빈문자열('')값로 저장
+
+
+- Foreignkey
+    - 1:N 관계
+    - N인 쪽에서 관계 선언
+
+
+- Migration
+    - `python manage.py makemigrations <app-name>` 을 통해 마이그레이션 파일을 만든다.
+    - `python manage.py migrate <app-name>`을 통해 마이그레이션 파일을 DB 스키마에 반영한다.
+
+
+- Django ORM
+    - Object Relation Mapping, 객체지향 언어와 RDBMS 시스템을 매핑
+    - 객체지향 프로그래밍을 쉽게 하도록 도움
+    - SQL문 사용하지 않고 DB 접근 가능
+    - ORM 쿼리를 이용하자!
+        - model_name.objects.all() 등이 ORM 쿼리이다.
+
+
+
