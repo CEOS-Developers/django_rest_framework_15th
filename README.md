@@ -90,4 +90,34 @@ https://www.youtube.com/playlist?list=PLuHgQVnccGMDeMJsGq2O-55Ymtx0IdKWf
         - model_name.objects.all() 등이 ORM 쿼리이다.
 
 
+## 모델링  
+- 인스타그램 서비스
+  1. 사용자는 각자의 프로필에 이름, 이메일, 상태메세지를 저장할 수 있다.
+  2. 사용자는 게시물을 CRUD 할 수 있다. 이때 사진, 영상, 내용글이 함께 create 된다.
+  3. 사용자는 모든 게시물에 댓글을 달 수 있다.
+  4. 사용자는 모든 게시물과 댓글에 좋아요를 누를 수 있다.
+
+
+- Profile
+  - 기본 User 모델에서 제공해주는 username, password, email 등을 그대로 사용하고,  
+  Profile 모델에는 상태메세지를 의미하는 status_msg를 추가했다.
+- Post
+    - 게시물을 관리하는 모델  
+    한 사용자가 여러 게시물을 작성할 수 있으므로 user와 일대다 관계이다.  
+    게시물 고유 id가 존재하며, 내용을 쓸 수 있는 content, 생성일자를 나타내는 create_date가 있다.  
+    어떤 사용자가 작성한 Post인지 식별하기 위해 user 모델을 foreignkey로 두었다.
+- Comment
+    - 댓글을 관리하는 모델  
+    한 게시물에 여러 댓글이 생성될 수 있으므로 post와 일대다 관계이다.  
+    댓글별 고유 id가 존재하며, 댓글 내용을 쓸 수 있는 content, 생성일자를 나타내는 create_date가 있다.      
+- Media
+    - 사진, 영상을 업로드 하기 위한 모델  
+    한 게시물에 여러 파일이 업로드 될 수 있으므로 post와 일대다 관계이다.  
+    어떤 게시물에 해당되는 파일인지 구별하기 위해 post 모델을 foreignkey로 두었다.
+- Like
+    - 좋아요 갯수를 관리하는 모델
+    post별로 좋아요 갯수를 다르게 저장해야 하므로, post모델 안에 like모델을 foreignkey로 두었다.  
+    마찬가지로 댓글 별로 좋아요 갯수를 저장해야 하므로 comment 안에 like모델을 foreignkey로 두었다.
+
+<img src="img_erd.jpg" width="650"/>
 
