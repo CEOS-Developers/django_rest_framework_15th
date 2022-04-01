@@ -13,8 +13,8 @@ class Post(models.Model):
     count_like = models.IntegerField(default=0)
     count_comment = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField()
-    deleted_at = models.DateTimeField()
+    updated_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True)
     is_archived = models.BooleanField(default=False)
     is_hide_count = models.BooleanField(default=False)
     is_turnoff_comment = models.BooleanField(default=False)
@@ -30,8 +30,8 @@ class Comment(models.Model):
     comment_id = models.BigIntegerField()   # comment of comment
     count_comment = models.IntegerField(default=0)  # comment number of comment
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField()
-    deleted_at = models.DateTimeField()
+    updated_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True)
 
 
 # 3 only for image not video
@@ -42,8 +42,8 @@ class File(models.Model):
     order = models.IntegerField()
     filter = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField()
-    deleted_at = models.DateTimeField()
+    updated_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True)
 
 
 # 4
@@ -75,7 +75,7 @@ class PostLike(models.Model):
     post_id = models.ForeignKey('Post', on_delete=models.CASCADE)     # FK
     user_id = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
     created_at = models.DateTimeField(auto_now_add=True)
-    deleted_at = models.DateTimeField()
+    deleted_at = models.DateTimeField(null=True)
 
 
 # 8
@@ -84,7 +84,7 @@ class CommentLke(models.Model):
     comment_id = models.ForeignKey('Comment', on_delete=models.CASCADE)     # FK
     user_id = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
     created_at = models.DateTimeField(auto_now_add=True)
-    deleted_at = models.DateTimeField()
+    deleted_at = models.DateTimeField(null=True)
 
 
 # 9
@@ -101,14 +101,14 @@ class User(models.Model):
     number_following = models.IntegerField(default=0)
     is_public = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField()
-    deleted_at = models.DateTimeField()
+    updated_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True)
 
 
 # 10
-class Follow(models.Model):
-    id = models.AutoField(primary_key=True)  # Automatic primary key
-    user1 = models.ForeignKey('User', on_delete=models.CASCADE)
-    user2 = models.ForeignKey('User', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    deleted_at = models.DateTimeField()
+# class Follow(models.Model):
+#     id = models.AutoField(primary_key=True)  # Automatic primary key
+#     user1 = models.ManyToManyField('User')
+#     user2 = models.ManyToManyField('User')
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     deleted_at = models.DateTimeField()
