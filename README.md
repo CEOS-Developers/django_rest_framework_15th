@@ -121,3 +121,25 @@ https://www.youtube.com/playlist?list=PLuHgQVnccGMDeMJsGq2O-55Ymtx0IdKWf
 
 <img src="img_erd.jpg" width="650"/>
 
+- 추가 : ImageField를 사용하려면 `pip install Pillow` 필수
+
+- 장고 Shell 시작하기
+    - `python manage.py shell`을 사용하여 shell 시작
+    - `from api.models import User, Profile, Like, Post`를 사용하여 Post 모델 불러오기
+    - `from django.utils import timezone`를 사용하여 현재시간을 부르기
+    - `l = Like(like_cnt=0)` `l.save()` 좋아요 모델 데이터
+    - `u = User(username="홍길동")` `u.save()` 유저 모델 데이터
+    - `pro = Profile(user=u)` `pro.save()` 프로필 모델 데이터
+    - `p = Post(user=u, like=l, content="첫글", create_date=timezone.now())` `p.save()` 포스트 모델 데이터
+    - 위의 과정을 모두 마치면 홍길동이 "첫글"이라고 올린 게시글이 업로드 되는 것이다.
+    - ORM을 사용하여 `Post.objects.all()`을 하면 글의 정보를 알 수 있다.
+<img src="img_shell1.jpg" width="650"/>
+    - 앞에 데이터를 하나 삭제했어서 (p.delete() 이용) id가 2부터 시작한다
+    - 이렇게 하면 id 2번인 데이터가 뭔지 알 수 없어서 models.py에 다음과 같은 코드를 추가하자
+    - `def __str__(self):`  
+        `return self.content`
+    - 결과는 아래와 같다. content로 게시물을 구별할 수 있다.
+<img src="img_shell2.jpg" width="650"/>
+
+- `Post.objects.filter(id=3)` 을 이용하면 id 3인 글만 불러올 수 있다.
+<img src="img_shell3.jpg" width="650"/>
