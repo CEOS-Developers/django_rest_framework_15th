@@ -99,7 +99,7 @@ CEOS 14기 백엔드 스터디 모델링 및 drf 연습을 위한 레포
 - ```if ! type docker > /dev/null```로 시작하는 코드 블록은 docker가 깔려있지 않을 때 설치해주는 코드
 - ```if ! type docker-compose > /dev/null```로 시작하는 코드 블록은 docker-compose가 깔려있지 않을 때 설치해주는 코드
   
-- ```
+  ```
   sudo docker-compose -f /home/ubuntu/srv/ubuntu/docker-compose.prod.yml up --build -d
   ```
   - 위의 맨 마지막 코드가 최종 실행 코드로 해당 command에 의해 서버가 빌드되고 실행됨
