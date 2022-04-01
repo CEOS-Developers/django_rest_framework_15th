@@ -39,6 +39,7 @@ class File(models.Model):
     id = models.AutoField(primary_key=True)     # Automatic primary key
     post_id = models.ForeignKey('Post', on_delete=models.CASCADE)     # FK
     file = models.FileField(upload_to='files/')
+    order = models.IntegerField()
     filter = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField()
@@ -107,7 +108,7 @@ class User(models.Model):
 # 10
 class Follow(models.Model):
     id = models.AutoField(primary_key=True)  # Automatic primary key
-    user1_id = models.BigIntegerField()
-    user2_id = models.BigIntegerField()
+    user1 = models.ForeignKey('User', on_delete=models.CASCADE)
+    user2 = models.ForeignKey('User', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField()
