@@ -61,3 +61,8 @@
 ### How to Upload Files With Django  
 https://simpleisbetterthancomplex.com/tutorial/2016/08/01/how-to-upload-files-with-django.html  
 
+```
+id = models.BigIntegerField()
+id = models.AutoField(primary_key=True)     # Automatic primary key
+```
+
