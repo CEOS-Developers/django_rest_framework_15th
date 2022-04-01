@@ -25,5 +25,5 @@ class Comment(models.Model):
 
 class Media(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    photo = models.ImageField(upload_to="", blank=True, null=True)
+    #photo = models.ImageField(upload_to="", blank=True, null=True)
     create_date = models.DateTimeField()
