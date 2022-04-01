@@ -6,7 +6,7 @@ from django.utils import timezone
 
 # 1
 class Post(models.Model):
-    id = models.BigIntegerField()       # key
+    id = models.AutoField(primary_key=True)     # Automatic primary key
     user_id # foreign key
     caption = models.CharField(max_length=2200)
     location = models.CharField(max_length=100)
@@ -22,7 +22,7 @@ class Post(models.Model):
 
 # 2
 class Comment(models.Model):
-    id = models.BigIntegerField()           # key
+    id = models.AutoField(primary_key=True)     # Automatic primary key
     post_id  # foreign key
     user_id  # foreign key
     content = models.CharField(max_length=2200)
@@ -36,7 +36,7 @@ class Comment(models.Model):
 
 # 3 only for image not video
 class File(models.Model):
-    id = models.BigIntegerField()  # key
+    id = models.AutoField(primary_key=True)     # Automatic primary key
     post_id  # foreign key
     file = models.FileField(upload_to='files/')
     filter = models.IntegerField(default=0)
@@ -47,7 +47,7 @@ class File(models.Model):
 
 # 4
 class Tag(models.Model):
-    id = models.BigIntegerField()   # key
+    id = models.AutoField(primary_key=True)  # Automatic primary key
     file_id  # foreign key
     user_id  # foreign key
     width = models.DecimalField(decimal_places=1, max_digits=3)
@@ -56,7 +56,7 @@ class Tag(models.Model):
 
 # 5
 class Alttext(models.Model):
-    id = models.BigIntegerField()  # key
+    id = models.AutoField(primary_key=True)  # Automatic primary key
     file_id  # foreign key
     alt_text = models.CharField(max_length=125)
 
@@ -64,14 +64,14 @@ class Alttext(models.Model):
 
 # 6
 class Hashtag(models.Model):
-    id = models.BigIntegerField()   # key
+    id = models.AutoField(primary_key=True)  # Automatic primary key
     post_id  # foreign key
     hashtag = models.CharField(max_length=140)
 
 
 # 7
 class PostLike(models.Model):
-    id = models.BigIntegerField()   # key
+    id = models.AutoField(primary_key=True)  # Automatic primary key
     post_id # foreign key
     user_id # foreign key
     created_at = models.DateTimeField(auto_now_add=True)
@@ -80,7 +80,7 @@ class PostLike(models.Model):
 
 # 8
 class CommentLke(models.Model):
-    id = models.BigIntegerField()   # key
+    id = models.AutoField(primary_key=True)  # Automatic primary key
     comment_id # foreign key
     user_id # foreign key
     created_at = models.DateTimeField(auto_now_add=True)
@@ -89,7 +89,7 @@ class CommentLke(models.Model):
 
 # 9
 class User(models.Model):
-    id = models.BigIntegerField()   # key
+    id = models.AutoField(primary_key=True)  # Automatic primary key
     username = models.CharField(max_length=30)
     password = models.CharField(max_length=32)   # Hash
     name = models.CharField(max_length=30)
@@ -107,7 +107,7 @@ class User(models.Model):
 
 # 10
 class Follow(models.Model):
-    id = models.BigIntegerField()   # key
+    id = models.AutoField(primary_key=True)  # Automatic primary key
     user1_id = models.BigIntegerField()
     user2_id = models.BigIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
