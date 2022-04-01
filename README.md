@@ -1,7 +1,6 @@
-#Week2 : Docker와 Github Action을 이용한 자동 배포하기
+# Week2 : Docker와 Github Action을 이용한 자동 배포하기
 
 ## Docker
-***
 ![Microsoft-Docker-logo](https://user-images.githubusercontent.com/68195241/160120711-231bf27e-8333-403a-aa99-a9d3ad5172c6.png)
 - 리눅스 컨테이너 기반의 오픈소스 가상화 플랫폼
 - 컨테이너에 '이미지(Image)'를 담아서 구동시키는 방식
@@ -24,7 +23,6 @@
 
 
 ## Github Actions
-***
 ![Continuous-Deployment-con-GitHub-Actions](https://user-images.githubusercontent.com/68195241/160120267-8a25411d-0ad2-414f-84c2-48f955bf2746.png)
 - Github에서 공식적으로 제공하는 CI/CD 툴
 - Workflow 자동화툴
@@ -36,8 +34,23 @@
   * 프로덕션 환경으로 서비스를 배포할 수 있도록 준비하는 프로세스
 - CD (Continuous Delivery)
   * 배포
-  * 프로덕션 환경으로 서비스를 배포할 수 있도록 준비하는 프로세스
+  * 저장소로 전달된 프로덕션 서비스를 실제 사용자들에게 배포하는 프로세스
 
 ### Workflow
 - 하나 이상의 Job으로 구성되고, Event에 의해 예약되거나 트리거될 수 있는 자동화된 절차
 - YAML 파일로 작성 + ```.git/workflows```에 저장
+
+
+***
+
+# Week3 : 모델링과 Django ORM
+
+## 모델링
+
+### Instagram 서비스 설명
+- 사용자마다 한 개의 프로필을 가질 수 있음
+- 사용자는 게시글을 올릴 수 있음 (수정 가능)
+- 게시글에는 반드시 사진이나 영상 하나가 포함되어야 함
+- 사용자는 게시글에 좋아요를 남길 수 있음
+- 사용자는 게시글에 댓글을 달 수 있음 (수정 불가능)
+- 사용자는 댓글에 대댓글을 달 수 있음 (수정 불가능)
