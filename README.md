@@ -58,5 +58,6 @@
 ### ERD (using ERDCloud)
 ![CEOS15](https://user-images.githubusercontent.com/77188666/160993717-d5db4812-5d7c-400d-9075-8b9d77481bb1.png)
 
-
+### How to Upload Files With Django  
+https://simpleisbetterthancomplex.com/tutorial/2016/08/01/how-to-upload-files-with-django.html  
 
