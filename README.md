@@ -54,3 +54,50 @@
 - 사용자는 게시글에 좋아요를 남길 수 있음
 - 사용자는 게시글에 댓글을 달 수 있음 (수정 불가능)
 - 사용자는 댓글에 대댓글을 달 수 있음 (수정 불가능)
+
+### 모델 설명
+![instaClone_ERD](https://user-images.githubusercontent.com/68195241/161352152-ff55b437-23a7-4664-a3ad-f6838844fe3c.png)
+#### User
+- user_id : 사용자 id
+- user_email : 사용자 이메일
+- user_pw : 사용자 비밀번호
+- user_bday : 사용자 생일
+
+#### Profile
+- user_id : 사용자 id (사용자 이름)
+- profile_pic : 프로필 사진
+- profile_name : 프로필 이름
+- profile_website : 프로필 웹사이트
+- profile_bio : 프로필 소개
+
+#### Post
+- post_id : 게시글 id
+- user_id : 사용자 id (게시글 작성자)
+- content : 게시글 내용
+- created_at : 게시글 최초 작성 날짜
+- modified_at : 게시글 최근 수정 날짜
+
+#### Media
+- post_id : 게시글 id (어느 게시글의 미디어인지)
+- content : 미디어 내용
+- content_type : 사진/영상 (미디어 종류)
+
+#### Comment
+- comment_id : 댓글 id
+- post_id : 게시글 id (어느 게시글에 단 댓글인지)
+- user_id : 사용자 id (댓글 작성자)
+- content : 댓글 내용
+- created_at : 댓글 최초 작성 날짜
+
+#### Reply
+- reply_id : 대댓글 id
+- post_id : 게시글 id (어느 게시글에 있는 댓글의 대댓글인지)
+- comment_id : 댓글 id (어느 댓글의 대댓글인지)
+- user_id : 사용자 id (대댓글 작성자)
+- content : 대댓글 내용
+- created_at : 대댓글 최초 작성 날짜
+
+#### Like
+- post_id : 게시글 id (어느 게시글의 좋아요인지)
+- user_id : 사용자 id (좋아요 등록자)
+- created_at : 좋아요 등록일
