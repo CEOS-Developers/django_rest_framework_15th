@@ -58,6 +58,27 @@
 ### ERD (using ERDCloud)
 ![CEOS15](https://user-images.githubusercontent.com/77188666/160993717-d5db4812-5d7c-400d-9075-8b9d77481bb1.png)
 
+
+### Django Model Data Type
+
+####
+|Data type|Django model type|Database MySQL DDL|Description - Validation - Notes|
+|---|---|---|---|
+|Boolean|models.BooleanField()|bool NOT NULL|Creates a boolean field to store True/False (or 0/1) values|
+|Date/time|models.DateField()|date NOT NULL|Creates a date field to store dates|
+|Date/time|models.DateTimeField()|datetime NOT NULL|Creates a datetime field to store dates with times|
+|Number|models.AutoField()|integer AUTO_INCREMENT NOT NULL|Creates an integer that autoincrements, primarly used for custom primary keys|
+|Number|models.IntegerField()|integer NOT NULL|Creates a column to store integer numbers.|
+|Number|models.DecimalField(decimal_places=X,max_digits=Y)|numeric(X, Y) NOT NULL|Enforces a number have a maximum X digits and Y decimal points Creates a decimal field to store decimal numbers.|
+|Text|models.CharField(max_length=N)|varchar(50) NOT NULL|Creates a text column, where the max_length argument is required to specify the maximum length in characters.|
+|Text (Specialized)|models.FileField()|varchar(100) NOT NULL|Enforces and provides various utilities to handle files.|
+
+
 ### How to Upload Files With Django  
 https://simpleisbetterthancomplex.com/tutorial/2016/08/01/how-to-upload-files-with-django.html  
+
+```
+id = models.BigIntegerField()
+id = models.AutoField(primary_key=True)     # Automatic primary key
+```
 
