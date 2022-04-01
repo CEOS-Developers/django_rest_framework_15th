@@ -122,6 +122,9 @@ https://www.youtube.com/playlist?list=PLuHgQVnccGMDeMJsGq2O-55Ymtx0IdKWf
 <img src="img/3/erd.JPG" width="650"/>
 
 - 추가 : ImageField를 사용하려면 `pip install Pillow` 필수
+  - 하지만 pillow 때문에 도커 빌드가 계속 실패했다 -> uninstall pillow 하니 정상적으로 빌드 됨
+  - 구글링 결과 pip 버전 문제.. 라던데 더 알아봐야 할 것 같다.
+
 
 - 장고 Shell 시작하기
     - `python manage.py shell`을 사용하여 shell 시작
