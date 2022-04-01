@@ -119,7 +119,7 @@ https://www.youtube.com/playlist?list=PLuHgQVnccGMDeMJsGq2O-55Ymtx0IdKWf
     post별로 좋아요 갯수를 다르게 저장해야 하므로, post모델 안에 like모델을 foreignkey로 두었다.  
     마찬가지로 댓글 별로 좋아요 갯수를 저장해야 하므로 comment 안에 like모델을 foreignkey로 두었다.
 
-<img src="img_erd.jpg" width="650"/>
+<img src="img_erd.JPG" width="650"/>
 
 - 추가 : ImageField를 사용하려면 `pip install Pillow` 필수
 
@@ -133,13 +133,15 @@ https://www.youtube.com/playlist?list=PLuHgQVnccGMDeMJsGq2O-55Ymtx0IdKWf
     - `p = Post(user=u, like=l, content="첫글", create_date=timezone.now())` `p.save()` 포스트 모델 데이터
     - 위의 과정을 모두 마치면 홍길동이 "첫글"이라고 올린 게시글이 업로드 되는 것이다.
     - ORM을 사용하여 `Post.objects.all()`을 하면 글의 정보를 알 수 있다.
-<img src="img_shell1.jpg" width="650"/>
-    - 앞에 데이터를 하나 삭제했어서 (p.delete() 이용) id가 2부터 시작한다
-    - 이렇게 하면 id 2번인 데이터가 뭔지 알 수 없어서 models.py에 다음과 같은 코드를 추가하자
-    - `def __str__(self):`  
-        `return self.content`
-    - 결과는 아래와 같다. content로 게시물을 구별할 수 있다.
-<img src="img_shell2.jpg" width="650"/>
+<img src="img_shell1.JPG" width="650"/>
+앞에서 데이터를 하나 삭제했어서 (p.delete() 이용) id가 2부터 시작한다  
+이렇게 하면 id 2번인 데이터가 뭔지 알 수 없어서 models.py에 다음과 같은 코드를 추가하자  
+`def __str__(self):`  
+`return self.content`  
+
+
+결과는 아래와 같다. content로 게시물을 구별할 수 있다.  
+<img src="img_shell2.JPG" width="650"/>
 
 - `Post.objects.filter(id=3)` 을 이용하면 id 3인 글만 불러올 수 있다.
-<img src="img_shell3.jpg" width="650"/>
+<img src="img_shell3.JPG" width="650"/>
