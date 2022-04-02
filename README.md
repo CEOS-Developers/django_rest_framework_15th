@@ -101,7 +101,7 @@ show tables;            # 전체 Table 조회
 ![CEOS15](https://user-images.githubusercontent.com/77188666/160993717-d5db4812-5d7c-400d-9075-8b9d77481bb1.png)
 
 
-#### DB Model ( `api/model.py` 의 주석 참고 )
+#### DB Model ( [api/model.py](https://github.com/yourzinc/django_rest_framework_15th/blob/yourzinc/api/models.py) 주석 참고 )
  
 1. Post 게시글  
 2. Comment  댓글  
@@ -222,7 +222,7 @@ Django Terminal > `python manage.py shell`
 ![queryset exercise](https://user-images.githubusercontent.com/77188666/161371388-47721a98-be40-41d4-9ace-f2cdfb4b50c1.PNG)
   
 
-### Extra)  def __ str__(self):
+#### Extra : Python return format
 
 Post
 ```
@@ -236,6 +236,36 @@ User
     def __str__(self):
         return "{} {}".format(self.id, self.username)
         # 출력 형식 = id + user_id
+```
+
+### 회고
+```
+MySQL은 RDBMS으로 Model을 만들 때, Fields와 Key에 대해 명확히 정의해야 한다는 것을 알게 되었다. 
+
+Model을 정의한 후 Relation을 정의할 때 1:1, 1:N, N:M로 나눌 때 다시 Model을 수정하기도 했다.
+Model은 한번에 완벽하게 정의 할 수 없는 것을 깨닫고, 새로운 Model이 추가될 때마다 기존의 Model과의 관계성을
+고려해야 함을 알게 되었다.
+
+Django에서, SQl문을 대신한 ORM Query들이 편하게 느껴졌다
+
+이전에는 user가 upload한 file이 DB에 바로 저장이 된다고 알았는데,
+그게 아닌, file의 위치가 VARCHAR type으로 DB에 저장되는 것을 알게 되었다.
+
+PC와 mobile app으로 Instagram을 들어가 service가 어떻게 작동하는지 분석하고, 실제 DB를 구현하는 과정에서
+1. 생각보다 엄청나게 많은 정보를 너무나 빠르게 처리하고 있다는 것,
+2. DB의 Size가 가늠이 되지 않을 정도로 크다는 것,
+3. 보기엔 단순하지만 실제 완벽한 모델링으로 구현하기 어렵다는 것을
+을 알게 되었다.
+
+특히 게시글에 첨부하는 사진 파일과 동영상 파일을 
+1. 하나의 Model로 정의하려고 했고,
+2. 따로 구분하여 Model을 정의하려고 했지만,
+
+두 방법에 모두 난항을 겪어 결국 사진 파일 모델만 작성했다.
+
+-1 하나의 model로 정의하려고 할 때 어려운 점은 video 항목만 가지고 있는 `is_muted`, `init_image`, `is_reels` 등의 설정 때문이다
+-2 따로 구분하여 Model로 정의하려고 할 때 어려운 점은 하나의 post에는 반드시 하나 이상의 file이 첨부되어야 한다는 점이다.
+image file과 video file 중 하나 이상의 file을 첨부해야 한다는 것에 설계에 어려움을 겪었다.
 ```
 </div>
 </details>
