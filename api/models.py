@@ -19,6 +19,10 @@ class Post(models.Model):
     is_hide_count = models.BooleanField(default=False)
     is_turnoff_comment = models.BooleanField(default=False)
 
+    def __str__(self):
+        return "{} {} {}".format(self.created_at, self.user.username, self.caption)
+        # date + user_id + caption
+
 
 # 2
 class Comment(models.Model):
@@ -27,11 +31,15 @@ class Comment(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
     content = models.CharField(max_length=2200)
     count_like = models.IntegerField(default=0)
-    comment = models.BigIntegerField()   # comment of comment
+    comment = models.BigIntegerField(null=True)   # comment of comment
     count_comment = models.IntegerField(default=0)  # comment number of comment
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
     deleted_at = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return "{} {} {} {}".format(self.created_at, self.user.username, self.post.id, self.content)
+        # date + user_id + post_id + content
 
 
 # 3 only for image not video
@@ -44,6 +52,9 @@ class File(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
     deleted_at = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return "{} {} {}".format(self.created_at, self.post.id, self.id)     # date + post_id + file_id
 
 
 # 4
@@ -103,6 +114,9 @@ class User(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
     deleted_at = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return "{} {}".format(self.id, self.username)
 
 
 # 10
