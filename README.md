@@ -63,53 +63,104 @@
 <summary> </summary>
 <div markdown="1">     
   
-### Django-MySQL 
-- ![mysql2](https://user-images.githubusercontent.com/77188666/161371240-8400acac-c893-4953-8a2c-b55463a1f95a.PNG)
+### Django-MySQL(local) Connect
+
+- Django project 에서 `.env` 파일 수정
+```
+DATABASE_NAME=
+DATABASE_USER=
+DATABASE_PASSWORD=
+DATABASE_HOST=
+DATABASE_PORT=
+DATABASE_SECRET_KEY=
+```
+- Django Project 에서 shell `python manage.py migrate`  
+- MySQl 8.0 Command Line Client
+```
+show databases;         # DB 목록
+use `database_name`;    # DB 사용
+show tables;            # 전체 Table 조회
+```
+- [X] MySQL Query에 `;`을 꼭 사용
+- 실행 결과
+![mysql2](https://user-images.githubusercontent.com/77188666/161371240-8400acac-c893-4953-8a2c-b55463a1f95a.PNG)
+
+
 
 ### ERD (using ERDCloud)
+- ERD Diagram
 ![CEOS15](https://user-images.githubusercontent.com/77188666/160993717-d5db4812-5d7c-400d-9075-8b9d77481bb1.png)
 
+
+#### DB Model ( `api/model.py` 의 주석 참고 )
+ 
+**1. Post** 게시글  
+**2. Comment**  댓글  
+**3. File**  이미지 파일  
+**4. Tag**  이미지 태그  
+**5. Alttext**  대치 텍스트  
+**6. Hashtag**  해시태그  
+**7. PostLike**  게시글 좋아요  
+**8. CommentLike**  댓글 좋아요  
+**9. User**  사용자  
+**(보류) 10. Follow**  팔로우/팔로잉
+---
+## Relationship 
+### 1:1 Relationship  
+X
+
+### 1:N Relationship  
+
+- `User : Post`, `User : Comment`, `User : Tag`, `User : PostLike`, `User : CommentLike`  
+- `Post : Comment`, `Post : File`, `Post : Hashtag`, `Post : PostLike`  
+- `File : Tag`, `File : Alttext`  
+- `Comment : CommentLike`  
+
+### N:M Relationship
+- `Follow : User`
+
+---
 
 ### Django Model Data Type
 
 ####
-|Data type|Django model type|Database MySQL DDL|Description - Validation - Notes|
-|---|---|---|---|
-|Boolean|models.BooleanField()|bool NOT NULL|Creates a boolean field to store True/False (or 0/1) values|
-|Date/time|models.DateField()|date NOT NULL|Creates a date field to store dates|
-|Date/time|models.DateTimeField()|datetime NOT NULL|Creates a datetime field to store dates with times|
-|Number|models.AutoField()|integer AUTO_INCREMENT NOT NULL|Creates an integer that autoincrements, primarly used for custom primary keys|
-|Number|models.IntegerField()|integer NOT NULL|Creates a column to store integer numbers.|
-|Number|models.DecimalField(decimal_places=X,max_digits=Y)|numeric(X, Y) NOT NULL|Enforces a number have a maximum X digits and Y decimal points Creates a decimal field to store decimal numbers.|
-|Text|models.CharField(max_length=N)|varchar(50) NOT NULL|Creates a text column, where the max_length argument is required to specify the maximum length in characters.|
-|Text (Specialized)|models.FileField()|varchar(100) NOT NULL|Enforces and provides various utilities to handle files.|
+|Data type|Django model type|MySQL DDL|
+|---|---|---|
+|Boolean|models.BooleanField()|bool NOT NULL|
+|Date/time|models.DateField()|date NOT NULL|
+|Date/time|models.DateTimeField()|datetime NOT NULL|
+|Number|models.AutoField()|integer AUTO_INCREMENT NOT NULL|
+|Number|models.IntegerField()|integer NOT NULL|
+|Number|models.DecimalField(decimal_places=X,max_digits=Y)|numeric(X, Y) NOT NULL|
+|Text|models.CharField(max_length=N)|varchar(50) NOT NULL|
+|Text (Specialized)|models.FileField()|varchar(100) NOT NULL|
 
-
-### How to Upload Files With Django  
+---
+### Image File Upload with Django 
 https://simpleisbetterthancomplex.com/tutorial/2016/08/01/how-to-upload-files-with-django.html  
 
+---
 ```
 id = models.BigIntegerField()
 id = models.AutoField(primary_key=True)     # Automatic primary key
 ```
-
 ---
-### ORM Query
+## ORM Query
   
-1. CREATE
+### 1. CREATE
   
-2. GET -all
+### 2. GET -all
   - before changing return type
   ![user_object_all_console3](https://user-images.githubusercontent.com/77188666/161371402-597619cb-6777-4ae7-a7aa-b5abacefea28.PNG)
   - after chainging
   ![user objects all()](https://user-images.githubusercontent.com/77188666/161371328-9ca50cbc-7901-4dac-b09f-f00e98a3a5b8.PNG)  
   
-3. GET
+### 3. GET
 ![user objects get(id)](https://user-images.githubusercontent.com/77188666/161371294-3cee271c-5f65-4842-ae35-bf7a79064e1c.PNG)
 - id - primary key index는 1부터 증가
   
   
-4. FILTER
+### 4. FILTER
 ![queryset exercise](https://user-images.githubusercontent.com/77188666/161371388-47721a98-be40-41d4-9ace-f2cdfb4b50c1.PNG)
 
 </div>
