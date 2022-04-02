@@ -85,8 +85,17 @@ show tables;            # 전체 Table 조회
 - 실행 결과
 ![mysql2](https://user-images.githubusercontent.com/77188666/161371240-8400acac-c893-4953-8a2c-b55463a1f95a.PNG)
 
+---
+### Makemigrations, Migrate
 
+1. models.py 수정 
 
+2. makemigrations file 생성  
+    `python manage.py makemigrations app_name --name migration_tag_name`
+
+3. makemigrations file 로 migrate  
+    `python manage.py migrate app_name {number_of_migration}`
+---
 ### ERD (using ERDCloud)
 - ERD Diagram
 ![CEOS15](https://user-images.githubusercontent.com/77188666/160993717-d5db4812-5d7c-400d-9075-8b9d77481bb1.png)
@@ -158,22 +167,75 @@ id = models.AutoField(primary_key=True)     # type 2 ( Automatic primary key )
 ```
 ---
 ## ORM Query
+Django Terminal > `python manage.py shell`  
+`>>> from api.models import *`
+
+### 1. CREATE  
+- Type 1
+```
+>>> u = User(username="yourzinc", password="password", name="Kim Ayeon", contact="01000000000", birth="0000-00-00")
+>>> u.save()
+>>> p = Post(user=u, caption="hello_world", location="Seoul")
+>>> p.save()
+```
+
+- Type 2
+```
+>>> User.objects.create(username="myzinc", password="password", name="Kim Ayeon", contact="01000000000", birth="0000-00-00")
+>>> Post.objects.create(user=User.objects.get(username="myzinc"), caption="goodbye_world_again", location="Seoul")
+```
   
-### 1. CREATE
-  
-### 2. GET -all
-  - before changing return type
-  ![user_object_all_console3](https://user-images.githubusercontent.com/77188666/161371402-597619cb-6777-4ae7-a7aa-b5abacefea28.PNG)
-  - after chainging
-  ![user objects all()](https://user-images.githubusercontent.com/77188666/161371328-9ca50cbc-7901-4dac-b09f-f00e98a3a5b8.PNG)  
+### 2. GET -all  
+
+```
+>>> User.objects.all()
+>>> Post.objects.all()
+```
+
+- result
+![user objects all()](https://user-images.githubusercontent.com/77188666/161371328-9ca50cbc-7901-4dac-b09f-f00e98a3a5b8.PNG)  
   
 ### 3. GET
-![user objects get(id)](https://user-images.githubusercontent.com/77188666/161371294-3cee271c-5f65-4842-ae35-bf7a79064e1c.PNG)
-- id - primary key index는 1부터 증가
-  
-  
-### 4. FILTER
-![queryset exercise](https://user-images.githubusercontent.com/77188666/161371388-47721a98-be40-41d4-9ace-f2cdfb4b50c1.PNG)
 
+```
+>>> User.objects.get(id=0)      # ERROR (doesn't exist)
+>>> User.objects.get(id=1)
+>>> User.objects.get(id=2)
+>>> User.objects.get(id=3)      # ERROR (doesn't exist)
+```
+- `id(primary key index)`는 1부터 count
+
+- result
+![user objects get(id)](https://user-images.githubusercontent.com/77188666/161371294-3cee271c-5f65-4842-ae35-bf7a79064e1c.PNG)
+
+### 4. FILTER
+
+```
+>>> User.objects.filter(name="Kim Ayeon")
+>>> User.objects.filter(name="Kim Ayeon").exclude(username="yourzinc")
+
+>>> Post.objects.filter(location="Seoul").exclude(user=User.objects.get(id=1))
+>>> Post.objects.filter(location="Seoul").exclude(user=User.objects.get(id=1)).exclude(caption="goodbye_world_again")
+```
+- exclude, include 의 연쇄적 사용
+- result
+![queryset exercise](https://user-images.githubusercontent.com/77188666/161371388-47721a98-be40-41d4-9ace-f2cdfb4b50c1.PNG)
+  
+
+### Extra)  def __ str__(self):
+
+Post
+```
+    def __str__(self):
+        return "{} {} {}".format(self.created_at, self.user.username, self.caption)
+        # 출력 형식 = 생성일 + user_id + 내용
+```
+
+User
+```
+    def __str__(self):
+        return "{} {}".format(self.id, self.username)
+        # 출력 형식 = id + user_id
+```
 </div>
 </details>
