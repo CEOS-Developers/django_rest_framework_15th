@@ -1,4 +1,4 @@
-# CEOS 15기 백엔드 스터디 2주차 도커-깃허브 액션을 이용한 자동배포
+## Week 2: 도커-깃허브 액션을 이용한 자동배포
 
 ### 도커
 리눅스 컨테이너에 프로세스 격리 기술을 사용해 컨테이너로서 더 쉽게 사용할 수 있게 만들어진 오픈소스 프로젝트
@@ -16,8 +16,6 @@
   - 이미지 용량 저하에 따른 배포 시간 단축
 
 도커 사용 시 => 개발 및 배포 과정의 편리성! 애플리케이션의 독립성과 확장성!
-
-<hr>
 
 ### 깃허브 액션
 깃허브 저장소를 기반으로 소프트웨어 개발 Workflow를 자동화 하는 CI/CD 도구
@@ -43,8 +41,6 @@
 - 개별 Workflow 삭제 불가능
 - Workflow에서 단일 Job만 실행 불가능
 - 큰 규모의 프로젝트의 경우 완전하지 못한 제어
-
-<hr>
 
 ### 도커-깃허브 액션
 깃허브 액션을 이용한 Docker Image Build 및 Push
@@ -92,3 +88,90 @@ Actions 탭에서 실행하거나 master에 push 한 뒤 잠시 기다리면 다
 ![image](https://user-images.githubusercontent.com/63996052/159650798-0bd37772-1692-47e0-9d96-3698023c1da7.png)
 
 ![image](https://user-images.githubusercontent.com/63996052/159661427-7a280fee-1dfc-4225-9aca-c92dfe7c541d.png)
+
+<hr>
+
+## Week 3: 인스타그램 데이터 모델링
+### 인스타그램 서비스 설명 ('사진, 영상 업로드' 기능만)
+모든 서비스는 유저 로그인 기반으로 동작
+- 게시글에 사진, 동영상 등록 (1개 이상)
+- 게시글에 댓글 (0개 이상)
+- 게시글에 좋아요 (0개 이상)
+- 게시글 삭제
+- 댓글 삭제
+- 좋아요 취소
+
+### 모델 설명
+<img width=75% src="https://user-images.githubusercontent.com/63996052/160544304-65b9f2bf-bd1f-46da-aa8a-aa45e7a2421a.png">
+
+**[Profile]**
+- 장고에서 기본으로 제공하는 auth_user와 OneToOne Link with User Model (OneToOneField)
+- 이름, 사용자 이름(아이디), 비밀번호 등의 정보는 User 테이블 참조
+- 휴대전화 번호, 웹사이트, 소개 컬럼
+- 사진, 영상 업로드 기능에만 집중하기 위해 유저의 다른 정보들은 생략
+
+**[Post]**
+- User와 1:N 관계, user_id (Foreignkey)
+- 내용 컬럼, 생성 날짜, 삭제 여부
+
+**[File]**
+- Post와 1:N 관계, post_id (Foreignkey)
+- 타입(이미지/비디오), 해당 파일의 url 주소 컬럼
+
+**[Like]**
+- User와 N:M, Post와 N:M 관계 (ManyToManyField)
+- 생성 날짜, 삭제 여부
+
+**[Comment]**
+- User와 N:M, Post와 N:M 관계 (ManyToManyField)
+- 내용 컬럼, 생성 날짜, 삭제 여부 
+
+### ORM 적용해보기
+임의의 User를 하나 생성하고, 해당 유저를 ForeignKey 필드로 포함하는 Post 모델을 선택하여 진행
+  
+1. 데이터베이스에 해당 모델 객체 3개 넣기
+
+ **ORM 쿼리**
+ ```
+ one = Post.objects.create(content="첫번째 게시글", user_id=1)
+ two = Post.objects.create(content="두번째 게시글", user_id=1)
+ thr = Post.objects.create(content="세번째 게시글", user_id=1)
+ ```
+ **결과화면**
+ ![image](https://user-images.githubusercontent.com/63996052/160549121-7526685d-f6ee-4687-b943-50aefb88db65.png)
+
+  
+2. 삽입한 객체들을 쿼리셋으로 조회해보기 (단, 객체들이 객체의 특성을 나타내는 구분가능한 이름으로 보여야 함)
+
+ **ORM 쿼리**
+ ```
+ Post.objects.all()
+ ```
+ **결과화면**
+ ![image](https://user-images.githubusercontent.com/63996052/160549260-11b31257-cc3a-49a9-b90f-8fdb0e66d3bf.png)
+
+  
+3. filter 함수 사용해보기
+
+ **ORM 쿼리**
+ ```
+ Post.objects.filter(id=2)
+ Post.objects.filter(user_id=1)
+ Post.objects.filter(content="첫번째 게시글")
+ ```
+**결과화면**
+  ![image](https://user-images.githubusercontent.com/63996052/160549484-dbe25899-da79-474b-92ea-f07cfda51ae8.png)
+
+
+### 회고
+장고와 같이 모델링하는 환경을 처음 접해보기 때문에, 데이터베이스를 설계하는 과정에서 다양한 고민이 있었다.
+
+이전에 해오던 대로 soft delete를 사용하는 것이 맞는지, CharField, TextField를 되도록이면 null=true 상태로 작성하지 않는 것이 맞는지 고민했다.
+
+또 인스타그램의 사진, 영상 등록이라는 주요 기능만을 고려하기 위해 많은 컬럼을 쳐내는 과정이 있었다.
+
+예를 들면 수정 시점은 기록할 필요가 없다고 느껴 updated_at과 같은 값을 사용하지 않았는데, 유의미한 데이터만 남았기를 바란다.
+
+마지막으로 깃허브 액션 확인 결과 제대로 배포되지 않음을 확인하여 이를 해결해야할 것 같다.
+
+-> 깃허브 액션 문제를 해결했다. 공부하는 과정에서 멋대로 pip freeze > requirements.txt를 실행했는데, 이 과정에서 기존에 사용했던 opencv를 포함한 다양한 라이브러리들이 포함되었다. 이로 인해 timeout이 나면서 자동 배포가 되지 않았음을 알게 되었다.
