@@ -64,10 +64,7 @@
 <div markdown="1">     
   
 ### Django-MySQL 
-- img1
-- img2
-- img3
-- img4
+- ![mysql2](https://user-images.githubusercontent.com/77188666/161371240-8400acac-c893-4953-8a2c-b55463a1f95a.PNG)
 
 ### ERD (using ERDCloud)
 ![CEOS15](https://user-images.githubusercontent.com/77188666/160993717-d5db4812-5d7c-400d-9075-8b9d77481bb1.png)
@@ -95,6 +92,25 @@ https://simpleisbetterthancomplex.com/tutorial/2016/08/01/how-to-upload-files-wi
 id = models.BigIntegerField()
 id = models.AutoField(primary_key=True)     # Automatic primary key
 ```
+
+---
+### ORM Query
+  
+1. CREATE
+  
+2. GET -all
+  - before changing return type
+  ![user_object_all_console3](https://user-images.githubusercontent.com/77188666/161371402-597619cb-6777-4ae7-a7aa-b5abacefea28.PNG)
+  - after chainging
+  ![user objects all()](https://user-images.githubusercontent.com/77188666/161371328-9ca50cbc-7901-4dac-b09f-f00e98a3a5b8.PNG)  
+  
+3. GET
+![user objects get(id)](https://user-images.githubusercontent.com/77188666/161371294-3cee271c-5f65-4842-ae35-bf7a79064e1c.PNG)
+- id - primary key index는 1부터 증가
+  
+  
+4. FILTER
+![queryset exercise](https://user-images.githubusercontent.com/77188666/161371388-47721a98-be40-41d4-9ace-f2cdfb4b50c1.PNG)
 
 </div>
 </details>
