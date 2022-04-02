@@ -94,16 +94,16 @@ show tables;            # 전체 Table 조회
 
 #### DB Model ( `api/model.py` 의 주석 참고 )
  
-**1. Post** 게시글  
-**2. Comment**  댓글  
-**3. File**  이미지 파일  
-**4. Tag**  이미지 태그  
-**5. Alttext**  대치 텍스트  
-**6. Hashtag**  해시태그  
-**7. PostLike**  게시글 좋아요  
-**8. CommentLike**  댓글 좋아요  
-**9. User**  사용자  
-**(보류) 10. Follow**  팔로우/팔로잉
+1. Post 게시글  
+2. Comment  댓글  
+3. File  이미지 파일  
+4. Tag  이미지 태그  
+5. Alttext  대치 텍스트  
+6. Hashtag  해시태그  
+7. PostLike  게시글 좋아요  
+8. CommentLike  댓글 좋아요  
+9. User  사용자  
+10. ~~Follow  팔로우/팔로잉~~ 
 ---
 ## Relationship 
 ### 1:1 Relationship  
@@ -136,13 +136,25 @@ X
 |Text (Specialized)|models.FileField()|varchar(100) NOT NULL|
 
 ---
-### Image File Upload with Django 
-https://simpleisbetterthancomplex.com/tutorial/2016/08/01/how-to-upload-files-with-django.html  
+### Image File Upload with Django  
+
+1. `POST` method => `request.FILES`
+
+2. Django 의  model fields : `FileField`, `ImageField`  
+   - `database`가 아닌 `filesystem`에 저장
+   - `actual file`의 `reference`를 가지고 있는 `string field`
+   - `FileField`나 `ImageField`를 지우면 `physical file`은 지우지 않고, `reference` 만 지워짐  
+
+3. DB 에는 `FileField`, `ImageField`의 `reference url`을 저장 `[ TYPE = VARCHAR ]`   
+
+##### Reference : https://simpleisbetterthancomplex.com/tutorial/2016/08/01/how-to-upload-files-with-django.html  
 
 ---
+
+#### Model 의 Primary Key 설정
 ```
-id = models.BigIntegerField()
-id = models.AutoField(primary_key=True)     # Automatic primary key
+id = models.BigIntegerField()               # type 1
+id = models.AutoField(primary_key=True)     # type 2 ( Automatic primary key )
 ```
 ---
 ## ORM Query
