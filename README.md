@@ -57,11 +57,6 @@
 
 ### 모델 설명
 ![instaClone_ERD](https://user-images.githubusercontent.com/68195241/161352152-ff55b437-23a7-4664-a3ad-f6838844fe3c.png)
-#### User
-- user_id : 사용자 id
-- user_email : 사용자 이메일
-- user_pw : 사용자 비밀번호
-- user_bday : 사용자 생일
 
 #### Profile
 - user_id : 사용자 id (사용자 이름)
@@ -80,7 +75,7 @@
 #### Media
 - post_id : 게시글 id (어느 게시글의 미디어인지)
 - content : 미디어 내용
-- content_type : 사진/영상 (미디어 종류)
+- ~~content_type : 사진/영상 (미디어 종류)~~
 
 #### Comment
 - comment_id : 댓글 id
@@ -101,3 +96,40 @@
 - post_id : 게시글 id (어느 게시글의 좋아요인지)
 - user_id : 사용자 id (좋아요 등록자)
 - created_at : 좋아요 등록일
+
+
+## ORM 적용해보기
+
+### 1. 데이터베이스에 해당 모델 객체 3개 넣기
+#### 코드
+```
+firstPost = Post.objects.create(user=1, content="1st Post")
+secondPost = Post.objects.create(user=2, content="2nd Post")
+thirdPost = Post.objects.create(user=1, content="3rd Post")
+```
+#### 결과화면
+
+### 2. 삽입한 객체들을 쿼리셋으로 조회해보기
+#### 코드
+```
+Post.object.all()
+```
+#### 결과화면
+
+### 3. filter 함수 사용해보기
+#### 코드
+```
+Post.object.filter(user=1)
+```
+#### 결과화면
+
+***
+
+> ### 회고
+> 처음이 많았던 과제여서 수행 과정이 그리 효율적이지는 못했던 것 같습니다. 그리고 제출한 결과가 과연 최선의 결과였을지 아직도 확신이 서지 않아서 복습 후 제대로 손을 볼 수 있으면 좋곘다는 생각이 듭니다.
+> <br/>
+> <br/>
+> #### 어려웠던 점
+> - mysqlclient : ~~wsl 수동설치 & 환경변수 설정으로 문제 해결~~ venv과 requirements.txt. 설치된 pip가 그렇게 많은 것이 애초에 이상함의 지표였음 (pip list로 확인)
+> - ERD : 생활코딩, 구글링 등등
+> - ORM : 참고자료, 구글링 등등
