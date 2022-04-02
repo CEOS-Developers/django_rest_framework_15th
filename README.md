@@ -1,7 +1,6 @@
-#Week2 : Docker와 Github Action을 이용한 자동 배포하기
+# Week2 : Docker와 Github Action을 이용한 자동 배포하기
 
 ## Docker
-***
 ![Microsoft-Docker-logo](https://user-images.githubusercontent.com/68195241/160120711-231bf27e-8333-403a-aa99-a9d3ad5172c6.png)
 - 리눅스 컨테이너 기반의 오픈소스 가상화 플랫폼
 - 컨테이너에 '이미지(Image)'를 담아서 구동시키는 방식
@@ -24,7 +23,6 @@
 
 
 ## Github Actions
-***
 ![Continuous-Deployment-con-GitHub-Actions](https://user-images.githubusercontent.com/68195241/160120267-8a25411d-0ad2-414f-84c2-48f955bf2746.png)
 - Github에서 공식적으로 제공하는 CI/CD 툴
 - Workflow 자동화툴
@@ -36,8 +34,102 @@
   * 프로덕션 환경으로 서비스를 배포할 수 있도록 준비하는 프로세스
 - CD (Continuous Delivery)
   * 배포
-  * 프로덕션 환경으로 서비스를 배포할 수 있도록 준비하는 프로세스
+  * 저장소로 전달된 프로덕션 서비스를 실제 사용자들에게 배포하는 프로세스
 
 ### Workflow
 - 하나 이상의 Job으로 구성되고, Event에 의해 예약되거나 트리거될 수 있는 자동화된 절차
 - YAML 파일로 작성 + ```.git/workflows```에 저장
+
+
+***
+
+# Week3 : 모델링과 Django ORM
+
+## 모델링
+
+### Instagram 서비스 설명
+- 사용자마다 한 개의 프로필을 가질 수 있음
+- 사용자는 게시글을 올릴 수 있음 (수정 가능)
+- 게시글에는 반드시 사진이나 영상 하나가 포함되어야 함
+- 사용자는 게시글에 좋아요를 남길 수 있음
+- 사용자는 게시글에 댓글을 달 수 있음 (수정 불가능)
+- 사용자는 댓글에 대댓글을 달 수 있음 (수정 불가능)
+
+### 모델 설명
+![instaClone_ERD](https://user-images.githubusercontent.com/68195241/161352152-ff55b437-23a7-4664-a3ad-f6838844fe3c.png)
+
+#### Profile
+- user_id : 사용자 id (사용자 이름)
+- profile_pic : 프로필 사진
+- profile_name : 프로필 이름
+- profile_website : 프로필 웹사이트
+- profile_bio : 프로필 소개
+
+#### Post
+- post_id : 게시글 id
+- user_id : 사용자 id (게시글 작성자)
+- content : 게시글 내용
+- created_at : 게시글 최초 작성 날짜
+- modified_at : 게시글 최근 수정 날짜
+
+#### Media
+- post_id : 게시글 id (어느 게시글의 미디어인지)
+- content : 미디어 내용
+- ~~content_type : 사진/영상 (미디어 종류)~~
+
+#### Comment
+- comment_id : 댓글 id
+- post_id : 게시글 id (어느 게시글에 단 댓글인지)
+- user_id : 사용자 id (댓글 작성자)
+- content : 댓글 내용
+- created_at : 댓글 최초 작성 날짜
+
+#### Reply
+- reply_id : 대댓글 id
+- post_id : 게시글 id (어느 게시글에 있는 댓글의 대댓글인지)
+- comment_id : 댓글 id (어느 댓글의 대댓글인지)
+- user_id : 사용자 id (대댓글 작성자)
+- content : 대댓글 내용
+- created_at : 대댓글 최초 작성 날짜
+
+#### Like
+- post_id : 게시글 id (어느 게시글의 좋아요인지)
+- user_id : 사용자 id (좋아요 등록자)
+- created_at : 좋아요 등록일
+
+
+## ORM 적용해보기
+
+### 1. 데이터베이스에 해당 모델 객체 3개 넣기
+#### 코드
+```
+firstPost = Post.objects.create(user=1, content="1st Post")
+secondPost = Post.objects.create(user=2, content="2nd Post")
+thirdPost = Post.objects.create(user=1, content="3rd Post")
+```
+#### 결과화면
+
+### 2. 삽입한 객체들을 쿼리셋으로 조회해보기
+#### 코드
+```
+Post.object.all()
+```
+#### 결과화면
+
+### 3. filter 함수 사용해보기
+#### 코드
+```
+Post.object.filter(user=1)
+```
+#### 결과화면
+
+***
+
+> ### 회고
+> 처음이 많았던 과제여서 수행 과정이 그리 효율적이지는 못했던 것 같습니다. 그리고 제출한 결과가 과연 최선의 결과였을지 아직도 확신이 서지 않아서 복습 후 제대로 손을 볼 수 있으면 좋곘다는 생각이 듭니다.
+> <br/>
+> <br/>
+> #### 어려웠던 점
+> - mysqlclient : ~~wsl 수동설치 & 환경변수 설정으로 문제 해결~~ venv과 requirements.txt. 설치된 pip가 그렇게 많은 것이 애초에 이상함의 지표였음 (pip list로 확인)
+> - ERD : 생활코딩, 구글링 등등
+> - ORM : 참고자료, 구글링 등등
