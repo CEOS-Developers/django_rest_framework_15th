@@ -1,8 +1,14 @@
 #### CEOS 15기 백엔드 스터디 (2) 모델링 및 drf 연습을 위한 레포
 
+
 ---
 # 2. Docker
 
+<details>
+<summary> </summary>
+<div markdown="1">       
+
+## Docker
 
 ## 'Docker file', 'Docker-image', 'Docker-container' 
   ![92180EDC-95C4-4CAF-B9E1-13307D9AE09A](https://user-images.githubusercontent.com/77188666/160082911-846ce296-23c1-4351-a0e7-de671be024ae.jpeg)
@@ -44,11 +50,19 @@
 
 #### docker-compose.yml
 ![A2C3D26E-1D1A-4068-9462-C8719AA225A4](https://user-images.githubusercontent.com/77188666/160082978-dfc08651-c3e5-471d-b4e0-8ba07daf7b45.jpeg)
+  
 ---
+
+</div>
+</details>
 
 ---
 # 3. Instagram Data Modeling
 
+<details>
+<summary> </summary>
+<div markdown="1">     
+  
 ### Django-MySQL 
 - img1
 - img2
@@ -82,3 +96,5 @@ id = models.BigIntegerField()
 id = models.AutoField(primary_key=True)     # Automatic primary key
 ```
 
+</div>
+</details>
