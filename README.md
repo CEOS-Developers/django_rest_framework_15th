@@ -103,25 +103,28 @@
 ### 1. 데이터베이스에 해당 모델 객체 3개 넣기
 #### 코드
 ```
-firstPost = Post.objects.create(user=1, content="1st Post")
-secondPost = Post.objects.create(user=2, content="2nd Post")
-thirdPost = Post.objects.create(user=1, content="3rd Post")
+firstPost = Post.objects.create(content="1st Post", user=u1)
+secondPost = Post.objects.create(content="2nd Post", user=u1)
+thirdPost = Post.objects.create(content="3rd Post", , user=u1)
 ```
 #### 결과화면
+![객체3개넣기](https://user-images.githubusercontent.com/68195241/161427793-8c5d4147-b33f-4a5d-bc6d-db256939b181.JPG)
 
 ### 2. 삽입한 객체들을 쿼리셋으로 조회해보기
 #### 코드
 ```
-Post.object.all()
+Post.objects.all()
 ```
 #### 결과화면
+![객체조회](https://user-images.githubusercontent.com/68195241/161427787-470003fc-a9c7-4cab-854a-f929f3af4dd6.JPG)
 
 ### 3. filter 함수 사용해보기
 #### 코드
 ```
-Post.object.filter(user=1)
+Post.objects.filter(content="1st Post")
 ```
 #### 결과화면
+![filter함수](https://user-images.githubusercontent.com/68195241/161427794-00448d86-b4be-4f3d-a116-16646b76f0f8.JPG)
 
 ***
 
