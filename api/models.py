@@ -7,7 +7,7 @@ from django.utils import timezone
 # 1
 class Post(models.Model):
     id = models.AutoField(primary_key=True)     # PK
-    user_id = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
+    user = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
     caption = models.CharField(max_length=2200)
     location = models.CharField(max_length=100)
     count_like = models.IntegerField(default=0)
@@ -23,11 +23,11 @@ class Post(models.Model):
 # 2
 class Comment(models.Model):
     id = models.AutoField(primary_key=True)     # Automatic primary key
-    post_id = models.ForeignKey('Post', on_delete=models.CASCADE)     # FK
-    user_id = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
+    post = models.ForeignKey('Post', on_delete=models.CASCADE)     # FK
+    user = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
     content = models.CharField(max_length=2200)
     count_like = models.IntegerField(default=0)
-    comment_id = models.BigIntegerField()   # comment of comment
+    comment = models.BigIntegerField()   # comment of comment
     count_comment = models.IntegerField(default=0)  # comment number of comment
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
@@ -37,7 +37,7 @@ class Comment(models.Model):
 # 3 only for image not video
 class File(models.Model):
     id = models.AutoField(primary_key=True)     # Automatic primary key
-    post_id = models.ForeignKey('Post', on_delete=models.CASCADE)     # FK
+    post = models.ForeignKey('Post', on_delete=models.CASCADE)     # FK
     file = models.FileField(upload_to='files/')
     order = models.IntegerField()
     filter = models.IntegerField(default=0)
@@ -49,8 +49,8 @@ class File(models.Model):
 # 4
 class Tag(models.Model):
     id = models.AutoField(primary_key=True)  # Automatic primary key
-    file_id = models.ForeignKey('File', on_delete=models.CASCADE)     # FK
-    user_id = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
+    file = models.ForeignKey('File', on_delete=models.CASCADE)     # FK
+    user = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
     width = models.DecimalField(decimal_places=1, max_digits=3)
     height = models.DecimalField(decimal_places=1, max_digits=3)
 
@@ -58,22 +58,22 @@ class Tag(models.Model):
 # 5
 class Alttext(models.Model):
     id = models.AutoField(primary_key=True)  # Automatic primary key
-    file_id = models.ForeignKey('File', on_delete=models.CASCADE)     # FK
+    file = models.ForeignKey('File', on_delete=models.CASCADE)     # FK
     alt_text = models.CharField(max_length=125)
 
 
 # 6
 class Hashtag(models.Model):
     id = models.AutoField(primary_key=True)  # Automatic primary key
-    post_id = models.ForeignKey('Post', on_delete=models.CASCADE)     # FK
+    post = models.ForeignKey('Post', on_delete=models.CASCADE)     # FK
     hashtag = models.CharField(max_length=140)
 
 
 # 7
 class PostLike(models.Model):
     id = models.AutoField(primary_key=True)  # Automatic primary key
-    post_id = models.ForeignKey('Post', on_delete=models.CASCADE)     # FK
-    user_id = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
+    post = models.ForeignKey('Post', on_delete=models.CASCADE)     # FK
+    user = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True)
 
@@ -81,8 +81,8 @@ class PostLike(models.Model):
 # 8
 class CommentLke(models.Model):
     id = models.AutoField(primary_key=True)  # Automatic primary key
-    comment_id = models.ForeignKey('Comment', on_delete=models.CASCADE)     # FK
-    user_id = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
+    comment = models.ForeignKey('Comment', on_delete=models.CASCADE)     # FK
+    user = models.ForeignKey('User', on_delete=models.CASCADE)     # FK
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True)
 
