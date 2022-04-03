@@ -59,42 +59,38 @@
 ![instaCloneERD](https://user-images.githubusercontent.com/68195241/161428714-e9491632-a792-4a3f-8dcf-135b947cfebf.png)
 
 #### Profile
-- user_id : 사용자 id (사용자 이름)
+- user : 사용자 id
 - profile_pic : 프로필 사진
 - profile_name : 프로필 이름
 - profile_website : 프로필 웹사이트
 - profile_bio : 프로필 소개
 
 #### Post
-- post_id : 게시글 id
-- user_id : 사용자 id (게시글 작성자)
+- user : 사용자 id (게시글 작성자)
 - content : 게시글 내용
 - created_at : 게시글 최초 작성 날짜
 - modified_at : 게시글 최근 수정 날짜
 
 #### Media
-- post_id : 게시글 id (어느 게시글의 미디어인지)
 - content : 미디어 내용
 - ~~content_type : 사진/영상 (미디어 종류)~~
 
 #### Comment
-- comment_id : 댓글 id
-- post_id : 게시글 id (어느 게시글에 단 댓글인지)
-- user_id : 사용자 id (댓글 작성자)
+- post : 게시글 id (어느 게시글에 단 댓글인지)
+- user : 사용자 id (댓글 작성자)
 - content : 댓글 내용
 - created_at : 댓글 최초 작성 날짜
 
 #### Reply
-- reply_id : 대댓글 id
-- post_id : 게시글 id (어느 게시글에 있는 댓글의 대댓글인지)
-- comment_id : 댓글 id (어느 댓글의 대댓글인지)
-- user_id : 사용자 id (대댓글 작성자)
+- post : 게시글 id (어느 게시글에 있는 댓글의 대댓글인지)
+- comment : 댓글 id (어느 댓글의 대댓글인지)
+- user : 사용자 id (대댓글 작성자)
 - content : 대댓글 내용
 - created_at : 대댓글 최초 작성 날짜
 
 #### Like
-- post_id : 게시글 id (어느 게시글의 좋아요인지)
-- user_id : 사용자 id (좋아요 등록자)
+- post : 게시글 id (어느 게시글의 좋아요인지)
+- user : 사용자 id (좋아요 등록자)
 - created_at : 좋아요 등록일
 
 
@@ -136,3 +132,16 @@ Post.objects.filter(content="1st Post")
 > - mysqlclient : ~~wsl 수동설치 & 환경변수 설정으로 문제 해결~~ venv과 requirements.txt. 설치된 pip가 그렇게 많은 것이 애초에 이상함의 지표였음 (pip list로 확인)
 > - ERD : 생활코딩, 구글링 등등
 > - ORM : 참고자료, 구글링 등등
+
+
+***
+
+# Week4 : DRF1-Serializer
+
+## 데이터 삽입
+### 모델 선택 및 데이터 삽입
+
+
+## 모든 데이터를 가져오는 API 만들기
+
+## 새로운 데이터를 create하도록 요청하는 API 만들기
