@@ -56,7 +56,7 @@
 - 사용자는 댓글에 대댓글을 달 수 있음 (수정 불가능)
 
 ### 모델 설명
-![instaClone_ERD](https://user-images.githubusercontent.com/68195241/161352152-ff55b437-23a7-4664-a3ad-f6838844fe3c.png)
+![instaCloneERD](https://user-images.githubusercontent.com/68195241/161428714-e9491632-a792-4a3f-8dcf-135b947cfebf.png)
 
 #### Profile
 - user_id : 사용자 id (사용자 이름)
