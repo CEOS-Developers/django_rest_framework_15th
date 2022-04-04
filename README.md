@@ -73,7 +73,7 @@
 
 #### Media
 - content : 미디어 내용
-- ~~content_type : 사진/영상 (미디어 종류)~~
+- content_type : 사진/영상 (미디어 종류)
 
 #### Comment
 - post : 게시글 id (어느 게시글에 단 댓글인지)
