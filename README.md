@@ -102,7 +102,7 @@ Actions 탭에서 실행하거나 master에 push 한 뒤 잠시 기다리면 다
 - 좋아요 취소
 
 ### 모델 설명
-<img width=75% src="https://user-images.githubusercontent.com/63996052/160544304-65b9f2bf-bd1f-46da-aa8a-aa45e7a2421a.png">
+<img width=75% src="https://user-images.githubusercontent.com/63996052/161687278-706d227f-684d-465e-98e4-71421a39d731.png">
 
 **[Profile]**
 - 장고에서 기본으로 제공하는 auth_user와 OneToOne Link with User Model (OneToOneField)
@@ -173,3 +173,9 @@ Actions 탭에서 실행하거나 master에 push 한 뒤 잠시 기다리면 다
 예를 들면 수정 시점은 기록할 필요가 없다고 느껴 updated_at과 같은 값을 사용하지 않았는데, 유의미한 데이터만 남았기를 바란다.
 
 마지막으로 깃허브 액션 확인 결과 제대로 배포되지 않음을 확인하여 이를 해결해야할 것 같다.
+
+-> 깃허브 액션 문제를 해결했다. 공부하는 과정에서 멋대로 pip freeze > requirements.txt를 실행했는데, 이 과정에서 기존에 사용했던 opencv를 포함한 다양한 라이브러리들이 포함되었다. 이로 인해 timeout이 나면서 자동 배포가 되지 않았음을 알게 되었다.
+
+-> 피드백 반영
+erd에 기본 유저 컬럼도 추가, post에 좋아요 카운트 추가, is_deleted 삭제, created updated 상속
+null=True, blank=True는 장고 컨벤션에 따라 blank
