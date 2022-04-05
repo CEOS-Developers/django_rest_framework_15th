@@ -18,7 +18,7 @@ class Profile(models.Model):
 
 
 class Post(DatetimeModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     content = models.TextField(blank=True)
     like_count = models.PositiveIntegerField(default=0)
 
@@ -30,11 +30,11 @@ class File(models.Model):
 
 
 class Like(DatetimeModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
 
 class Comment(DatetimeModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     content = models.TextField()
