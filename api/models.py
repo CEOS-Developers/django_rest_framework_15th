@@ -24,7 +24,7 @@ class Post(DatetimeModel):
 
 
 class File(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='files', on_delete=models.CASCADE)
     type = models.CharField(max_length=20)
     url = models.CharField(max_length=200)
 
