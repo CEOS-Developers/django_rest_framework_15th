@@ -10,15 +10,15 @@ class BaseModel(models.Model):
     status = models.CharField(max_length=20, default='valid')
 
     class Meta:
-        abstract=True
+        abstract = True
 
 
 class Profile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=20, blank=True, null=True)
+    name = models.CharField(max_length=20, blank=True)
     nickname = models.CharField(max_length=30, unique=True)
-    profile_scripts = models.TextField(blank=True, null=True)
-    profile_image = models.CharField(max_length=40, blank=True, null=True)
+    profile_scripts = models.TextField(blank=True)
+    profile_image = models.CharField(max_length=40, blank=True)
 
     def __str__(self):
         return self.nickname
@@ -53,9 +53,10 @@ class Post(BaseModel):
         ("re", "Reels")
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    script = models.TextField(blank=True, null=True)
+    script = models.TextField(blank=True)
     type = models.CharField(max_length=20, choices=POST_TYPE)
-    location = models.ForeignKey(Location, on_delete=models.PROTECT, null=True, blank=True)
+    location = models.ForeignKey(Location, on_delete=models.PROTECT, blank=True)
+    liking_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.type
