@@ -114,10 +114,6 @@ https://www.youtube.com/playlist?list=PLuHgQVnccGMDeMJsGq2O-55Ymtx0IdKWf
     - 사진, 영상을 업로드 하기 위한 모델  
     한 게시물에 여러 파일이 업로드 될 수 있으므로 post와 일대다 관계이다.  
     어떤 게시물에 해당되는 파일인지 구별하기 위해 post 모델을 foreignkey로 두었다.
-- Like
-    - 좋아요 갯수를 관리하는 모델
-    post별로 좋아요 갯수를 다르게 저장해야 하므로, post모델 안에 like모델을 foreignkey로 두었다.  
-    마찬가지로 댓글 별로 좋아요 갯수를 저장해야 하므로 comment 안에 like모델을 foreignkey로 두었다.
 
 <img src="img/3/erd.JPG" width="650"/>
 
@@ -153,3 +149,13 @@ def __str__(self):
 
 - `Post.objects.filter(id=3)` 을 이용하면 id 3인 글만 불러올 수 있다.  
 <img src="img/3/shell3.JPG" width="650"/>
+
+- 추가 : DateField(auto_now_add=True)를 추가했다.  
+field option에서, auto_now=True 는 주로 수정일자에 사용된다.  
+model 이 save 될 때마다 현재날짜로 갱신된다.  
+field option에서, auto_now_add=True 는 주로 생성일자에 사용된다.
+model 이 최초 저장될 때만 현재날짜가 적용된다.
+
+# 4주차 : DRF1 - Serializer
+
+
