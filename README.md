@@ -138,10 +138,22 @@ Post.objects.filter(content="1st Post")
 
 # Week4 : DRF1-Serializer
 
-## 데이터 삽입
-### 모델 선택 및 데이터 삽입
+## [1] 데이터 삽입
+### - 모델 선택 및 데이터 삽입
 
+```Post 모델```
+```python
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
 
-## 모든 데이터를 가져오는 API 만들기
+    def __str__(self):
+        return '{} - {}'.format(self.user, self.content)
+```
+![PostModel](https://user-images.githubusercontent.com/68195241/162532963-e3271d0e-0a82-4a24-a540-a1d5e52172f1.JPG)
 
-## 새로운 데이터를 create하도록 요청하는 API 만들기
+## [2] 모든 데이터를 가져오는 API
+
+## [3] 새로운 데이터를 create하도록 요청하는 API
