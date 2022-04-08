@@ -241,3 +241,159 @@ $ python manage.py migrate api
 > User 생성에 계속 실패하여 (last_login 컬럼 문제) 검색해봤지만 전부 영어 문서여서 제일 믿음직한 스택 오버플로우에서 시키는대로 mysql에 접속 후, 
 > 생성 db를 삭제하고 migrations 파일들을 전부 삭제 후 다시 진행하는 방법을 택했다. (배포 후에는 사용하면 안된다고 함) 
 > 장고뿐만 아니라 데이터베이스, erd 설계 공부 등이 더 필요하다고 생각하게 되는 과제였다.
+
+
+## Serializer를 이용하여 Views.py 작성
+
+### models.py 수정
+
+> 과제 발표할 때 들었던 수정사항들과 Serializer를 사용하면서 발생한 문제점들에 대해 수정
+
+```
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)  # 해당 레코드 생성 시 현재 시간 자동 저장
+    updated_at = models.DateTimeField(auto_now=True)  # 해당 레코드 갱신 시 현재 시간 자동 저장
+    status = models.CharField(max_length=20, default='valid')
+
+    class Meta:
+        abstract = True
+        
+```
+
+* created_at, updated_at, status 같은 중복 컬럼들은 따로 클래스로 선언 후 상속
+
+```
+class Post(BaseModel):
+  ...
+    liking_count = models.PositiveIntegerField(default=0)
+    
+```
+
+* 좋아요 카운트를 하나의 컬럼으로 생성
+
+```
+class Following(BaseModel):
+    follower = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='followerUser')
+    following = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='followingUser')
+
+    def __str__(self):
+        return '{} : {}'.format(self.follower.nickname, self.following.nickname)
+
+```
+
+* 팔로잉 테이블 생성 시 related_name을 지정하여 한 테이블이 동시에 참조 가능하게 설정
+
+
+### 데이터 삽입
+
+> django shell을 통해 Profile 데이터 3개 삽입
+
+![스크린샷 2022-04-08 오후 10 07 13](https://user-images.githubusercontent.com/59060780/162441746-1035fa6f-e67c-4318-b1da-a679f3994cce.png)
+
+
+### API 만들기
+
+> 모든 Profile 가져오기
+> > URI: api/profile/
+> > Method : GET
+
+```
+# JSON
+[
+    {
+        "id": 1,
+        "created_at": "2022-04-08T17:57:14.213173+09:00",
+        "updated_at": "2022-04-08T17:57:14.213301+09:00",
+        "status": "valid",
+        "name": "test1",
+        "nickname": "sanbonai06",
+        "profile_scripts": "",
+        "profile_image": "",
+        "user": 1
+    },
+    {
+        "id": 2,
+        "created_at": "2022-04-08T21:42:28.206798+09:00",
+        "updated_at": "2022-04-08T21:42:28.206819+09:00",
+        "status": "valid",
+        "name": "",
+        "nickname": "고스락키보드",
+        "profile_scripts": "",
+        "profile_image": "",
+        "user": 2
+    },
+    {
+        "id": 3,
+        "created_at": "2022-04-08T21:45:58.555640+09:00",
+        "updated_at": "2022-04-08T21:45:58.555664+09:00",
+        "status": "valid",
+        "name": "",
+        "nickname": "min_zzoni",
+        "profile_scripts": "",
+        "profile_image": "",
+        "user": 3
+    }
+]
+
+```
+
+> Profile 생성
+> > URI: api/profile/
+> > Method : POST
+
+![스크린샷 2022-04-08 오후 10 13 22](https://user-images.githubusercontent.com/59060780/162442795-911a0529-ada9-4c4c-b99b-a2d6c4c3d35e.png)
+
+
+> Profile을 통해 새로운 게시글(Post) 생성 API
+> > URI: api/post
+> > Method: POST
+
+![스크린샷 2022-04-08 오후 10 14 46](https://user-images.githubusercontent.com/59060780/162443017-73db9c4f-15a4-4959-885f-e7b57ab681cd.png)
+
+
+> 모든 Post 가져오기
+> > URI: api/post
+> > Method: GET
+
+```
+# JSON
+[
+    {
+        "id": 1,
+        "author_nickname": "sanbonai06",
+        "created_at": "2022-04-08T18:10:15.875153+09:00",
+        "updated_at": "2022-04-08T18:10:15.875196+09:00",
+        "status": "valid",
+        "script": "test1",
+        "type": "Posting",
+        "liking_count": 0,
+        "author": 1,
+        "location": 1
+    },
+    {
+        "id": 2,
+        "author_nickname": "sanbonai06",
+        "created_at": "2022-04-08T21:00:01.300981+09:00",
+        "updated_at": "2022-04-08T21:00:01.301034+09:00",
+        "status": "valid",
+        "script": "test2",
+        "type": "Posting",
+        "liking_count": 0,
+        "author": 1,
+        "location": 1
+    },
+    {
+        "id": 3,
+        "author_nickname": "sanbonai06",
+        "created_at": "2022-04-08T22:14:40.392765+09:00",
+        "updated_at": "2022-04-08T22:14:40.392801+09:00",
+        "status": "valid",
+        "script": "test2",
+        "type": "Posting",
+        "liking_count": 0,
+        "author": 1,
+        "location": 1
+    }
+]
+
+```
