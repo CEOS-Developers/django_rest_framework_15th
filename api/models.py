@@ -18,7 +18,7 @@ class Post(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return '{} - {}'.fomat(self.user, self.content)
+        return '{} - {}'.format(self.user, self.content)
 
 class Media(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
