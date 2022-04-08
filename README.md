@@ -157,3 +157,4 @@ class Post(models.Model):
 ## [2] 모든 데이터를 가져오는 API
 
 ## [3] 새로운 데이터를 create하도록 요청하는 API
+
