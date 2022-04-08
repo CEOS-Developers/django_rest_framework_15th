@@ -14,7 +14,7 @@ class BaseModel(models.Model):
 
 
 class Profile(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     name = models.CharField(max_length=20, blank=True)
     nickname = models.CharField(max_length=30, unique=True)
     profile_scripts = models.TextField(blank=True)
@@ -25,17 +25,11 @@ class Profile(BaseModel):
 
 
 class Following(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followingUser')
+    follower = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='followerUser')
+    following = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='followingUser')
 
     def __str__(self):
-        return self.user_id
-
-
-class Follower(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followerUser')
-
-    def __str__(self):
-        return self.user_id
+        return '{} : {}'.format(self.follower.nickname, self.following.nickname)
 
 
 class Location(BaseModel):
@@ -48,59 +42,55 @@ class Location(BaseModel):
 
 
 class Post(BaseModel):
-    POST_TYPE = (
-        ("po", "Post"),
-        ("re", "Reels")
-    )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='post')
     script = models.TextField(blank=True)
-    type = models.CharField(max_length=20, choices=POST_TYPE)
-    location = models.ForeignKey(Location, on_delete=models.PROTECT, blank=True)
+    type = models.CharField(max_length=20)
+    location = models.ForeignKey(Location, on_delete=models.PROTECT, blank=True, related_name='related_location_post')
     liking_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return self.type
+        return '{} : {}'.format(self.author, self.type)
 
 
 class Image(BaseModel):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='image')
     url = models.TextField()
 
 
 class Movie(BaseModel):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='movie')
     url = models.TextField()
 
 
 class Liking(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='user_like_posting')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='liked_post')
 
     def __str__(self):
-        return self.user_id
+        return '{} : {}'.format(self.user.nickname, self.post.type)
 
 
 class Comment(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='user_add_comment')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comment_post')
     script = models.TextField()
 
     def __str__(self):
-        return self.user_id
+        return '{} : {} : {}'.format(self.user.nickname, self.post.type, self.script)
 
 
 class Story(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='user_upload_story')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='story')
 
     def __str__(self):
-        return self.user_id
+        return '{} : {}'.format(self.user.nickname, self.id)
 
 
 class ViewingStory(BaseModel):
-    story = models.ForeignKey(Story, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    story = models.ForeignKey(Story, on_delete=models.CASCADE, related_name='viewing_story')
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='viewer')
     liking = models.IntegerField()
 
     def __str__(self):
-        return self.story_id
+        return '{} : {}'.format(self.user.nickname, self.story.id)
