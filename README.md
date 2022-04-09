@@ -58,6 +58,35 @@
     리드미에서는 일단 가장 중요한 것 같은 Docker, docker-compose와 관련된 부분 중심으로 다루었고, 이를 넘어가지만 흥미있던 부분들에는 링크를 걸었습니다. 관심있으신 분들은 참고하시면 될 것 같습니다.
     항상 세미나를 통해 모르는것을 배워가는것이 매우 기분 좋고 보람찹니다. 진행해주시는 운영진 여러분들께 감사드리며,  앞으로도 CEOS 백엔드팀에서 저와 저희 백엔드 모두 함께 성장할 수 있었으면 좋겠습니다.
     </ol>
-  </body>
+    <h1>3주차 과제</h1>
+    <ol>
+      <li><h3><strong>sql 연결<strong></h3></li>
+      <img src = "./images/mysql.PNG">
+     <p>
+    <li><h3><strong>인스타그램 모델링과 데이터 작성 </strong></h3></li>
+    <img src = "./images/erd.PNG">
+      <ul>
+          <li><strong>profile</strong> : 장고에서 제공하는 기본 user의  OneToOne Link 방식 확장</li>
+          <li><strong>Post</strong> : 게시글. user와 1:N 관계. 내용과 생성 날짜</li>
+          <li><strong>Comment</strong> : 댓글. 게시글과 1:N 관계</li>
+          <li><strong>Media</strong> : 미디어. 게시글에 올라갈 이미지 혹은 영상에 관한 정보 </li>
+          <li><strong>Like</strong> : 좋아요 기능 관련 .현재는 게시글에만 좋아요를 설정했으나..</li>
+      </ul>
+     </p>
+  <li><h3><strong>django ORM 쿼리</strong></h3></li>
+    <img src = "/images/orm.PNG">
+     user 생성 후 user를 이용한 post 객체 생성. 그 후 filter를 이용해 post의 멤버들을 가지고 객체들을 조회함
+
   
+  
+  <li><h3><strong>소감과 느낀점</strong></h3></li>
+ 건강상의 문제로 인해 계속 늦어지고 계속 정상적인 과제 진행이 안되고 있었습니다. 급하게 하느라 부족한 점이 너무 많아 최대한 이른 시간내에
+ 수정 보완을 진행할 예정입니다. 
+ 건강 뿐 아니라 기본적인 프로젝트 진행에 있어서도 여러모로 애를 먹었습니다. 저의 부족함 때문입니다.<br>
+ sql을 직접 다루는게 아닌 ORM으로 다루는것이 익숙치는 않았기에 공부중에 있습니다.<br>
+ erd 설계 부분도 다른 분들의 리드미를 읽어보닌 너무 제가 간단하게 생각했다는걸 깨달았습니다.<br> 
+ 수정과 보완이 많이 필요할 것 같다는 생각이 듭니다.<br>
+ 바쁘신 와중에 허접한 과제 보여드려 죄송합니다. 분발하겠습니다.<br>
+ </ol>
+  </body>  
 </html>
