@@ -163,6 +163,13 @@ CEOS 14기 백엔드 스터디 모델링 및 drf 연습을 위한 레포
 > auto_now는 django model이 save 될 때마다 현재 시간으로 갱신<br>
 > auto_now_add는 django model이 최초 저장(insert, create)될 때만 현재 시간으로 적용
 
+<br>
+
+> `related_name 옵션` <br>
+> ForeignKey를 통해 연결되어 있는 모델들 사이에서 역참조를 할 수 있게끔 필드명을 지정함
+> <br>
+> ex.) Comment 모델을 ForeignKey를 통해 User 모델로 연결을 했을 때, User의 Comment 들을 불러올 수 있게끔 필드명을 지정해준 것
+
 ---
 
 ### ORM 적용
@@ -223,3 +230,246 @@ Post.objects.filter(like_count=0)
 인스타그램 데이터 모델링을 할 때 사진, 영상 업로드 기능이라는 핵심 기능에만 초점을 맞춰야 했기 때문에 어떤 기능들을 제거하고 ERD를 만드는 게 좋을지 고민이 있었던 것 같다. 결과적으로 핵심 기능에만 집중하기 위해 팔로우, 스토리, 대댓글 등의 기능들은 과감하게 고려하지 않고 설계했다.<br>
 CharField, TextField, ImageField, FileField 등 알지 못했던 부분들도 공부해보며 적용했다.<br>
 이번에 장고를 통해 모델링을 해보며 가장 편리했던 점은 User 모델이 자체적으로 존재했다는 것이다. User 모델에 대해 더 자세하게 공부해보고 싶은 생각이 들어 개인적으로 Django의 User 모델에 대해 더 공부해볼 생각이다.
+
+<br>
+
+---
+
+### Django Admin
+
+특정 모델클래스를 admin에 등록하면, 해당 모델을 어드민 계정을 통해 GUI 환경에서 관리 가능함
+
+#### Model Admin 등록방법
+
+1. 기본 ModelAdmin
+```python
+from django.contrib import admin
+from api.models import *
+
+admin.site.register(Post)
+```
+
+2. 기본 ModelAdmin 등록 후 커스터마이징
+```python
+from django.contrib import admin
+from api.models import *
+
+class PostAdmin(admin.ModelAdmin):
+    list_display = ['id', 'content']
+
+admin.site.register(Post, PostAdmin)
+```
+
+3. decorator 형태로 ModelAdmin 등록
+```python
+from django.contrib import admin
+from api.models import *
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ['id', 'content']
+```
+<br>
+
+- ModelAdmin 옵션
+  - list_display : 보여질 필드 목록
+  - list_display_links : 목록 내에서 링크 지정할 필드 목록
+  - list_editable : 목록 내에서 수정할 필드 목록
+  - list_per_page : 페이지 별로 보여질 최대 갯수
+  - list_filter : 필터 옵션
+
+<br>
+
+## 4주차 DRF1: Serializer
+
+---
+
+### Serializer 란
+
+queryset 및 모델 인스턴스와 같은 복잡한 데이터를 JSON, XML 등의 content type 쉽게 변환 가능한 python datatype으로 변환시켜줌
+
+`Deserialize` 는 받은 데이터 (parse -> python datatype)를 validating 한 후에 parsed data를 복잡한 타입으로 다시 변환해주는 것을 말함
+
+생성한 모델을 대상으로 serializing 할 수 있는 `ModelSerializer` 클래스가 존재하며 **create()** 와 **update()** 함수 또한 미리 구현되어 있어 해당 클래스를 사용해주면 편리함
+```python
+from rest_framework import serializers
+from api.models import *
+
+class PostSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Post
+		fields = ['id', 'user', 'content', 'like_count', 'comment_count', 'files']
+```
+
+### Nested Serializer
+
+다른 모델과 가지고 있는 relationship을 표현해 두 모델을 사용할 수 있음
+```python
+from rest_framework import serializers
+from api.models import *
+
+class FileSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = File
+		fields = '__all__'
+
+
+class PostSerializer(serializers.ModelSerializer):
+	files = FileSerializer(many=True, read_only=True)
+
+	class Meta:
+		model = Post
+		fields = ['id', 'user', 'content', 'like_count', 'comment_count', 'files']
+```
+
+### Serializer Method Field
+
+serializer의 필드로 relationship을 가지는 다른 모델의 필드를 가져올 수 있음
+
+```python
+from rest_framework import serializers
+from api.models import *
+
+
+class FileSerializer(serializers.ModelSerializer):
+	post_id = serializers.SerializerMethodField()
+
+	class Meta:
+		model = File
+		fields = '__all__'
+
+	def get_post_id(self, obj):
+		return obj.post.id
+```
+<br>
+
+---
+
+### View
+
+- GET
+<br>
+  모델 인스턴스들을 받아 serializing 한 JSON 데이터를 JsonResponse()를 통해 반환함
+- POST
+<br>
+  사용자가 입력한 JSON 데이터를 JSONParser()를 통해 parse함<br>
+  해당 데이터를 serializing 해준 뒤, is_valid() 를 통해 유효한 데이터임을 알아내면 JsonReponse()를 통해 201 상태코드와 함께 JSON 데이터를 반환해줌
+  - 만약 유효하지 않은 데이터임이 드러나면 (is_valid()) 에러와 함께 400 상태코드를 반환해줌
+
+<br>
+
+---
+
+### 데이터 삽입
+
+Post 모델 & File 모델
+```python
+class Post(DateTime):
+	user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='posts')
+	content = models.TextField()
+	like_count = models.PositiveIntegerField(default=0)
+	comment_count = models.PositiveIntegerField(default=0)
+
+	def __str__(self):
+		return self.content
+
+
+class File(models.Model):
+	post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='files')
+	type = models.PositiveIntegerField() # 0: photo, 1: video
+	path = models.CharField(max_length=300)
+```
+
+<img width="958" alt="스크린샷 2022-04-28 오전 12 10 39" src="https://user-images.githubusercontent.com/78442839/165579522-9d291e95-0ad7-43b3-8e64-15b23a101508.png">
+<img width="957" alt="스크린샷 2022-04-28 오전 12 11 16" src="https://user-images.githubusercontent.com/78442839/165579626-cc0ca748-caa8-4675-beb4-3cae9b9a371b.png">
+
+### 모든 데이터를 가져오는 API
+
+- **URL**: `api/post/`
+- **Method**: `GET`
+
+```
+[
+    {
+        "id": 1,
+        "content": "post content 1",
+        "like_count": 0,
+        "comment_count": 0,
+        "files": [
+            {
+                "id": 1,
+                "post_id": 1,
+                "type": 0,
+                "path": "post1.photo.path1",
+                "post": 1
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "content": "post content 2",
+        "like_count": 0,
+        "comment_count": 0,
+        "files": [
+            {
+                "id": 2,
+                "post_id": 2,
+                "type": 1,
+                "path": "post2.video.path1",
+                "post": 2
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "content": "post content 3",
+        "like_count": 0,
+        "comment_count": 0,
+        "files": [
+            {
+                "id": 3,
+                "post_id": 3,
+                "type": 0,
+                "path": "post3.photo.path1",
+                "post": 3
+            }
+        ]
+    }
+]
+```
+
+### 새로운 데이터를 create하도록 요청하는 API
+
+- **URL**: `api/post/`
+- **Method**: `POST`
+- **Body**
+  ```
+  {
+      "user": 2,
+      "content": "post 4",
+      "like_count": 0, 
+      "comment_count": 0
+  }
+  ```
+
+**결과**
+```
+{
+    "id": 4,
+    "user": 2,
+    "content": "post 4",
+    "like_count": 0,
+    "comment_count": 0,
+    "files": []
+}
+```
+<br>
+
+---
+
+### 회고
+
+Nested Serializer를 공부하면서 생각보다 에러가 나는 부분들이 많아 고생을 조금 했다.
+처음에는 욕심을 내서 profile, file, post, comment 까지 전부 중첩해서 가져올 수 있을 것 같다는 생각에 시도를 하였는데 자잘자잘한 오류가 발생하여 Nested Serializer에 대해 조금 더 공부를 해본 뒤, 다시 시도해 보려고 한다.
+그리고 views에 safe=False 옵션을 주라는 오류가 몇 번 발생해서 해당 부분을 추가하였더니 잘 작동하였다.
+마지막으로 Django Admin을 이번에 나름 적극적으로 활용해봤는데, 정말 편리한 기능인 것 같아서 앞으로 Django를 사용하는 동안 유용하게 활용할 수 있을 것 같다.
