@@ -169,7 +169,11 @@ Django는 보통 views.py에서 return을 할 때, render나 httpresponse함수�
 GET, POST, PUT, DELETE 같은 http method와 (CRUD기능), http url을 사용해서 특정 정보를 주거나 받는 행위를 쉽게 할 수 있다.  
 Django REST API를 사용하면, view에서 html페이지가 아닌 JSON형식의 정보를 전달해줄 수 있는 것이다.  
 즉 프론트 개발자들은 장고를 몰라도 JSON 형식의 데이터를 가져와 작업을 할 수 있다!  
-CEOS의 프론트 개발자들이 사용하는 리액트 뿐만 아니라 여러 도구에 제약이 없어지는 것이다.
+CEOS의 프론트 개발자들이 사용하는 리액트 뿐만 아니라 여러 도구에 제약이 없어지는 것이다.  
+
+추가적으로 URI는 자원을 표현하는데 중점을 두어야 한다.  
+그러므로 delete와 같은 행위에 대한 표현이 들어가면 안된다.  
+그리고 가독성을 높이기 위해 밑줄(_)보다는 하이픈(-)을 사용한다.  
 
 ### DRF
 DRF(Django Rest Framework)란, Django 안에서 RESTful API 서버를 쉽게 구축할 수 있도록 하는 오픈소스 라이브러리다.  
@@ -188,4 +192,9 @@ Serializer, ModelSerializer는 데이터 변환과 직렬화를 지원하는 것
 
 이제 장고를 이용해 RESTful한 API를 만들어보자!
 
-### 
+### DRF 세팅
+현재 프로젝트를 기준으로 /django_rest_framework_15th/settings/base.py 안의 INSTALLED_APPS에  
+`'rest_framework', 'snippets.apps.SnippetsConfig',`를 추가한다.  
+이렇게 하면 DRF를 사용할 수 있다.  
+
+
