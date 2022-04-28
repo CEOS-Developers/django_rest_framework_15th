@@ -17,7 +17,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['user', 'nickname', 'introduction', 'profileImg', 'this_post']
 
 
-class CommentSerialize(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
     Comment_writer = serializers.SerializerMethodField()
 
     class Meta:
