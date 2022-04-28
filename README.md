@@ -204,3 +204,8 @@ ModelSerializer은 모델을 JSON으로 쉽게 바꿀 수 있도록 해준다.
 PostSerializer, CommentSerializer를 만들어서 내가 원하는 모델의 필드들만 json으로 만들어줄 수 있다.  
 `fields = '__all__'`을 사용하면 모델의 모든 필드를 가져올 수도 있다.  
 
+### Nested Serializer
+두 모델이 연관이 있을 때 사용할 수 있는 것이다.  
+이 프로젝트의 모델은 Post, Comment, Media가 연관 관계를 가지고 있으므로 Nested Serializer을 사용해보도록 하겠다!  
+
+### 
