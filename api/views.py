@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from .models import *
 from .serializers import *
+from django.contrib.auth.models import User
 
 
 @csrf_exempt
@@ -13,7 +14,7 @@ def post_api(request):
         serializer = PostSerializer(posts, many=True)
         return JsonResponse(serializer.data)
 
-    elif request.method =='POST':
+    elif request.method == 'POST':
         data = JSONParser().parse(request)
         serializer = PostSerializer(data=data)
         if serializer.is_valid():
@@ -24,15 +25,16 @@ def post_api(request):
 
 @csrf_exempt
 def profile_api(request):
-    if request.method =='GET':
+    if request.method == 'GET':
         profiles = Profile.objects.all()
         serializer = ProfileSerializer(profiles, many=True)
-        return JsonResponse(serializer.data)
+        return JsonResponse(serializer.data,safe=False)
 
-    elif request.method=='POST':
-        data = JSONParser.parse(request)
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
         serializer = ProfileSerializer(data=data)
         if serializer.is_valid():
+            serializer.user = User
             serializer.save()
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
@@ -46,7 +48,7 @@ def comment_api(request):
         return JsonResponse(serializer.data)
 
     elif request.method =='POST':
-        data = JSONParser.parse(request)
+        data = JSONParser().parse(request)
         serializer = CommentSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -62,7 +64,7 @@ def media_api(request):
         return JsonResponse(serializer.data)
 
     elif request.method == 'POST':
-        data = JSONParser.parse(request)
+        data = JSONParser().parse(request)
         serializer = MediaSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -78,7 +80,7 @@ def like_api(request):
         return JsonResponse(serializer.data)
 
     elif request.method == 'POST':
-        data = JSONParser.parse(request)
+        data = JSONParser().parse(request)
         serializer = LikeSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

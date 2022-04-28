@@ -4,15 +4,15 @@ from django.contrib.auth.models import User
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    nickname = models.TextField(max_length=10)
-    introduction = models.TextField(max_length=200)
-    profileImg = models.CharField(max_length=200)
+    user = models.OneToOneField(User,blank=True, null=True, on_delete=models.CASCADE)
+    nickname = models.TextField(null=False, max_length=10)
+    introduction = models.TextField(default='', max_length=200)
+    profileImg = models.CharField(null=True, max_length=200)
 
 
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    Profile = models.ForeignKey(Profile, related_name='this_post', on_delete=models.CASCADE)
+    Profile = models.ForeignKey(Profile, default=-987654321, related_name='this_post', on_delete=models.CASCADE)
     content = models.TextField(blank=True)
     isMedia = models.BooleanField(default=True)
 
