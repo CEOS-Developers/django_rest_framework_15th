@@ -157,6 +157,7 @@ field option에서, auto_now_add=True 는 주로 생성일자에 사용된다.
 model 이 최초 저장될 때만 현재날짜가 적용된다.
 
 # 4주차 : DRF1 - Serializer
+## 개념
 ### JSON과 REST API 
 객체 표기법은 언어마다 다른데, JSON은 **특정 언어에 종속되지 않은 채로** 데이터를 교환하기 위해 만들어진 데이터 포맷이다.  
 데이터를 표시하는 표현 방법이라고 생각하면 된다.  
@@ -192,9 +193,14 @@ Serializer, ModelSerializer는 데이터 변환과 직렬화를 지원하는 것
 
 이제 장고를 이용해 RESTful한 API를 만들어보자!
 
+## 적용
 ### DRF 세팅
 현재 프로젝트를 기준으로 /django_rest_framework_15th/settings/base.py 안의 INSTALLED_APPS에  
-`'rest_framework', 'snippets.apps.SnippetsConfig',`를 추가한다.  
+`'rest_framework',`를 추가한다.  
 이렇게 하면 DRF를 사용할 수 있다.  
 
+### Serializer
+ModelSerializer은 모델을 JSON으로 쉽게 바꿀 수 있도록 해준다.  
+PostSerializer, CommentSerializer를 만들어서 내가 원하는 모델의 필드들만 json으로 만들어줄 수 있다.  
+`fields = '__all__'`을 사용하면 모델의 모든 필드를 가져올 수도 있다.  
 
