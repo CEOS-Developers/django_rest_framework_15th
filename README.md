@@ -370,6 +370,68 @@ urlpatterns = [
 
 ## HW 1 : INSERT Data
 
+### Django Admin Page
+
+1. 관리자 계정 설정
+`python manage.py createsuperuser`
+
+2. `admin.py` 수정
+```
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('profile', 'caption', 'count_like', 'count_comment')
+
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'name', 'number_follower', 'number_following')
+
+admin.site.register(Profile, ProfileAdmin)
+admin.site.register(Post, PostAdmin)
+```
+
+
+2-1 `models.py` 수정
+```
+class Post(CommonInfo):                                             # 게시글
+    ...
+
+    class Meta:
+        managed = True
+        verbose_name = 'Post'
+        verbose_name_plural = 'Posts'
+        
+class Profile(CommonInfo):                                          # 프로필                
+    ...
+    
+    class Meta:
+        managed = True
+        verbose_name = 'Profile'
+        verbose_name_plural = 'Profiles'
+```
+3. `127.0.0.1:8000/admin` admin login
+
+![may2](https://user-images.githubusercontent.com/77188666/166111205-890a2f06-657a-41dc-94c5-231cf18bbc11.PNG)
+
+### Profile Model
+```
+class Profile(CommonInfo):                                              # 프로필
+    user = models.OneToOneField(User, on_delete=models.CASCADE)         # FK (user_id)
+    name = models.CharField(max_length=30)                              # 이름
+    photo = models.FileField(upload_to='file/profile/', null=True)      # 프로필 사진 저장 위치
+    website = models.CharField(max_length=320)                          # Website
+    bio = models.CharField(max_length=150)                              # Bio
+    public_flag = models.BooleanField(default=False)                    # 공개 계정
+    number_follower = models.IntegerField(default=0)                    # 팔로워 수
+    number_following = models.IntegerField(default=0)                   # 팔로잉 수
+    number_posts = models.IntegerField(default=0)                       # 게시글 수
+
+    class Meta:
+        managed = True
+        verbose_name = 'Profile'
+        verbose_name_plural = 'Profiles'
+```
+
+![may1](https://user-images.githubusercontent.com/77188666/166110989-e5eadf12-102a-46d7-96ce-0a68f5e8de93.PNG)
+
+
 ## HW 2 : /GET/ API 
 
 ## HW 3 : /POST/ API 
