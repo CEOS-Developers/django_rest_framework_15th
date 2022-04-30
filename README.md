@@ -221,7 +221,7 @@ In order to allow non-dict objects to be serialized set the safe parameter to Fa
 `return JsonResponse(serializer.data, safe=False)`  
 로 바꾸었다. `safe=False`를 추가한 것!  
 수정 후 127.0.0.1:8000/api/posts/로 접속 시  
-<img src="img/4/api-posts.JPG" width="650"/>
+<img src="img/4/api-posts.JPG" width="650"/>  
 위와 같이 뜬다.... 오류일까..?  
 
 ### 과제 1. 데이터 삽입
@@ -245,7 +245,8 @@ In order to allow non-dict objects to be serialized set the safe parameter to Fa
 Serializer를 처음 사용해보는 거라 많은 것을 배울 수 있었다.   
 API 작성 완료 후 테스트를 하는 과정에서  
 DRF+브라우저 활용 방법을 이용했는데 브라우저 화면이 원하는대로 띄워지지 않아서 오류가 생겼다고 생각된다..   
-오류 수정을 최대한 해보고 만약 방법을 찾을 수 없으면 포스트맨을 설치해서 5주차 스터디 전까지 리드미에 추가할 예정이다!!  
+오류 수정을 최대한 해보고 만약 방법을 찾을 수 없으면  
+포스트맨을 설치해서 5주차 스터디 전까지 리드미에 추가할 예정이다!!  
 
 
 
