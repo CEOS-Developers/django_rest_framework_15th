@@ -115,7 +115,7 @@ https://www.youtube.com/playlist?list=PLuHgQVnccGMDeMJsGq2O-55Ymtx0IdKWf
     한 게시물에 여러 파일이 업로드 될 수 있으므로 post와 일대다 관계이다.  
     어떤 게시물에 해당되는 파일인지 구별하기 위해 post 모델을 foreignkey로 두었다.
 
-<img src="img/3/erd.JPG" width="650"/>````
+<img src="img/3/erd.JPG" width="650"/>
 
 - 추가 : ImageField를 사용하려면 `pip install Pillow` 필수
   - 하지만 pillow 때문에 도커 빌드가 계속 실패했다 -> uninstall pillow 하니 정상적으로 빌드 됨
@@ -208,4 +208,36 @@ PostSerializer, CommentSerializer를 만들어서 내가 원하는 모델의 필
 두 모델이 연관이 있을 때 사용할 수 있는 것이다.  
 이 프로젝트의 모델은 Post, Comment, Media가 연관 관계를 가지고 있으므로 Nested Serializer을 사용해보도록 하겠다!  
 
-### 
+### Serializer Method Field
+모델에 없는 필드이지만 JSON에 추가하고 싶거나  
+모델에 있는 값을 변경해서 JSON에 추가하고 싶을 때 사용할 수 있다고 한다.  
+(예를 들어 모델에는 fullName 필드가 있지만 JSON에는 firtsName으로 보내고 싶을 때)  
+
+### API Test
+`TypeError at /api/posts/
+In order to allow non-dict objects to be serialized set the safe parameter to False.`  
+라는 에러가 떴다.  
+그래서 api/views.py 의 post_list의 리턴값을  
+`return JsonResponse(serializer.data, safe=False)`  
+로 바꾸었다. `safe=False`를 추가한 것!  
+수정 후 127.0.0.1:8000/api/posts/로 접속 시  
+<img src="img/4/api-posts.JPG" width="650"/>
+위와 같이 뜬다.... 오류일까..?  
+
+### 과제 1. 데이터 삽입
+**모델 (Post, Comment)**  
+<img src="img/4/1-model.JPG" width="650"/>
+
+**데이터**  
+<img src="img/4/1-data.JPG" width="650"/>
+/admin 을 사용했다!
+
+### 과제 2. 모든 데이터를 가져오는 API
+
+
+
+
+
+
+
+
