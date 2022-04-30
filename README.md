@@ -433,9 +433,29 @@ class Profile(CommonInfo):                                              # 프로
 
 
 ## HW 2 : /GET/ API 
+```
+def profile_list(request):
+    if request.method == 'GET':
+        profiles = Profile.objects.all()
+        serializer = ProfileSerializer(profiles, many=True)
+        return JsonResponse(serializer.data)
+    ...
+```
+
 
 ## HW 3 : /POST/ API 
-
+```
+def profile_list(request):
+    
+    ...
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = ProfileSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+```
 
 ## 회고
 
