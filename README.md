@@ -56,45 +56,41 @@
 - 사용자는 댓글에 대댓글을 달 수 있음 (수정 불가능)
 
 ### 모델 설명
-![instaClone_ERD](https://user-images.githubusercontent.com/68195241/161352152-ff55b437-23a7-4664-a3ad-f6838844fe3c.png)
+![instaCloneERD](https://user-images.githubusercontent.com/68195241/161428714-e9491632-a792-4a3f-8dcf-135b947cfebf.png)
 
 #### Profile
-- user_id : 사용자 id (사용자 이름)
+- user : 사용자 id
 - profile_pic : 프로필 사진
 - profile_name : 프로필 이름
 - profile_website : 프로필 웹사이트
 - profile_bio : 프로필 소개
 
 #### Post
-- post_id : 게시글 id
-- user_id : 사용자 id (게시글 작성자)
+- user : 사용자 id (게시글 작성자)
 - content : 게시글 내용
 - created_at : 게시글 최초 작성 날짜
 - modified_at : 게시글 최근 수정 날짜
 
 #### Media
-- post_id : 게시글 id (어느 게시글의 미디어인지)
 - content : 미디어 내용
-- ~~content_type : 사진/영상 (미디어 종류)~~
+- content_type : 사진/영상 (미디어 종류)
 
 #### Comment
-- comment_id : 댓글 id
-- post_id : 게시글 id (어느 게시글에 단 댓글인지)
-- user_id : 사용자 id (댓글 작성자)
+- post : 게시글 id (어느 게시글에 단 댓글인지)
+- user : 사용자 id (댓글 작성자)
 - content : 댓글 내용
 - created_at : 댓글 최초 작성 날짜
 
 #### Reply
-- reply_id : 대댓글 id
-- post_id : 게시글 id (어느 게시글에 있는 댓글의 대댓글인지)
-- comment_id : 댓글 id (어느 댓글의 대댓글인지)
-- user_id : 사용자 id (대댓글 작성자)
+- post : 게시글 id (어느 게시글에 있는 댓글의 대댓글인지)
+- comment : 댓글 id (어느 댓글의 대댓글인지)
+- user : 사용자 id (대댓글 작성자)
 - content : 대댓글 내용
 - created_at : 대댓글 최초 작성 날짜
 
 #### Like
-- post_id : 게시글 id (어느 게시글의 좋아요인지)
-- user_id : 사용자 id (좋아요 등록자)
+- post : 게시글 id (어느 게시글의 좋아요인지)
+- user : 사용자 id (좋아요 등록자)
 - created_at : 좋아요 등록일
 
 
@@ -103,25 +99,28 @@
 ### 1. 데이터베이스에 해당 모델 객체 3개 넣기
 #### 코드
 ```
-firstPost = Post.objects.create(user=1, content="1st Post")
-secondPost = Post.objects.create(user=2, content="2nd Post")
-thirdPost = Post.objects.create(user=1, content="3rd Post")
+firstPost = Post.objects.create(content="1st Post", user=u1)
+secondPost = Post.objects.create(content="2nd Post", user=u1)
+thirdPost = Post.objects.create(content="3rd Post", , user=u1)
 ```
 #### 결과화면
+![객체3개넣기](https://user-images.githubusercontent.com/68195241/161427793-8c5d4147-b33f-4a5d-bc6d-db256939b181.JPG)
 
 ### 2. 삽입한 객체들을 쿼리셋으로 조회해보기
 #### 코드
 ```
-Post.object.all()
+Post.objects.all()
 ```
 #### 결과화면
+![객체조회](https://user-images.githubusercontent.com/68195241/161427787-470003fc-a9c7-4cab-854a-f929f3af4dd6.JPG)
 
 ### 3. filter 함수 사용해보기
 #### 코드
 ```
-Post.object.filter(user=1)
+Post.objects.filter(content="1st Post")
 ```
 #### 결과화면
+![filter함수](https://user-images.githubusercontent.com/68195241/161427794-00448d86-b4be-4f3d-a116-16646b76f0f8.JPG)
 
 ***
 
@@ -133,3 +132,29 @@ Post.object.filter(user=1)
 > - mysqlclient : ~~wsl 수동설치 & 환경변수 설정으로 문제 해결~~ venv과 requirements.txt. 설치된 pip가 그렇게 많은 것이 애초에 이상함의 지표였음 (pip list로 확인)
 > - ERD : 생활코딩, 구글링 등등
 > - ORM : 참고자료, 구글링 등등
+
+
+***
+
+# Week4 : DRF1-Serializer
+
+## [1] 데이터 삽입
+### - 모델 선택 및 데이터 삽입
+
+```Post 모델```
+```python
+class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '{} - {}'.format(self.user, self.content)
+```
+![PostModel](https://user-images.githubusercontent.com/68195241/162532963-e3271d0e-0a82-4a24-a540-a1d5e52172f1.JPG)
+
+## [2] 모든 데이터를 가져오는 API
+
+## [3] 새로운 데이터를 create하도록 요청하는 API
+
