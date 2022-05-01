@@ -114,10 +114,6 @@ https://www.youtube.com/playlist?list=PLuHgQVnccGMDeMJsGq2O-55Ymtx0IdKWf
     - 사진, 영상을 업로드 하기 위한 모델  
     한 게시물에 여러 파일이 업로드 될 수 있으므로 post와 일대다 관계이다.  
     어떤 게시물에 해당되는 파일인지 구별하기 위해 post 모델을 foreignkey로 두었다.
-- Like
-    - 좋아요 갯수를 관리하는 모델
-    post별로 좋아요 갯수를 다르게 저장해야 하므로, post모델 안에 like모델을 foreignkey로 두었다.  
-    마찬가지로 댓글 별로 좋아요 갯수를 저장해야 하므로 comment 안에 like모델을 foreignkey로 두었다.
 
 <img src="img/3/erd.JPG" width="650"/>
 
@@ -153,3 +149,108 @@ def __str__(self):
 
 - `Post.objects.filter(id=3)` 을 이용하면 id 3인 글만 불러올 수 있다.  
 <img src="img/3/shell3.JPG" width="650"/>
+
+- 추가 : DateField(auto_now_add=True)를 추가했다.  
+field option에서, auto_now=True 는 주로 수정일자에 사용된다.  
+model 이 save 될 때마다 현재날짜로 갱신된다.  
+field option에서, auto_now_add=True 는 주로 생성일자에 사용된다.  
+model 이 최초 저장될 때만 현재날짜가 적용된다.
+
+# 4주차 : DRF1 - Serializer
+## 개념
+### JSON과 REST API 
+객체 표기법은 언어마다 다른데, JSON은 **특정 언어에 종속되지 않은 채로** 데이터를 교환하기 위해 만들어진 데이터 포맷이다.  
+데이터를 표시하는 표현 방법이라고 생각하면 된다.  
+
+Django는 보통 views.py에서 return을 할 때, render나 httpresponse함수를 사용하여 렌더링된 html페이지를 돌려준다.  
+즉 프론트 개발자들의 장고 template를 작성해야하는 것이다.  
+장고를 모르는 프론트 개발자들은 어떻게 하란 말인가!  
+
+일단, REST API라는 것을 사용하면  
+GET, POST, PUT, DELETE 같은 http method와 (CRUD기능), http url을 사용해서 특정 정보를 주거나 받는 행위를 쉽게 할 수 있다.  
+Django REST API를 사용하면, view에서 html페이지가 아닌 JSON형식의 정보를 전달해줄 수 있는 것이다.  
+즉 프론트 개발자들은 장고를 몰라도 JSON 형식의 데이터를 가져와 작업을 할 수 있다!  
+CEOS의 프론트 개발자들이 사용하는 리액트 뿐만 아니라 여러 도구에 제약이 없어지는 것이다.  
+
+추가적으로 URI는 자원을 표현하는데 중점을 두어야 한다.  
+그러므로 delete와 같은 행위에 대한 표현이 들어가면 안된다.  
+그리고 가독성을 높이기 위해 밑줄(_)보다는 하이픈(-)을 사용한다.  
+
+### DRF
+DRF(Django Rest Framework)란, Django 안에서 RESTful API 서버를 쉽게 구축할 수 있도록 하는 오픈소스 라이브러리다.  
+DRF는 Serializer 기능을 제공해준다. 또한 Serializer는 직렬화 라는 뜻을 가지고 있다.  
+쉽게 이야기 하면, Python 데이터와 QuerySet 데이터를 JSON 타입의 데이터로 변환해주는 역할을 한다!  
+
+### Serializer vs Form
+Serializer를 찾아보니 기존에 사용해봤던 Django Form과 비슷했다.  
+차이가 뭘까?  
+
+Form, ModelForm은 HTML 입력폼을 통해 입력에 대한 유효성 검사를 수행한다.  
+주로 Create, Update 등 admin에서 활동이 된다.  
+
+Serializer, ModelSerializer는 데이터 변환과 직렬화를 지원하는 것이다.  
+주로 JSON 포맷 입력에 대한 유효성을 검사한다.  
+
+이제 장고를 이용해 RESTful한 API를 만들어보자!
+
+## 적용
+### DRF 세팅
+현재 프로젝트를 기준으로 /django_rest_framework_15th/settings/base.py 안의 INSTALLED_APPS에  
+`'rest_framework',`를 추가한다.  
+이렇게 하면 DRF를 사용할 수 있다.  
+
+### Serializer
+ModelSerializer은 모델을 JSON으로 쉽게 바꿀 수 있도록 해준다.  
+PostSerializer, CommentSerializer를 만들어서 내가 원하는 모델의 필드들만 json으로 만들어줄 수 있다.  
+`fields = '__all__'`을 사용하면 모델의 모든 필드를 가져올 수도 있다.  
+
+### Nested Serializer
+두 모델이 연관이 있을 때 사용할 수 있는 것이다.  
+이 프로젝트의 모델은 Post, Comment, Media가 연관 관계를 가지고 있으므로 Nested Serializer을 사용해보도록 하겠다!  
+
+### Serializer Method Field
+모델에 없는 필드이지만 JSON에 추가하고 싶거나  
+모델에 있는 값을 변경해서 JSON에 추가하고 싶을 때 사용할 수 있다고 한다.  
+(예를 들어 모델에는 fullName 필드가 있지만 JSON에는 firtsName으로 보내고 싶을 때)  
+
+### API Test
+`TypeError at /api/posts/
+In order to allow non-dict objects to be serialized set the safe parameter to False.`  
+라는 에러가 떴다.  
+그래서 api/views.py 의 post_list의 리턴값을  
+`return JsonResponse(serializer.data, safe=False)`  
+로 바꾸었다. `safe=False`를 추가한 것!  
+수정 후 127.0.0.1:8000/api/posts/로 접속 시  
+<img src="img/4/api-posts.JPG" width="650"/>  
+위와 같이 뜬다.... 오류일까..?  
+
+### 과제 1. 데이터 삽입
+**모델 (Post, Comment)**  
+<img src="img/4/1-model.JPG" width="650"/>  
+
+**데이터**  
+<img src="img/4/1-data.JPG" width="650"/>  
+/admin 을 사용했다!
+
+### 과제 2. 모든 데이터를 가져오는 API
+- **URL**: `api/posts/`  
+- **Method**: `GET`  
+
+### 과제 3. 새로운 데이터를 create하도록 요청하는 API
+- **URL**: `api/posts/`  
+- **Method**: `POST`  
+- **BODY**: `{}`
+
+### 회고
+Serializer를 처음 사용해보는 거라 많은 것을 배울 수 있었다.   
+API 작성 완료 후 테스트를 하는 과정에서  
+DRF+브라우저 활용 방법을 이용했는데 브라우저 화면이 원하는대로 띄워지지 않아서 오류가 생겼다고 생각된다..   
+오류 수정을 최대한 해보고 만약 방법을 찾을 수 없으면  
+포스트맨을 설치해서 5주차 스터디 전까지 리드미에 추가할 예정이다!!  
+
+
+
+
+
+
+
