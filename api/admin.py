@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post
+from .models import *
 
 # 출력할 PostAdmin 클래스
 class PostAdmin(admin.ModelAdmin):
@@ -7,3 +7,4 @@ class PostAdmin(admin.ModelAdmin):
 
 # 클래스를 Admin 사이트에 등록
 admin.site.register(Post, PostAdmin)
+admin.site.register(Like)
