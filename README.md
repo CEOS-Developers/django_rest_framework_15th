@@ -1,6 +1,6 @@
 CEOS 14기 백엔드 스터디 모델링 및 drf 연습을 위한 레포
 
-### 2주차 <hr>
+## 2주차 <hr>
 
 ### 도커
 
@@ -71,7 +71,7 @@ push, pull request 등
 
 <br>
 
-### 3주차 <hr>
+## 3주차 <hr>
 
 #### MySQL 설치
 환경 변수 설정 안하면 mysql 명령어 에러남   
@@ -80,35 +80,33 @@ push, pull request 등
 
 <br>
 
-#### 인스타그램 데이터 모델링
+### 인스타그램 데이터 모델링
 
-<<<<<<< HEAD
-=======
 ![다운로드](https://user-images.githubusercontent.com/81256252/161230387-f2a8c3bd-4715-4dea-85ca-4b5034a5fe9b.png)
 
->>>>>>> f8c1c76a8249f6505fafa018dd773cbc76591d95
 #### User
 장고에서 기본으로 제공하는 유저 모델
 * 사용자 이름, 비밀번호, 이름, 성, 이메일 주소 필드
 
+
 #### Profile
 장고 기본 User Model OneToOne 확장   
-* 전화번호 
-* 프로필 사진
+* 전화번호 _중복 방지하기 위해 `unique=True` 추가_
+* 프로필 사진 _ImageField 대신 url 링크 넣을 수 있는 CharField로 변경_
 * 웹사이트
 * 소개
 * 팔로워, 팔로잉
   * Profile 모델(self)과 N:M 관계
-  * 팔로워, 팔로잉 0인 경우 존재하기 때문에 null=True, blank=True
-  ```    follower=models.ManyToManyField('self',null=True, blank=True)```   
-    ```following=models.ManyToManyField('self',null=True, blank=True)```
+  * 팔로워, 팔로잉 0인 경우 존재하기 때문에 blank=True   
+  ```    follower=models.ManyToManyField('self', blank=True)```   
+    ```following=models.ManyToManyField('self', blank=True)```
 
 #### Post
 게시글 모델   
 사진이나 영상 파일은 1:N으로 연결하기 위해 별도 모델로 관리
 * 유저 아이디 Foreign Key로 사용 1(유저):N(게시글) 
 * 내용
-* 업로드 시간
+* ~~업로드 시간~~
 * 댓글
   * 댓글 수만 카운트, 댓글 상세 내용은 Comment 모델에서 관리
 * 좋아요
@@ -118,14 +116,14 @@ push, pull request 등
 글과 함께 올라가는 사진 및 영상 파일 모델    
 게시글과 1(글):N(파일)
 * 포스트 아이디 Foreign Key로 사용 1(글):N(파일)
-* 해당 글에 업로드할 파일
+* 해당 글에 업로드할 파일 _FileField 대신 url 링크 넣을 수 있는 CharField로 변경_
 
 #### Comment
 글에 달린 댓글 관련 상세 내용 관리   
 게시글과 1:N 관계
 * 포스트 아이디 Foreign Key로 사용 1(글):N(댓글)
 * 유저 아이디 Foreign Key로 사용 1(댓글 작성한 유저):N(댓글)
-* 업로드 시간
+* ~~업로드 시간~~
 * 댓글 내용
 
 #### Like
@@ -133,18 +131,18 @@ push, pull request 등
 게시글과 1:N 관계
 * 포스트 아이디 Foreign Key로 사용 1(글):N(댓글)
 * 유저 아이디 Foreign Key로 사용 1(좋아요 한 유저):N(댓글)
-* 업로드 시간
+* ~~업로드 시간~~
+
+
+#### + Base Model
+다른 모델이 상속받아 사용할 수 있도록 created_at, updated_at 필드 따로 작성한 모델   
+`class Meta: abstract = True`
+* 최초 업로드 시간 `auto_now_add=True`
+* 수정 시간 `auto_now=True`
 
 <br>
 
 #### ORM 적용해보기
-<<<<<<< HEAD
-1. 데이터베이스에 객체 넣기
-
-2. 삽입한 객체 조회하기
-
-3. filter 함수 사용해보기
-=======
 1. 데이터베이스에 객체 넣기      
 ![post create+all](https://user-images.githubusercontent.com/81256252/161230476-c8351705-7f1d-4902-b842-f051b9955735.PNG)
 
@@ -166,4 +164,149 @@ ERD 모델링을 먼저 하고 models.py 코드를 작성하였는데 그 과정
 팔로우 관련 기능을 구현할 때 N:M 관계를 이용하였는데 해당 기능을 Profile 모델에 넣었더니 Profile 모델에 너무 많은 필드가 들어가게 되었다.
 팔로우 관련 기능은 별도로 관리할 수 있게 following과 follower 필드는 따로 빼 모델을 수정할 예정이다.
 
+<br>
 
+## 4주차 <hr/>
+#### 데이터 삽입
+Post 모델  
+```
+class Post(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    like_count = models.PositiveIntegerField(default=0)
+    comment_count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.content[:50]
+
+class Like(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='like', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.post.content[:50]+" / "+self.user.username
+
+class Comment(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='comment', on_delete=models.CASCADE)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.post.content[:50]+" / "+self.user.username
+```
+데이터 삽입 결과    
+![image](https://user-images.githubusercontent.com/81256252/162493664-ff7b9505-a489-4eb7-b638-edf7d8541e02.png)
+
+<br>
+        
+#### 모든 데이터 가져오는 API
+* URL : api/post/
+* Method : GET
+```
+[
+    {
+        "id": 1,
+        "comment": [
+            {
+                "id": 1,
+                "created_at": "2022-04-04T00:37:19.719049+09:00",
+                "updated_at": "2022-04-04T00:52:54.935482+09:00",
+                "content": "hihi",
+                "user": 3,
+                "post": 1
+            }
+        ],
+        "like": [
+            {
+                "id": 1,
+                "created_at": "2022-04-04T00:37:07.577675+09:00",
+                "updated_at": "2022-04-04T00:37:07.577675+09:00",
+                "user": 1,
+                "post": 1
+            }
+        ],
+        "file": [
+            {
+                "id": 1,
+                "url": "asdasd",
+                "post": 1
+            }
+        ],
+        "created_at": "2022-04-04T00:35:09.855194+09:00",
+        "updated_at": "2022-04-09T02:37:37.044732+09:00",
+        "content": "Ut hendrerit arcu facilisis erat molestie, et egestas sem blandit. Ut mattis ligula sed nulla efficitur ullamcorper. Sed tellus sem, consectetur ac laoreet vitae, aliquet vel metus. Quisque sed turpis malesuada, sodales ex ut, semper tellus. Aenean dapibus nec neque id dapibus. Aenean hendrerit lorem eu volutpat efficitur. Sed pulvinar finibus lorem, ac pharetra metus finibus vel. Cras sit amet arcu luctus, feugiat nibh a, blandit mi. Pellentesque rutrum mi molestie, pellentesque felis ut, rutrum metus. Phasellus fringilla dignissim nisl, sed molestie orci vehicula vitae. Nulla facilisi. Aenean sed maximus massa. Mauris vel pellentesque nulla. Curabitur ut posuere purus. Maecenas elementum est ex.",
+        "like_count": 2,
+        "comment_count": 2,
+        "user": 1
+    },
+    {
+        "id": 2,
+        "comment": [
+            {
+                "id": 2,
+                "created_at": "2022-04-04T00:46:32.936881+09:00",
+                "updated_at": "2022-04-04T00:46:32.936881+09:00",
+                "content": "asd",
+                "user": 1,
+                "post": 2
+            },
+            {
+                "id": 3,
+                "created_at": "2022-04-04T00:52:43.022380+09:00",
+                "updated_at": "2022-04-04T00:52:43.022380+09:00",
+                "content": "abc",
+                "user": 2,
+                "post": 2
+            }
+        ],
+        "like": [
+            {
+                "id": 2,
+                "created_at": "2022-04-04T00:52:26.776129+09:00",
+                "updated_at": "2022-04-04T00:52:26.776129+09:00",
+                "user": 2,
+                "post": 2
+            }
+        ],
+        "file": [],
+        "created_at": "2022-04-04T00:46:20.295188+09:00",
+        "updated_at": "2022-04-04T00:51:05.388888+09:00",
+        "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pellentesque lorem sed lorem posuere tincidunt. Sed finibus metus sed ante eleifend consectetur. Curabitur interdum nisl eu urna semper ornare. Curabitur varius sodales aliquet. Aliquam a elementum magna. Nam commodo auctor fermentum. In semper gravida est, ut condimentum risus consequat nec. Proin dapibus pellentesque rutrum. Morbi tincidunt nulla in porta convallis.",
+        "like_count": 0,
+        "comment_count": 0,
+        "user": 2
+    },
+    {
+        "id": 3,
+        "comment": [],
+        "like": [],
+        "file": [],
+        "created_at": "2022-04-04T00:48:42.437394+09:00",
+        "updated_at": "2022-04-09T02:38:15.035626+09:00",
+        "content": "Nulla iaculis auctor pretium. Phasellus nec nisl ut diam sodales viverra et sed sem. Pellentesque vestibulum euismod ligula, nec pretium sem ultricies sodales. Nulla id quam interdum, dapibus ex ut, feugiat est. Vestibulum congue condimentum ligula, sed ultricies est rutrum at. Phasellus vulputate magna a dolor tincidunt, vel tempus quam accumsan. Etiam dignissim ut purus scelerisque ultrices. Nullam viverra vulputate dui, a commodo nisi tempor condimentum. Nulla facilisi. Vivamus consectetur magna egestas mauris volutpat, vitae vestibulum tellus accumsan. Morbi eu purus tempor, vehicula mi tempor, feugiat mauris.",
+        "like_count": 1,
+        "comment_count": 1,
+        "user": 3
+    }
+]
+```
+
+<br>
+
+#### 새로운 데이터 생성하는 API
+* URL : api/post/
+* Method : POST   
+* Body : ```{ "id":6, "content":"post", "user":3 }```  
+
+![image](https://user-images.githubusercontent.com/81256252/162494842-e6b14197-79b2-4660-bdd5-bd8b482545e0.png)   
+
+![image](https://user-images.githubusercontent.com/81256252/162494896-1103aaea-6451-4fdb-b8d7-b4a95c23e980.png)
+
+
+#### 회고
+3주차 과제 피드백을 반영하여 의미가 불분명한 모델의 필드명을 수정하였고 사진이나 영상 파일을 받을 때 사용한 ImageField, FileField를 CharField로 수정하였다. 
+모델마다 중복 사용된 업로드 시간, 수정 시간 필드는 추상 모델인 BaseModel 안에 시간 관련 필드를 작성해 다른 모델들이 이를 상속받을 수 있게 히였다.
+
+4주차 과제 중 모든 데이터를 가져오는 API가 외래키로 연결된 모델의 내용을 제대로 가지고 오지 못하는 문제가 발생하였다. 모델에 ```'related_name'```을 추가하지 않아 발생한 문제임을 알게되었고 가져와야 하는 내용을 담고있는 모델 필드에 ```related_name```을 설정해 해결할 수 있었다. 
+
+view의 경우 이전에 ViewSet을 사용하였을 때 코드를 간결하게 작성했던 기억이 있어 viewset을 가져와 사용하였고 url은 라우터를 이용하여 연결해주었다.
