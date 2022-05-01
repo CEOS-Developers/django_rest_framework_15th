@@ -155,6 +155,29 @@ class Post(models.Model):
 ![PostModel](https://user-images.githubusercontent.com/68195241/162532963-e3271d0e-0a82-4a24-a540-a1d5e52172f1.JPG)
 
 ## [2] 모든 데이터를 가져오는 API
+- URL : ```api/posts/```
+- Method : ```GET```
+
+#### 결과 코드
+```json
+
+```
 
 ## [3] 새로운 데이터를 create하도록 요청하는 API
+- URL : ```api/items/```
+- Method : ```POST```
+- Body : ```{}```
 
+#### 결과 코드
+```json
+
+```
+
+***
+
+> ### 회고
+> 시험 기간으로 꽤 많은 시간을 날리고 나니 그 시간 동안 배웠던 지식들도 휘발되는 바람에 고생을 많이 했습니다... 그리고 지금도 어째선지 api를 요청했을 때 TypeError 창이 뜨고 있어서 끝이 좋지 못합니다. 부디 이번 주말 안에 해결할 수 있기를 바랍니다...
+> <br/>
+> <br/>
+> #### 어려웠던 점
+> - api 요청 결과 띄우기
