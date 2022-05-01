@@ -11,7 +11,7 @@ def post_list(request):
     if request.method == 'GET':
         post = Post.objects.all()
         serializer = PostSerializer(post, many=True)
-        return JsonResponse(serializer.data)
+        return JsonResponse(serializer.data, safe=False)
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)
