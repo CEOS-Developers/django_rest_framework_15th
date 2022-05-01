@@ -155,7 +155,7 @@ class Post(models.Model):
 ![PostModel](https://user-images.githubusercontent.com/68195241/162532963-e3271d0e-0a82-4a24-a540-a1d5e52172f1.JPG)
 
 ## [2] 모든 데이터를 가져오는 API
-- URL : ```api/posts/```
+- URL : ```api/post/```
 - Method : ```GET```
 
 #### 결과 코드
@@ -164,7 +164,7 @@ class Post(models.Model):
 ```
 
 ## [3] 새로운 데이터를 create하도록 요청하는 API
-- URL : ```api/items/```
+- URL : ```api/post/```
 - Method : ```POST```
 - Body : ```{}```
 
