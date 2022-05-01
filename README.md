@@ -111,7 +111,9 @@ docs에서 option 카테고리에 가보면 다양한 옵션을 찾을 수 있�
 ***
 
 # 3주차 과제
-<img width="741" alt="스크린샷 2022-04-02 오후 5 41 27" src="https://user-images.githubusercontent.com/88263178/161375031-22e0b8ff-923c-4c18-b32f-0de6b3155b5c.png">
+⚒️ refactoring: 중복되는 필드인 생성 시간, 수정 시간을 timestamp 추상 클래스로 만들어서 상속관계로 구현
+## 데이터베이스 
+<img width="770" alt="ERD" src="https://user-images.githubusercontent.com/88263178/161997711-49c05ae8-7f4b-4979-87b3-8d31424e7e17.png">
 
 - profile
   - 인스타그램 프로필
@@ -121,23 +123,24 @@ docs에서 option 카테고리에 가보면 다양한 옵션을 찾을 수 있�
 - user
   - 사용자 모델
   - 장고의 기본 User 모델 사용
-  - username, email, password
-
+  
+- timestamp
+  - 생성 시간, 수정 시간을 가지는 추상 클래스
 
 - comment
   - 게시글에 달리는 댓글 모델
   - 댓글은 게시글에 여러 개 달릴 수 있으므로, 일대다 관계
-  - 댓글은 사용자와 일대일 관계
-  - 댓글 내용, 생성시간, 수정시간
+  - 댓글은 사용자와 일대다 관계
+  - 댓글 내용, 생성시간, 수정시간(timestamp를 상속)
   
 - post
   - 게시글 모델
   - 게시글은 한 유저가 여러 개 작성할 수 있으므로, 일대다 관계
-  - 게시글 내용, 생성시간, 수정시간, 좋아요 개수
+  - 게시글 내용, 생성시간, 수정시간(timestamp를 상속), 좋아요 개수
 
 - like
   - 좋아요 모델
-  - 좋아요는 유저와 일대일 관계
+  - 좋아요는 유저와 일대다 관계
   - 좋아요는 게시글이 여러 개 가질 수 있으므로 일대다 관계
 
 - file
@@ -156,3 +159,72 @@ TIMESTAMP는 데이터 입출력시 time_zone 시스템 변수 값을 체크해 
 따라서 해외에 나가는 사이트라면 TIMESTAMP를 고려해야할 것 같습니다.
 
 저는 이번 인스타그램 프로젝트는 한국에서만 사용하는 것으로 판단하고 DATETIME으로 지정하였습니다.
+
+## ORM 적용
+
+### 객체 생성
+
+<img width="1523" alt="ORM_객체생성" src="https://user-images.githubusercontent.com/88263178/161998117-22b8edba-de7d-400c-a5a2-b765e25107d8.png">
+
+
+## 객체 조회
+<img width="725" alt="ORM_객체조회" src="https://user-images.githubusercontent.com/88263178/161998291-48e2dcff-f71c-4012-8fc8-b9a6c91a221f.png">
+
+## filter 사용 
+
+<img width="1519" alt="ORM_filter1" src="https://user-images.githubusercontent.com/88263178/161998335-5f473f76-3b2c-4a67-8949-3e47ca99ce86.png">
+
+<img width="1542" alt="ORM_filter2" src="https://user-images.githubusercontent.com/88263178/161998346-1d086b9e-0f65-4ed9-9922-3e8213b8be91.png">
+
+***
+
+# 4주차 과제
+
+## 데이터 삽입
+### Post, Comment 모델
+Comment가 Post를 fk로 가지고 있습니다.
+<img width="864" alt="스크린샷 2022-04-07 오후 3 28 04" src="https://user-images.githubusercontent.com/88263178/162134254-68a754aa-445d-4c23-bb6c-46edd437d4fe.png">
+
+### Serializer
+Nested Serializer로 구현했습니다.
+
+<img width="618" alt="스크린샷 2022-04-07 오후 3 30 51" src="https://user-images.githubusercontent.com/88263178/162134654-4485a6c3-a2ed-4a84-851c-23a14ca102fa.png">
+
+그런데 shell에서 데이터를 넣고 출력해보면 아래의 사진처럼 comments가 보이지 않는 오류가 발생했습니다.
+<img width="676" alt="nested_serializer_error" src="https://user-images.githubusercontent.com/88263178/162134864-9e5501a8-b5ef-4506-9502-c0777740175b.png">
+
+원인을 찾아보니 model에서 related_name이라는 필드가 있는 것을 발견하고 추가해주니 정상적으로 comments가 출력되는 것을 볼 수 있었습니다.
+<img width="862" alt="ns_error_모델변경" src="https://user-images.githubusercontent.com/88263178/162134937-395dc3bc-a614-465c-8af0-653999a63477.png">
+<img width="1383" alt="ns_error_해결코드" src="https://user-images.githubusercontent.com/88263178/162135082-d8ef1e0c-a97a-40fe-ba0a-a4679f23bd8b.png">
+
+그리고 장고 admin 페이지에서 Post와 Comment를 확인해보았습니다.
+<img width="804" alt="post" src="https://user-images.githubusercontent.com/88263178/162135398-9804aa92-513b-4c3e-9b5a-672735ece4be.png">
+
+<img width="793" alt="comment" src="https://user-images.githubusercontent.com/88263178/162135408-c32e9c79-598c-4f99-83a8-1c0cd82b90cc.png">
+
+## 모든 데이터를 가져오는 API
+모든 'Post'의 list를 가져오는 API 요청 결과
+
+url : api/post/ GET
+
+<img width="404" alt="GET api:post" src="https://user-images.githubusercontent.com/88263178/162135599-3e599cb9-36e2-4321-a0c2-957d769059b1.png">
+
+## 새로운 데이터를 create하도록 요청하는 API
+Post를 추가하는 API 요청 결과
+
+url : api/post/ POST
+
+<img width="637" alt="POST api:post:" src="https://user-images.githubusercontent.com/88263178/162135684-c3b45f91-8ab3-4189-801c-99907d1acb47.png">
+
+## 회고
+이번 주는 아주 다사다난 했습니다. 저번 주에 장고가 'environ'이라는 모듈 하나를 인식하지 못해서 애를 먹었는데 전부 파헤쳐보니 파이썬의 경로가 꼬여서 생긴 오류였습니다. 
+
+이 오류를 해결하고자 빽엔드 운영진분들이 많은 도움을 주셨습니다. 정말 감사합니다..❤️
+
+그렇게 파이썬을 모두 지우고 다시 깔았더니 장고가 오류 없이 깨끗하게 잘 돌아갔습니다! 너무 기뻐서 과제하는 것이 아주 즐거웠습니다!
+
+지난 과제 피드백을 반영해서 timestamp라는 추상 클래스를 만들고 상속받는 구조로 DB를 수정했습니다. 중복되는 필드를 없애니 코드가 눈에 더 잘 들어오는 것 같습니다.
+
+nested serializer에서 'related name'을 지정하지 않아서 생긴 오류 때문에 구글링을 열심히 해보았지만 해결방법은 공식 문서에서 찾을 수 있었습니다.
+
+공식 문서를 한 번 꼼꼼하게 읽는 것이 100블로그 들어가보는 것보다 낫다는 깨달음을 얻었습니다.
