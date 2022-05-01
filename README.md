@@ -269,3 +269,196 @@ image file과 video file 중 하나 이상의 file을 첨부해야 한다는 것
 ```
 </div>
 </details>
+
+---
+# 4. DRF1: Serializer
+
+## DRF
+Django REST Framework
+
+## Serializer
+
+Serializers allow complex data such as `querysets and model instances` to be converted to `native Python datatypes` that can then be easily rendered into `JSON`, `XML` or `other content types`.  
+Serializers also provide `deserialization`, allowing parsed data to be converted back into complex types, after first validating the incoming data.
+
+## Tutorial 1: Serialization
+https://www.django-rest-framework.org/tutorial/1-serialization/#tutorial-1-serialization
+
+### 1. model : DB 모델 인스턴스 만들기
+- snippets/models.py
+
+```
+class Snippet(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=100, blank=True, default='')
+    code = models.TextField()
+    linenos = models.BooleanField(default=False)
+    language = models.CharField(choices=LANGUAGE_CHOICES, default='python', max_length=100)
+    style = models.CharField(choices=STYLE_CHOICES, default='friendly', max_length=100)
+
+    class Meta:
+        ordering = ['created']
+```  
+
+### 2. ModelSerializers : ModelSerializers 만들기 
+- snippets/serializers.py
+
+```
+class SnippetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Snippet
+        fields = ['id', 'title', 'code', 'linenos', 'language', 'style']
+
+```  
+
+### 3. Views : View 만들기 
+- snippets/views.py
+
+```
+def snippet_list(request):
+    if request.method == 'GET':
+        snippets = Snippet.objects.all()
+        serializer = SnippetSerializer(snippets, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = SnippetSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+```
+```
+def snippet_detail(request, pk):
+    try:
+        snippet = Snippet.objects.get(pk=pk)
+    except Snippet.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        serializer = SnippetSerializer(snippet)
+        return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = SnippetSerializer(snippet, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
+
+    elif request.method == 'DELETE':
+        snippet.delete()
+        return HttpResponse(status=204)
+```
+
+### 4. Urlconf : Url 설정하기
+- snippets/urls.py : snippets -> local url
+```
+urlpatterns = [
+    path('snippets/', views.snippet_list),
+    path('snippets/<int:pk>/', views.snippet_detail),
+]
+```
+- tutorial/urls.py : tutorial -> snippets
+```
+urlpatterns = [
+    path('', include('snippets.urls')),
+]
+```
+
+## HW 1 : INSERT Data
+
+### Django Admin Page
+
+1. 관리자 계정 설정
+`python manage.py createsuperuser`
+
+2. `admin.py` 수정
+```
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('profile', 'caption', 'count_like', 'count_comment')
+
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'name', 'number_follower', 'number_following')
+
+admin.site.register(Profile, ProfileAdmin)
+admin.site.register(Post, PostAdmin)
+```
+
+
+2-1 `models.py` 수정
+```
+class Post(CommonInfo):                                             # 게시글
+    ...
+
+    class Meta:
+        managed = True
+        verbose_name = 'Post'
+        verbose_name_plural = 'Posts'
+        
+class Profile(CommonInfo):                                          # 프로필                
+    ...
+    
+    class Meta:
+        managed = True
+        verbose_name = 'Profile'
+        verbose_name_plural = 'Profiles'
+```
+3. `127.0.0.1:8000/admin` admin login
+
+![may2](https://user-images.githubusercontent.com/77188666/166111205-890a2f06-657a-41dc-94c5-231cf18bbc11.PNG)
+
+### Profile Model
+```
+class Profile(CommonInfo):                                              # 프로필
+    user = models.OneToOneField(User, on_delete=models.CASCADE)         # FK (user_id)
+    name = models.CharField(max_length=30)                              # 이름
+    photo = models.FileField(upload_to='file/profile/', null=True)      # 프로필 사진 저장 위치
+    website = models.CharField(max_length=320)                          # Website
+    bio = models.CharField(max_length=150)                              # Bio
+    public_flag = models.BooleanField(default=False)                    # 공개 계정
+    number_follower = models.IntegerField(default=0)                    # 팔로워 수
+    number_following = models.IntegerField(default=0)                   # 팔로잉 수
+    number_posts = models.IntegerField(default=0)                       # 게시글 수
+
+    class Meta:
+        managed = True
+        verbose_name = 'Profile'
+        verbose_name_plural = 'Profiles'
+```
+
+![may1](https://user-images.githubusercontent.com/77188666/166110989-e5eadf12-102a-46d7-96ce-0a68f5e8de93.PNG)
+
+
+## HW 2 : /GET/ API 
+```
+def profile_list(request):
+    if request.method == 'GET':
+        profiles = Profile.objects.all()
+        serializer = ProfileSerializer(profiles, many=True)
+        return JsonResponse(serializer.data)
+    ...
+```
+
+
+## HW 3 : /POST/ API 
+```
+def profile_list(request):
+    
+    ...
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = ProfileSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+```
+
+## 회고
+
+
+
+---
