@@ -241,3 +241,307 @@ $ python manage.py migrate api
 > User 생성에 계속 실패하여 (last_login 컬럼 문제) 검색해봤지만 전부 영어 문서여서 제일 믿음직한 스택 오버플로우에서 시키는대로 mysql에 접속 후, 
 > 생성 db를 삭제하고 migrations 파일들을 전부 삭제 후 다시 진행하는 방법을 택했다. (배포 후에는 사용하면 안된다고 함) 
 > 장고뿐만 아니라 데이터베이스, erd 설계 공부 등이 더 필요하다고 생각하게 되는 과제였다.
+
+
+## Serializer를 이용하여 Views.py 작성
+
+### models.py 수정
+
+> 과제 발표할 때 들었던 수정사항들과 Serializer를 사용하면서 발생한 문제점들에 대해 수정
+
+```
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)  # 해당 레코드 생성 시 현재 시간 자동 저장
+    updated_at = models.DateTimeField(auto_now=True)  # 해당 레코드 갱신 시 현재 시간 자동 저장
+    status = models.CharField(max_length=20, default='valid')
+
+    class Meta:
+        abstract = True
+        
+```
+
+* created_at, updated_at, status 같은 중복 컬럼들은 따로 클래스로 선언 후 상속
+
+```
+class Post(BaseModel):
+  ...
+    liking_count = models.PositiveIntegerField(default=0)
+    
+```
+
+* 좋아요 카운트를 하나의 컬럼으로 생성
+
+```
+class Following(BaseModel):
+    follower = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='followerUser')
+    following = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='followingUser')
+
+    def __str__(self):
+        return '{} : {}'.format(self.follower.nickname, self.following.nickname)
+
+```
+
+* 팔로잉 테이블 생성 시 related_name을 지정하여 한 테이블이 동시에 참조 가능하게 설정
+
+
+### 데이터 삽입
+
+> django shell을 통해 Profile 데이터 3개 삽입
+
+![스크린샷 2022-04-08 오후 10 07 13](https://user-images.githubusercontent.com/59060780/162441746-1035fa6f-e67c-4318-b1da-a679f3994cce.png)
+
+
+### API 만들기
+
+#### ModelSerializer 사용
+
+```
+# api.serializers.py
+
+from rest_framework import serializers
+from api.models import *
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    user_nickname = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Liking
+        fields = '__all__'
+
+    def get_user_nickname(self, obj):
+        return obj.user.nickname
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    user_nickname = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+    def get_user_nickname(self, obj):
+        return obj.user.nickname
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = ['name']
+
+
+class PostSerializer(serializers.ModelSerializer):
+    author_nickname = serializers.SerializerMethodField()
+    liked_post = LikeSerializer(many=True, read_only=True, source='liking_set')
+    comment_post = CommentSerializer(many=True, read_only=True, source='comment_set')
+
+    class Meta:
+        model = Post
+        fields = '__all__'
+
+    def get_author_nickname(self, obj):
+        return obj.author.nickname
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    post = PostSerializer(many=True, read_only=True, source='post_set')
+    user_like_posting = LikeSerializer(many=True, read_only=True, source='liking_set')
+    user_add_comment = CommentSerializer(many=True, read_only=True, source='comment_set')
+
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+```
+
+#### FBV (함수 기반으로 뷰 작성)
+```
+# api.views.py
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.parsers import JSONParser
+from api.models import *
+from api.serializers import *
+from rest_framework import viewsets
+
+@csrf_exempt
+def post_api(request):
+    if request.method == 'GET':
+        post_list = Post.objects.all()
+        serializer = PostSerializer(post_list, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = PostSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+
+
+def post_detail(request, pk):
+    try:
+        get_post = Post.objects.get(pk=pk)
+        serializer = PostSerializer(get_post)
+        return JsonResponse(serializer.data)
+    except Post.DoesNotExist:
+        return JsonResponse(status=404)
+
+
+@csrf_exempt
+def profile_api(request):
+    if request.method == 'GET':
+        profile_list = Profile.objects.all()
+        serializer = ProfileSerializer(profile_list, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = ProfileSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+
+
+@csrf_exempt
+def profile_detail(request, pk):
+    try:
+        get_profile = Profile.objects.get(pk=pk)
+        serializer = ProfileSerializer(get_profile)
+        return JsonResponse(serializer.data)
+    except Profile.DoesNotExist:
+        return JsonResponse(status=404)
+
+
+```
+
+#### Url 연결
+
+```
+# api.urls.py
+
+urlpatterns = [
+    path('api/post/', views.post_api),
+    path('api/post/<int:pk>', views.post_detail),
+    path('api/profile', views.profile_api),
+    path('api/profile/<int:pk>', views.profile_detail),
+]
+
+```
+
+#### API 결과 
+
+> 모든 Profile 가져오기
+> > URI: api/profile/
+> > Method : GET
+
+```
+# JSON
+[
+    {
+        "id": 1,
+        "created_at": "2022-04-08T17:57:14.213173+09:00",
+        "updated_at": "2022-04-08T17:57:14.213301+09:00",
+        "status": "valid",
+        "name": "test1",
+        "nickname": "sanbonai06",
+        "profile_scripts": "",
+        "profile_image": "",
+        "user": 1
+    },
+    {
+        "id": 2,
+        "created_at": "2022-04-08T21:42:28.206798+09:00",
+        "updated_at": "2022-04-08T21:42:28.206819+09:00",
+        "status": "valid",
+        "name": "",
+        "nickname": "고스락키보드",
+        "profile_scripts": "",
+        "profile_image": "",
+        "user": 2
+    },
+    {
+        "id": 3,
+        "created_at": "2022-04-08T21:45:58.555640+09:00",
+        "updated_at": "2022-04-08T21:45:58.555664+09:00",
+        "status": "valid",
+        "name": "",
+        "nickname": "min_zzoni",
+        "profile_scripts": "",
+        "profile_image": "",
+        "user": 3
+    }
+]
+
+```
+
+> Profile 생성
+> > URI: api/profile/
+> > Method : POST
+
+![스크린샷 2022-04-08 오후 10 13 22](https://user-images.githubusercontent.com/59060780/162442795-911a0529-ada9-4c4c-b99b-a2d6c4c3d35e.png)
+
+
+> Profile을 통해 새로운 게시글(Post) 생성 API
+> > URI: api/post
+> > Method: POST
+
+![스크린샷 2022-04-08 오후 10 14 46](https://user-images.githubusercontent.com/59060780/162443017-73db9c4f-15a4-4959-885f-e7b57ab681cd.png)
+
+
+> 모든 Post 가져오기
+> > URI: api/post
+> > Method: GET
+
+```
+# JSON
+[
+    {
+        "id": 1,
+        "author_nickname": "sanbonai06",
+        "created_at": "2022-04-08T18:10:15.875153+09:00",
+        "updated_at": "2022-04-08T18:10:15.875196+09:00",
+        "status": "valid",
+        "script": "test1",
+        "type": "Posting",
+        "liking_count": 0,
+        "author": 1,
+        "location": 1
+    },
+    {
+        "id": 2,
+        "author_nickname": "sanbonai06",
+        "created_at": "2022-04-08T21:00:01.300981+09:00",
+        "updated_at": "2022-04-08T21:00:01.301034+09:00",
+        "status": "valid",
+        "script": "test2",
+        "type": "Posting",
+        "liking_count": 0,
+        "author": 1,
+        "location": 1
+    },
+    {
+        "id": 3,
+        "author_nickname": "sanbonai06",
+        "created_at": "2022-04-08T22:14:40.392765+09:00",
+        "updated_at": "2022-04-08T22:14:40.392801+09:00",
+        "status": "valid",
+        "script": "test2",
+        "type": "Posting",
+        "liking_count": 0,
+        "author": 1,
+        "location": 1
+    }
+]
+
+```
+
+
+### 과제하면서 느낀 점
+
+> API 단 두개만 만들면 된다 생각한 과제였지만 호되게 당해버렸다... 그동안 프로젝트를 쿼리문을 이용해서 만들었었는데 ORM을 직접 사용해보니 생각보다 어려운 점이 많았던 것 같다.
+> Serializer를 선언하면서 테이블 끼리의 참조관계에 대해 굉장히 헷갈렸고 어려움을 겪었다. 실제 쿼리문 작성처럼 생각하면 안된다는 것을 깨달았다. 그리고 처음엔 User 테이블 자체를 참조하려 했지만 여러 오류를 겪고 Profile 테이블 참조로 바꾸었다.
+> Views.py를 작성할 때도 마찬가지였다. Serializer부터 오류가 발생하니 모든게 엉망이였다. 결국 여러 정보들을 찾아보며 해결하였지만 여러 API들을 구현하려면 더 많은 공부가 필요하다는 것을 깨달았다.
