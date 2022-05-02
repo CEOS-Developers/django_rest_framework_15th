@@ -60,7 +60,7 @@
     </ol>
     <h1>3주차 과제</h1>
     <ol>
-      <li><h3><strong>sql 연결<strong></h3></li>
+      <li><h3><strong>sql 연결</strong></h3></li>
       <img src = "./images/mysql.PNG">
      <p>
     <li><h3><strong>인스타그램 모델링과 데이터 작성 </strong></h3></li>
@@ -121,6 +121,17 @@
    <h3><strong><li>소감</li></strong></h3>
 발생한 수많은 에러들을 처리하느라 진땀흘린 과제였습니다. 개인적으로 3주차 과제에 부족한점이 많았고 그로 인한 수정사항들로 인해서 이번 과제에서 굉장히 많은 에러들을 뽑아낸것이 엄청나게 당황스러웠습니다. 또한 몇 몇 에러들은 ERD를 더 섬세하게 했다면 애초에 발생하지 않았을 과제인 것 같아서 아쉬웠습니다. 앞으로 백엔드 개발자로서 ERD와 모델링에 대해 좀 더 섬세히 공부하고 계획할 필요가 있다고 생각하였습니다. api test를 위해 post맨을 사용하였는데, 지금 보시다시피 error들을 회피하여 api test를 하기 위해 너무 많은 default값을 줬고 그로 인해 post 요청에 정말 저거 하나만 때려도 성공하는걸 보고 복잡한 감정이 들었습니다.. 앞으로 열심히 하겠습니다.  
 </ol>  
-     
+ 
+ <br>    
+ <h1><strong>5주차 과제 - drf2 : Api view</strong></h1>
+ <br>
+ <ol>
+   <li>1. 저번 주차 과제의 피드백 사항 정리 
+     <ul>
+       <li> user - profile, profile - post, user -post 사이의 참조 관계 중복 문제 개선</li>
+       <li>url 설계 시 복수로 하는 사항 수정</li>
+       <li>serilaizer의 기능에 관하여 -> 오직 직렬화만을 담당. 다른 방법으로의 에러 해결</li>
+     </ul>
+ </ol>
   </body>  
 </html>
