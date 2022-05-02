@@ -155,7 +155,7 @@ class Post(models.Model):
 ![PostModel](https://user-images.githubusercontent.com/68195241/162532963-e3271d0e-0a82-4a24-a540-a1d5e52172f1.JPG)
 
 ## [2] 모든 데이터를 가져오는 API
-- URL : ```api/post/```
+- URL : ```api/posts/```
 - Method : ```GET```
 
 #### 결과 코드
@@ -183,7 +183,7 @@ class Post(models.Model):
 ```
 
 ## [3] 새로운 데이터를 create하도록 요청하는 API
-- URL : ```api/post/```
+- URL : ```api/posts/```
 - Method : ```POST```
 - Body : ```{"user":3, "content":"New 포스트"}```
 
@@ -212,3 +212,97 @@ class Post(models.Model):
 > ...
 > #### 어려웠던 점
 > - api 요청 결과 띄우기 - Postman으로는 띄우기 성공
+
+***
+
+# Week5 : DRF2-API View
+
+## [1] 모든 list를 가져오는 API
+- URL : ```api/posts/```
+- Method : ```GET```
+
+#### 결과 코드
+```json
+[
+    {
+        "user": 3,
+        "content": "첫번째 포스트",
+        "created_at": "2022-04-09T05:58:15.047992+09:00",
+        "modified_at": "2022-04-09T05:58:15.047992+09:00"
+    },
+    {
+        "user": 4,
+        "content": "두번째 포스트",
+        "created_at": "2022-04-09T05:58:36.441409+09:00",
+        "modified_at": "2022-04-09T05:58:36.441409+09:00"
+    },
+    {
+        "user": 5,
+        "content": "세번째 포스트",
+        "created_at": "2022-04-09T05:58:46.633393+09:00",
+        "modified_at": "2022-04-09T05:58:46.633393+09:00"
+    },
+    {
+        "user": 3,
+        "content": "New 포스트",
+        "created_at": "2022-05-03T04:24:02.893540+09:00",
+        "modified_at": "2022-05-03T04:24:02.894536+09:00"
+    }
+]
+```
+
+## [2] 특정 데이터를 가져오는 API
+- URL : ```api/posts/7/```
+- Method : ```GET```
+
+#### 결과 코드
+```json
+{
+    "user": 3,
+    "content": "New 포스트",
+    "created_at": "2022-05-03T04:24:02.893540+09:00",
+    "modified_at": "2022-05-03T04:24:02.894536+09:00"
+}
+```
+
+## [3] 새로운 데이터를 생성하는 API
+- URL : ```api/posts/```
+- Method : ```POST```
+- Body : ```{"user":4, "content":"다섯번째 포스트"}```
+
+#### 결과 코드
+```json
+{
+    "user": 4,
+    "content": "다섯번째 포스트",
+    "created_at": "2022-05-03T05:22:14.393278+09:00",
+    "modified_at": "2022-05-03T05:22:14.393278+09:00"
+}
+```
+
+## [4] 특정 데이터를 업데이트하는 API
+- URL : ```api/posts/7/```
+- Method : ```PUT```
+- Body : ```{"user":5, "content":"네번째 포스트"}```
+
+#### 결과 코드
+```json
+{
+    "user": 5,
+    "content": "네번째 포스트",
+    "created_at": "2022-05-03T04:24:02.893540+09:00",
+    "modified_at": "2022-05-03T05:24:03.217081+09:00"
+}
+```
+
+## [5] 특정 데이터를 삭제하는 API
+- URL : ```api/posts/8/```
+- Method : ```DELETE```
+
+#### 결과
+![API_DELETE](https://user-images.githubusercontent.com/68195241/166322236-0fa14fbf-9005-4759-9e02-6f2fbcad7c74.JPG)
+
+***
+
+> ### 회고
+> 뭔가 너무 예상보다 날로 먹은 과제 같아서 고민이 많았지만....? 공식 문서의 CBV 내용을 읽어보고 참고하니 이번에는 그다지 어렵지 않게 완료해서 얼떨떨합니다...! 남은 기간은 공부한 내용을 정리하며 알차게 보내려고 합니다.
