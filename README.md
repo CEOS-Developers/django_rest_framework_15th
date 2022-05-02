@@ -126,7 +126,7 @@
  <h1><strong>5주차 과제 - drf2 : Api view</strong></h1>
  <br>
  <ol>
-   <li>1. 저번 주차 과제의 피드백 사항 정리 
+   <li>저번 주차 과제의 피드백 사항 정리 
      <ul>
        <li> user - profile, profile - post, user -post 사이의 참조 관계 중복 문제 개선</li>
        <li>url 설계 시 복수로 하는 사항 수정</li>
