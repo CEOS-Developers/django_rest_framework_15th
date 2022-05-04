@@ -60,7 +60,7 @@
     </ol>
     <h1>3주차 과제</h1>
     <ol>
-      <li><h3><strong>sql 연결<strong></h3></li>
+      <li><h3><strong>sql 연결</strong></h3></li>
       <img src = "./images/mysql.PNG">
      <p>
     <li><h3><strong>인스타그램 모델링과 데이터 작성 </strong></h3></li>
@@ -87,6 +87,51 @@
  erd 설계 부분도 다른 분들의 리드미를 읽어보닌 너무 제가 간단하게 생각했다는걸 깨달았습니다.<br> 
  수정과 보완이 많이 필요할 것 같다는 생각이 듭니다.<br>
  바쁘신 와중에 허접한 과제 보여드려 죄송합니다. 분발하겠습니다.<br>
+ </ol>
+ 
+ <h1><strong>4주차 과제 - drf1 : serializer</strong></h1>
+ <ol>
+  <h3><strong><li>저번 과제의 수정 사항들 반영 - 모델 수정 및 마이그레이션 진행</strong></li></h3>
+  <h3><strong><li>데이터 삽입</li></strong></h3>
+  <img src = "./images/dataInsertion.PNG">
+  
+    class Profile(models.Model):
+    user = models.OneToOneField(User,blank=True, null=True, on_delete=models.CASCADE)
+    nickname = models.TextField(null=False, max_length=10)
+    introduction = models.TextField(default='', max_length=200)
+    profileImg = models.CharField(null=True, max_length=200)
+    
+  <h3><strong><li>모든 데이터를 가져오는 api 만들기 </li></strong></h3>
+  <br> api/profile GET
+  <img src="./images/GET.PNG">
+  
+  <h3><strong><li>새로운 데이터를 create 하도록 요청하는 api</li></strong></h3>
+  <br> api/profile POST
+  <img src="./images/post.PNG">
+  
+  <h3><strong><li> 진행하면서 발생한 오류들 정리 </li></strong></h3>
+  <ul>
+  <li>1048 - Profile 모델이 foriegn key로 user를 가지는데, Profile 생성시 user가 주어지지 않아서 생긴 문제 - 생성시 save 전에 user를 줌으로써 해결</li>
+      serializer.user = User
+  <li>1054 - 마이그레이션 관련 오류 - 모델이 수정되면서 생긴 오류 -> 마이그레이션 파일 삭제 후 다시 makemigrations (이 때 number 파일들만 삭제</li>
+  <li>1452 - a->b foreign key 참조, b->c foreign key 참조. 이 상황에서 a->c 참조로 인한 error. 해결법 - 마이그레이션을 다시 해줬음.
+  <li> 마이그레이션 변경 - 원래 있던 데이터들에 대해 새로 생긴(수정된) 필드를 어떻게 적용할 것인지. null=True 혹은 default 값 설정</li>
+  </ul>
+   
+   <h3><strong><li>소감</li></strong></h3>
+발생한 수많은 에러들을 처리하느라 진땀흘린 과제였습니다. 개인적으로 3주차 과제에 부족한점이 많았고 그로 인한 수정사항들로 인해서 이번 과제에서 굉장히 많은 에러들을 뽑아낸것이 엄청나게 당황스러웠습니다. 또한 몇 몇 에러들은 ERD를 더 섬세하게 했다면 애초에 발생하지 않았을 과제인 것 같아서 아쉬웠습니다. 앞으로 백엔드 개발자로서 ERD와 모델링에 대해 좀 더 섬세히 공부하고 계획할 필요가 있다고 생각하였습니다. api test를 위해 post맨을 사용하였는데, 지금 보시다시피 error들을 회피하여 api test를 하기 위해 너무 많은 default값을 줬고 그로 인해 post 요청에 정말 저거 하나만 때려도 성공하는걸 보고 복잡한 감정이 들었습니다.. 앞으로 열심히 하겠습니다.  
+</ol>  
+ 
+ <br>    
+ <h1><strong>5주차 과제 - drf2 : Api view</strong></h1>
+ <br>
+ <ol>
+  <li><h3><strong>저번 주차 과제의 피드백 사항 정리</strong></h3> 
+     <ul>
+       <li> user - profile, profile - post, user -post 사이의 참조 관계 중복 문제 개선</li>
+       <li>url 설계 시 복수로 하는 사항 수정</li>
+       <li>serilaizer의 기능에 관하여 -> 오직 직렬화만을 담당. 다른 방법으로의 에러 해결</li>
+     </ul>
  </ol>
   </body>  
 </html>
