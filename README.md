@@ -235,11 +235,54 @@ In order to allow non-dict objects to be serialized set the safe parameter to Fa
 ### 과제 2. 모든 데이터를 가져오는 API
 - **URL**: `api/posts/`  
 - **Method**: `GET`  
+```
+  [
+    {
+        "user": 1,
+        "content": "첫글",
+        "create_date": "2022-04-01"
+    },
+    {
+        "user": 1,
+        "content": "두번째 글",
+        "create_date": "2022-04-01"
+    },
+    {
+        "user": 1,
+        "content": "세번째 글",
+        "create_date": "2022-04-01"
+    },
+    {
+        "user": 6,
+        "content": "Test",
+        "create_date": "2022-04-29"
+    }
+]
+```
 
 ### 과제 3. 새로운 데이터를 create하도록 요청하는 API
 - **URL**: `api/posts/`  
 - **Method**: `POST`  
-- **BODY**: `{}`
+- **BODY**: `{"user":"6","content": "다섯번째 글", "create_date": "2022-04-29"}`
+```
+{
+    "user": 6,
+    "content": "다섯번째 글",
+    "create_date": "2022-05-05"
+}
+```
+
+
+- **URL**: `api/posts/`  
+- **Method**: `POST`  
+- **BODY**: `{"user":"6","content": "여섯번째 글"}`
+```
+{
+    "user": 6,
+    "content": "여섯번째 글",
+    "create_date": "2022-05-05"
+}
+```
 
 ### 회고
 Serializer를 처음 사용해보는 거라 많은 것을 배울 수 있었다.   
@@ -247,6 +290,13 @@ API 작성 완료 후 테스트를 하는 과정에서
 DRF+브라우저 활용 방법을 이용했는데 브라우저 화면이 원하는대로 띄워지지 않아서 오류가 생겼다고 생각된다..   
 오류 수정을 최대한 해보고 만약 방법을 찾을 수 없으면  
 포스트맨을 설치해서 5주차 스터디 전까지 리드미에 추가할 예정이다!!  
+
++) 포스트맨 설치를 후 API test를 성공적으로 할 수 있었다!!  
+POST를 할 때 500 server가 났었는데 그 이유는 내가 api/posts/가 아닌 api/posts를 했기 때문이다.  
+마지막에 슬래시를 꼭 쓰자.  
+
+그리고 create_date같은 경우, 내가 임의로 과거의 시간으로 설정해도  
+오늘 날짜로 자동으로 값이 전달되었다!  
 
 
 
