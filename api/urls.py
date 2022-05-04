@@ -3,9 +3,9 @@ from . import views
 
 
 urlpatterns = [
-    path('api/comment', views.comment_api),
-    path('api/like', views.like_api),
-    path('api/media', views.media_api),
-    path('api/post', views.post_api),
-    path('api/profile', views.profile_api)
+    path('api/comments', views.comment_api),
+    path('api/likes', views.like_api),
+    path('api/medias', views.media_api),
+    path('api/posts', views.post_api),
+    path('api/profiles', views.profile_api)
 ]

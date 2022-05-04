@@ -11,14 +11,13 @@ class Profile(models.Model):
 
 
 class Post(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     Profile = models.ForeignKey(Profile, default=-987654321, related_name='this_post', on_delete=models.CASCADE)
     content = models.TextField(blank=True)
     isMedia = models.BooleanField(default=True)
 
 
 class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    Profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, related_name='ownPost', on_delete=models.CASCADE)
     content = models.TextField(blank=True)
 
