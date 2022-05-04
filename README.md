@@ -273,6 +273,10 @@ image file과 video file 중 하나 이상의 file을 첨부해야 한다는 것
 ---
 # 4. DRF1: Serializer
 
+<details>
+<summary> </summary>
+<div markdown="1">      
+
 ## DRF
 Django REST Framework
 
@@ -459,6 +463,21 @@ def profile_list(request):
 
 ## 회고
 
-
+</div>
+</details>
 
 ---
+
+# 5. DRF2: API View
+
+### Django MVT
+사진첨부 - MVT Pattern
+
+Django의 MVT : client request 처리 과정
+
+1. `client`로 `request`를 받으면 `URLconf`를 이용하여 `URL`을 분석한다
+2. URL 분석 결과를 통해 해당 `URL에 대한 처리`를 담당할 `View`를 결정한다
+3. `View`는 `view의 로직`을 실행한다
+   ( DB 처리가 필요하면 `Model`을 통해 처리하고 그 결과를 반환받는다 )
+4. `View`는 로직 처리가 끝나면 `Template`을 사용하여 `client`에 전송할 `HTML` 파일을 생성한다
+5. `View`는 `client`에 `response`(HTML 파일) 한다 
