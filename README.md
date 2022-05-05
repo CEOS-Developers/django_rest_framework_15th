@@ -347,11 +347,11 @@ class FileSerializer(serializers.ModelSerializer):
 
 ### View
 
-- GET
-<br>
+- GET<br>
   모델 인스턴스들을 받아 serializing 한 JSON 데이터를 JsonResponse()를 통해 반환함
-- POST
-<br>
+
+
+- POST<br>
   사용자가 입력한 JSON 데이터를 JSONParser()를 통해 parse함<br>
   해당 데이터를 serializing 해준 뒤, is_valid() 를 통해 유효한 데이터임을 알아내면 JsonReponse()를 통해 201 상태코드와 함께 JSON 데이터를 반환해줌
   - 만약 유효하지 않은 데이터임이 드러나면 (is_valid()) 에러와 함께 400 상태코드를 반환해줌
