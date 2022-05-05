@@ -548,7 +548,7 @@ urlpatterns = [
 
 ----
 
-## CBV 기반 뷰 작성
+## CBV, API 추가
 
 ### 피드백 반영
 
@@ -585,7 +585,7 @@ class PostSerializer(serializers.ModelSerializer):
 
 ### FBV -> CBV
 
-#### CBV 기반 뷰 작성
+#### CBV
 
 ```
 # views.py
