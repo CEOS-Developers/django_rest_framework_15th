@@ -7,12 +7,15 @@ def custom_exception_handler(exc, context):
 
     # Now add the HTTP status code to the response.
     if response is not None:
-        response.data['status_code'] = response.status_code
         if response.status_code == 400:
-            response.data["detail"] = "잘못된 요청입니다."
+            message = "잘못된 요청입니다."
         elif response.status_code == 404:
-            response.data["detail"] = "데이터를 찾을 수 없습니다."
+            message = "데이터를 찾을 수 없습니다."
         elif response.status_code == 403:
-            response.data["detail"] = "해당 권한이 없습니다."
+            message = "해당 권한이 없습니다."
+        response.data = {
+            'status_code': response.status_code,
+            'detail': message
+        }
 
     return response

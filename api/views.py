@@ -67,7 +67,7 @@ class PostDetailView(APIView):
             if get_post.author_id != int(user_id):
                 raise exceptions.AuthenticationFailed()
             if get_post.author_id != data['author']:
-                return Response(status=400)
+                raise exceptions.ValidationError()
             serializer.save()
             return JsonResponse(serializer.data, status=201, safe=False)
         return JsonResponse(serializer.errors, status=400, safe=False)
@@ -79,7 +79,7 @@ class PostDetailView(APIView):
             raise exceptions.AuthenticationFailed()
         else:
             get_post.delete()
-            return JsonResponse({"status": 204, "message": "SUCCESS"}, status=201, safe=False)
+            return JsonResponse({"status": 204, "message": "SUCCESS"}, status=204, safe=False)
 
 
 class LikeView(APIView):
@@ -90,6 +90,11 @@ class LikeView(APIView):
             'user': user_id,
             'post': get_post.id,
         }
+
+        liking = Liking.objects.filter(post_id=get_post.id, user_id=user_id)
+        if len(liking) > 0:
+            raise exceptions.ValidationError()
+
         serializer = LikingSerializer(data=query_set)
         if serializer.is_valid():
             serializer.save()
@@ -100,11 +105,12 @@ class LikeView(APIView):
         get_post = get_object_or_404(Post, pk=pk)
         user_id = int(request.headers["userId"])
         query_set = Liking.objects.filter(post_id=get_post.id, user_id=user_id)
-        if query_set is None:
+        if len(query_set) is 0:
             raise exceptions.ValidationError()
         else:
             query_set.delete()
             return JsonResponse({"status": 203, "message": "SUCCESS"}, status=201, safe=False)
+
 
 class CommentView(APIView):
     def post(self, request, pk):
@@ -126,7 +132,7 @@ class CommentView(APIView):
         get_post = get_object_or_404(Post, pk=pk)
         user_id = int(request.headers["userId"])
         query_set = Comment.objects.filter(post_id=get_post.id, user_id=user_id)
-        if query_set is None:
+        if len(query_set) is 0:
             raise exceptions.ValidationError()
         else:
             query_set.delete()

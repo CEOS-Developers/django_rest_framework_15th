@@ -46,10 +46,10 @@ class PostSerializer(serializers.ModelSerializer):
         return obj.author.nickname
 
     def get_post_liking(self, obj):
-        return list(Liking.objects.all().prefetch_related('post').values())
+        return list(Liking.objects.filter(post_id=obj.id).prefetch_related('post').values())
 
     def get_post_comment(self, obj):
-        return list(Comment.objects.all().prefetch_related('post').values())
+        return list(Comment.objects.filter(post_id=obj.id).prefetch_related('post').values())
 
     # @classmethod
     # def add_liking_count(cls):
