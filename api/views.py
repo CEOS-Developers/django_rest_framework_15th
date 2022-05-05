@@ -79,4 +79,55 @@ class PostDetailView(APIView):
             raise exceptions.AuthenticationFailed()
         else:
             get_post.delete()
-            return JsonResponse({"status": 201, "message": "SUCCESS"}, status=201, safe=False)
+            return JsonResponse({"status": 204, "message": "SUCCESS"}, status=201, safe=False)
+
+
+class LikeView(APIView):
+    def post(self, request, pk):
+        get_post = get_object_or_404(Post, pk=pk)
+        user_id = int(request.headers["userId"])
+        query_set = {
+            'user': user_id,
+            'post': get_post.id,
+        }
+        serializer = LikingSerializer(data=query_set)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse({"status": 201, "message": "SUCCESS", 'data': serializer.data}, status=201, safe=False)
+        return JsonResponse(serializer.errors, status=400, safe=False)
+
+    def delete(self, request, pk):
+        get_post = get_object_or_404(Post, pk=pk)
+        user_id = int(request.headers["userId"])
+        query_set = Liking.objects.filter(post_id=get_post.id, user_id=user_id)
+        if query_set is None:
+            raise exceptions.ValidationError()
+        else:
+            query_set.delete()
+            return JsonResponse({"status": 203, "message": "SUCCESS"}, status=201, safe=False)
+
+class CommentView(APIView):
+    def post(self, request, pk):
+        get_post = get_object_or_404(Post, pk=pk)
+        user_id = request.headers["userId"]
+        script = request.data["script"]
+        query_set = {
+            'user': int(user_id),
+            'post': get_post.id,
+            'script': script
+        }
+        serializer = CommentSerializer(data=query_set)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse({"status": 201, "message": "SUCCESS", "data": serializer.data}, status=201, safe=False)
+        return JsonResponse(serializer.errors, status=400, safe=False)
+
+    def delete(self, request, pk):
+        get_post = get_object_or_404(Post, pk=pk)
+        user_id = int(request.headers["userId"])
+        query_set = Comment.objects.filter(post_id=get_post.id, user_id=user_id)
+        if query_set is None:
+            raise exceptions.ValidationError()
+        else:
+            query_set.delete()
+            return JsonResponse({"status": 203, "message": "SUCCESS"}, status=201, safe=False)

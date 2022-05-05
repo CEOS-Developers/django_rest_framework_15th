@@ -2,15 +2,16 @@ from rest_framework import serializers
 from api.models import *
 
 
-class LikeSerializer(serializers.ModelSerializer):
+class LikingSerializer(serializers.ModelSerializer):
     user_nickname = serializers.SerializerMethodField()
 
     class Meta:
         model = Liking
-        fields = ['user_nickname']
+        fields = ['post', 'user', 'user_nickname', 'created_at']
 
     def get_user_nickname(self, obj):
         return obj.user.nickname
+
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -18,10 +19,11 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['user_nickname', 'script']
+        fields = ['post', 'user', 'user_nickname', 'script', 'created_at']
 
     def get_user_nickname(self, obj):
         return obj.user.nickname
+
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -32,22 +34,33 @@ class LocationSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     author_nickname = serializers.SerializerMethodField(read_only=True)
-    liked_post = LikeSerializer(many=True, read_only=True, allow_null=True, source='liking_set')
-    comment_post = CommentSerializer(many=True, read_only=True, allow_null=True, source='comment_set')
+    post_liking = serializers.SerializerMethodField()
+    post_comment = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ['id', 'author_nickname', 'status', 'script', 'type', 'liking_count', 'author', 'location', 'liked_post', 'comment_post', 'created_at', 'updated_at']
+        fields = ['id', 'author_nickname', 'status', 'script', 'type', 'author', 'location',
+                  'created_at', 'updated_at', 'post_liking', 'post_comment']
 
     def get_author_nickname(self, obj):
         return obj.author.nickname
 
+    def get_post_liking(self, obj):
+        return list(Liking.objects.all().prefetch_related('post').values())
+
+    def get_post_comment(self, obj):
+        return list(Comment.objects.all().prefetch_related('post').values())
+
+    # @classmethod
+    # def add_liking_count(cls):
+
+
 
 class ProfileSerializer(serializers.ModelSerializer):
     post = PostSerializer(many=True, read_only=True, source='post_set')
-    user_like_posting = LikeSerializer(many=True, read_only=True, source='liking_set')
+    user_like_posting = LikingSerializer(many=True, read_only=True, source='liking_set')
     user_add_comment = CommentSerializer(many=True, read_only=True, source='comment_set')
 
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = ['id', 'name', 'nickname', 'post', 'user_like_posting', 'user_add_comment', 'created_at', 'status']
