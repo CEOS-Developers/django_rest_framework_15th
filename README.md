@@ -837,6 +837,33 @@ def custom_exception_handler(exc, context):
 
 ```
 
+> Post에 연결된 댓글과 좋아요에 관한 정보들을 엮기 위해서 prefetch_realated()라는 함수를 배웠다.
+
+```
+class PostSerializer(serializers.ModelSerializer):
+    author_nickname = serializers.SerializerMethodField(read_only=True)
+    post_liking = serializers.SerializerMethodField()
+    post_comment = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Post
+        fields = ['id', 'author_nickname', 'status', 'script', 'type', 'author', 'location',
+                  'created_at', 'updated_at', 'post_liking', 'post_comment']
+
+    def get_author_nickname(self, obj):
+        return obj.author.nickname
+
+    def get_post_liking(self, obj):
+        return list(Liking.objects.filter(post_id=obj.id).prefetch_related('post').values())
+
+    def get_post_comment(self, obj):
+        return list(Comment.objects.filter(post_id=obj.id).prefetch_related('post').values())
+```        
+
+> prefetch_related('post') : 해당 테이블에서 row들을 가져올 때 모델별로 쿼리를 실행해서 따로 쿼리셋을 가져옴.
+> > 객체를 Json으로 직렬화하기 위해 list(.values())로 묶어줬다.
+
+
 #### 새로운 데이터 삽입 API
 > URI: api/posts/
 
