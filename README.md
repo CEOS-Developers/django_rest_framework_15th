@@ -291,16 +291,153 @@ DRF+브라우저 활용 방법을 이용했는데 브라우저 화면이 원하�
 오류 수정을 최대한 해보고 만약 방법을 찾을 수 없으면  
 포스트맨을 설치해서 5주차 스터디 전까지 리드미에 추가할 예정이다!!  
 
-+) 포스트맨 설치를 후 API test를 성공적으로 할 수 있었다!!  
-POST를 할 때 500 server가 났었는데 그 이유는 내가 api/posts/가 아닌 api/posts를 했기 때문이다.  
++) 포스트맨 설치를 한 후 API test를 성공적으로 할 수 있었다!!  
+POST를 할 때 500 server error 가 났었는데 그 이유는 내가 api/posts/가 아닌 api/posts를 했기 때문이다.  
 마지막에 슬래시를 꼭 쓰자.  
 
 그리고 create_date같은 경우, 내가 임의로 과거의 시간으로 설정해도  
 오늘 날짜로 자동으로 값이 전달되었다!  
 
+# 5주차 : DRF2 - API View
+
+## Django View
+장고에서 제공하는 view는 FBV와 CBV가 있다.
+
+### FBV
+FBV는 함수기반 뷰 (Function-Base Views)로, 간단하고 가독성이 좋다는 장점이 있다.  
+하지만 코드 확장 및 재사용이 어렵다는 단점이 있다.  
+views.py는 아래와 같이 적을 수 있다.  
+```
+from django.http import HttpResponse
+def index(request):
+    if request.method == 'POST':         
+        # POST 요청일 때
+        return HttpResponse('result')
+    else:         
+        # POST 요청이 아닐 때
+```
+직접 함수를 작성하여 request를 처리한다.  
+여러개의 request 메소드를 사용할 경우 if 조건문으로 구분하여 처리한다.  
+
+### CBV
+CBV는 클래스기반 뷰 (Class-Based Views)로, 코드를 재사용할 수 있고 뷰를 체계적으로 사용할 수 있다는 장점이 있다.  
+FBV, CBV 중 확실하게 좋은 것은 없으며 상황에 따라 적절히 사용하면 된다고 한다.  
+```
+from django.http import HttpResponse
+from django.views import View
+
+class Index(View):
+    def get(self, request):
+        # GET 요청일 때
+        return HttpResponse('result')
+```
+django.views.View 클래스를 상속받아 생성한다.  
+request가 GET이라면 해당 클래스 내의 get() 메소드를 실행한다.  
+
+## DRF View
+DRF에서 제공해주는 view에 대해 알아보자.  
+DRF APIView 클래스는 장고의 View 클래스를 상속받은 클래스이다.  
+
+DRF APIView도 FBV 방식과 CBV 방식이 있다.  
+FBC 방식의 경우 @api_view 데코레이터를 사용한다.  
+`@api_view(['GET'])`  
+
+CBV 방식의 경우 메소드를 처리할 클래스를 만들고,  
+그 안에 get, post 등 http 메소드를 처리할 함수를 정의한다.  
 
 
+### 과제 1.  모든 데이터를 가져오는 API
+- **URL**: `api/posts/`  
+- **Method**: `GET`
+```
+[
+    {
+        "user": 1,
+        "content": "첫글",
+        "create_date": "2022-04-01"
+    },
+    {
+        "user": 1,
+        "content": "두번째 글",
+        "create_date": "2022-04-01"
+    },
+    {
+        "user": 1,
+        "content": "세번째 글",
+        "create_date": "2022-04-01"
+    },
+    {
+        "user": 6,
+        "content": "Test",
+        "create_date": "2022-04-29"
+    },
+    {
+        "user": 6,
+        "content": "다섯번째 글",
+        "create_date": "2022-05-05"
+    },
+    {
+        "user": 6,
+        "content": "여섯번째 글",
+        "create_date": "2022-05-05"
+    }
+]
+```
 
 
+### 과제 2.  특정 데이터를 가져오는 API
+- **URL**: `api/posts/<int:pk>/`  
+- **Method**: `GET`  
+- `api/posts/2/` `GET`
+```
+{
+    "user": 1,
+    "content": "첫글",
+    "create_date": "2022-04-01"
+}
+```
 
+
+### 과제 3.  새로운 데이터를 create하도록 요청하는 API
+- **URL**: `api/posts/`  
+- **Method**: `POST`
+- **Body**:`{"user":"1","content": "일곱번째 글"}`
+```
+{
+    "user": 1,
+    "content": "일곱번째 글",
+    "create_date": "2022-05-06"
+}
+```
+
+
+### 과제 4.  특정 데이터를 업데이트하는 API
+- **URL**: `api/posts/<int:pk>/`  
+- **Method**: `PUT`
+- **Body**:`{"user":"6","content": "네번째 글"}`
+- `api/posts/5/`
+- User 필드는 id = 1 에서 6으로 바꾸고 content 필드를 "Test에서" "네번째 글"로 바꿔보자
+```
+{
+    "user": 6,
+    "content": "네번째 글",
+    "create_date": "2022-04-29"
+}
+```
+
+
+### 과제 5.  특정 데이터를 삭제하는 API
+- **URL**: `api/posts/<int:pk>/`  
+- **Method**: `DELETE`
+<img src="img/5/delete-2.JPG" width="650"/>  
+
+### 회고
+지난 주에는 만든 API의 Test가 잘 안되어서 못 느꼈는데,  
+이번에 포스트맨을 설치하여 API Test를 하면서 코드를 짜니 개발의 즐거움을 느낄 수 있었다.  
+저번주에는 구현하지 못한 PUT, DELETE까지 해봐서 API제작에 능숙해진 것만 같은 기분이 들었다.  
+이번에는 DFR에서 제공하는 CBV 방식으로 구현을 해보았는데  
+FBV 방식으로 구현을 해보며 더 공부를 하고싶다.  
+장고가 점점 재밌어진다 ^^  
+
+참고한 공식문서 : https://www.django-rest-framework.org/tutorial/3-class-based-views/  
 
