@@ -7,7 +7,7 @@ class LikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Liking
-        fields = '__all__'
+        fields = ['user_nickname']
 
     def get_user_nickname(self, obj):
         return obj.user.nickname
@@ -18,7 +18,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ['user_nickname', 'script']
 
     def get_user_nickname(self, obj):
         return obj.user.nickname
@@ -31,13 +31,13 @@ class LocationSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    author_nickname = serializers.SerializerMethodField()
-    liked_post = LikeSerializer(many=True, read_only=True, source='liking_set')
-    comment_post = CommentSerializer(many=True, read_only=True, source='comment_set')
+    author_nickname = serializers.SerializerMethodField(read_only=True)
+    liked_post = LikeSerializer(many=True, read_only=True, allow_null=True, source='liking_set')
+    comment_post = CommentSerializer(many=True, read_only=True, allow_null=True, source='comment_set')
 
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['id', 'author_nickname', 'status', 'script', 'type', 'liking_count', 'author', 'location', 'liked_post', 'comment_post', 'created_at', 'updated_at']
 
     def get_author_nickname(self, obj):
         return obj.author.nickname
