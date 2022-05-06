@@ -109,7 +109,7 @@ class LikeView(APIView):
             raise exceptions.ValidationError()
         else:
             query_set.delete()
-            return JsonResponse({"status": 203, "message": "SUCCESS"}, status=201, safe=False)
+            return JsonResponse({"status": 204, "message": "SUCCESS"}, status=204, safe=False)
 
 
 class CommentView(APIView):
@@ -136,4 +136,4 @@ class CommentView(APIView):
             raise exceptions.ValidationError()
         else:
             query_set.delete()
-            return JsonResponse({"status": 203, "message": "SUCCESS"}, status=201, safe=False)
+            return JsonResponse({"status": 204, "message": "SUCCESS"}, status=204, safe=False)
