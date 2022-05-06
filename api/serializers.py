@@ -21,16 +21,17 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'content']
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = '__all__'
-
-
 class PostSerializer(serializers.ModelSerializer):
     files = FileSerializer(many=True, read_only=True)
-    profile = ProfileSerializer(read_only=True)
 
     class Meta:
         model = Post
         fields = ['id', 'content', 'like_count', 'files', 'profile']
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    post = PostSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = '__all__'

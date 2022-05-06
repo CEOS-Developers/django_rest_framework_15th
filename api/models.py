@@ -18,7 +18,7 @@ class Profile(models.Model):
 
 
 class Post(DatetimeModel):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='post')
     content = models.TextField(blank=True)
     like_count = models.PositiveIntegerField(default=0)
 
