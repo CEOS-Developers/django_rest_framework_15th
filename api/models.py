@@ -11,7 +11,7 @@ class DatetimeModel(models.Model):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     mobile_number = models.CharField(unique=True, max_length=20, blank=True, default="")
     website = models.CharField(max_length=200, blank=True)
     bio = models.CharField(max_length=200, blank=True)
