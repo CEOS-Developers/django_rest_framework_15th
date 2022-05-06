@@ -4,8 +4,8 @@ from .models import *
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-	list_display = ['user', 'name', 'site', 'bio', 'profile_img']
-	list_display_links = ['name', 'bio']
+	list_display = ['id', 'user', 'name', 'site', 'bio', 'profile_img']
+	list_display_links = ['id', 'name']
 
 
 @admin.register(Post)
@@ -16,8 +16,8 @@ class PostAdmin(admin.ModelAdmin):
 
 @admin.register(File)
 class FileAdmin(admin.ModelAdmin):
-	list_display = ['post', 'type', 'path']
-	list_display_links = ['path']
+	list_display = ['id', 'post', 'type', 'path']
+	list_display_links = ['id', 'path']
 
 
 @admin.register(Comment)
