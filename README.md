@@ -257,3 +257,263 @@ DatetimeModel을 상속하는 형태로 변경하면서 오류가 났는지 의�
 다음으로 api.models에 속하지 않아 django의 auth_user 테이블을 상속하면 접근이 되지 않는건가 싶어 User 대신 Profile과 ForeignKey 관계에 놓이도록 코드를 변경하였다.
 
 마찬가지로 해결되지 않아 검색 결과 `related_name='files'`와 같이 Serializer에서 접근할 명칭을 지정해주면 된다는 것을 확인하여 수정하였고, 이후 잘 작동하였다.
+
+## 5주차 과제
+### 모든 list를 가져오는 API
+- API 요청한 URL: http://127.0.0.1:8000/posts/ `GET`
+- 결과 데이터: 
+```
+[
+    {
+        "id": 1,
+        "content": "수정 post",
+        "like_count": 0,
+        "files": [
+            {
+                "id": 1,
+                "post_content": "수정 post",
+                "type": "image",
+                "url": "hi"
+            },
+            {
+                "id": 8,
+                "post_content": "수정 post",
+                "type": "image",
+                "url": "fileurl"
+            }
+        ],
+        "profile": {
+            "id": 1,
+            "mobile_number": "",
+            "website": "",
+            "bio": "",
+            "user": 1
+        }
+    },
+    {
+        "id": 2,
+        "content": "두번째 게시글",
+        "like_count": 0,
+        "files": [
+            {
+                "id": 9,
+                "post_content": "두번째 게시글",
+                "type": "image",
+                "url": "url"
+            },
+            {
+                "id": 10,
+                "post_content": "두번째 게시글",
+                "type": "image",
+                "url": "imageurl"
+            }
+        ],
+        "profile": {
+            "id": 1,
+            "mobile_number": "",
+            "website": "",
+            "bio": "",
+            "user": 1
+        }
+    },
+    {
+        "id": 3,
+        "content": "세번째 게시글",
+        "like_count": 0,
+        "files": [
+            {
+                "id": 11,
+                "post_content": "세번째 게시글",
+                "type": "video",
+                "url": "new-video"
+            }
+        ],
+        "profile": {
+            "id": 1,
+            "mobile_number": "",
+            "website": "",
+            "bio": "",
+            "user": 1
+        }
+    },
+    {
+        "id": 6,
+        "content": "여섯번째 게시글",
+        "like_count": 0,
+        "files": [
+            {
+                "id": 2,
+                "post_content": "여섯번째 게시글",
+                "type": "image",
+                "url": "image1"
+            },
+            {
+                "id": 3,
+                "post_content": "여섯번째 게시글",
+                "type": "image",
+                "url": "image2"
+            },
+            {
+                "id": 4,
+                "post_content": "여섯번째 게시글",
+                "type": "image",
+                "url": "image3"
+            }
+        ],
+        "profile": {
+            "id": 1,
+            "mobile_number": "",
+            "website": "",
+            "bio": "",
+            "user": 1
+        }
+    },
+    {
+        "id": 7,
+        "content": "여섯번째 게시글",
+        "like_count": 0,
+        "files": [
+            {
+                "id": 5,
+                "post_content": "여섯번째 게시글",
+                "type": "image",
+                "url": "image1"
+            },
+            {
+                "id": 6,
+                "post_content": "여섯번째 게시글",
+                "type": "image",
+                "url": "image2"
+            },
+            {
+                "id": 7,
+                "post_content": "여섯번째 게시글",
+                "type": "image",
+                "url": "image3"
+            }
+        ],
+        "profile": {
+            "id": 1,
+            "mobile_number": "",
+            "website": "",
+            "bio": "",
+            "user": 1
+        }
+    }
+]
+```
+
+### 특정 데이터를 가져오는 API
+- API 요청한 URL: http://127.0.0.1:8000/posts/1 `GET`
+- 결과 데이터: 
+```
+{
+    "id": 1,
+    "content": "수정 post",
+    "like_count": 0,
+    "files": [
+        {
+            "id": 1,
+            "post_content": "수정 post",
+            "type": "image",
+            "url": "hi"
+        },
+        {
+            "id": 8,
+            "post_content": "수정 post",
+            "type": "image",
+            "url": "fileurl"
+        }
+    ],
+    "profile": {
+        "id": 1,
+        "mobile_number": "",
+        "website": "",
+        "bio": "",
+        "user": 1
+    }
+}
+```
+
+### 새로운 데이터를 생성하는 API
+- 요청 URL: http://127.0.0.1:8000/posts/ `POST`
+- body 데이터의 내용:
+```
+{
+    "profile": "1",
+    "id": 4,
+    "content": "삽입 post",
+    "like_content": 0
+}
+```
+- create된 결과:
+```
+{
+    "id": 8,
+    "content": "삽입 post",
+    "like_count": 0,
+    "files": [],
+    "profile": 1
+}
+```
+
+### 특정 데이터를 업데이트하는 API
+- 요청 URL: http://127.0.0.1:8000/posts/1 `PUT`
+- body 데이터의 내용:
+```
+{
+    "id": 4,
+    "content": "수정 post"
+}
+```
+- update된 결과:
+```
+{
+    "id": 1,
+    "content": "수정 post",
+    "like_count": 0,
+    "files": [
+        {
+            "id": 1,
+            "post_content": "수정 post",
+            "type": "image",
+            "url": "hi"
+        },
+        {
+            "id": 8,
+            "post_content": "수정 post",
+            "type": "image",
+            "url": "fileurl"
+        }
+    ],
+    "profile": {
+        "id": 1,
+        "mobile_number": "",
+        "website": "",
+        "bio": "",
+        "user": 1
+    }
+}
+```
+
+### 특정 데이터를 삭제하는 API
+- 요청 URL: http://127.0.0.1:8000/posts/3 `DELETE`
+- delete된 결과:
+```
+{
+    "status": 204,
+    "message": "SUCCESS"
+}
+```
+
+### 공부한 내용 정리
+이번 주차 내용 중 POST api를 생성하는데에 있어서 가장 어려움을 겪었다.
+
+저번 주 피드백을 통해 fields를 일일이 지정해주어야 한다는 점을 알게 되었고, Post에서도 마찬가지로 하고자 시도하였다.
+
+다만 `profile = ProfileSerializer(read_only=True)` 구문을 PostSerializer 안에서 다시 작성하면서, 원래 존재하는 필드인 profile을 덮어 씌워 정상적인 접근이 불가능해지며 삽입이 되지 않은 것 같다.
+
+특정 컬럼 값을 원하거나 여러개의 리스트를 가져올 때만, 그에 일치하는 변수명을 만들고 따로 선언하여 사용하면 될 것 같다.
+
+### 간단한 회고
+저번에 겪었던 related_name 문제로 인해 사용하고자 하는 class에서 related_name들을 미리 지정을 해주고 migrate한뒤 코드를 작성하였다. 그럼에도 불구하고 이번 주차 과제를 하다보니 여전히 related_name과 Serializer에 대한 완전한 이해가 되지 않은 것 같아 아쉬웠다. 공부가 더 필요할 것 같다.
