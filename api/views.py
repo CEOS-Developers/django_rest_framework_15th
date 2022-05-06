@@ -1,39 +1,47 @@
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
-from django.shortcuts import render
+from django.http import JsonResponse, Http404
+from rest_framework import status
+from rest_framework.views import APIView
 from api.models import Profile, Post
 from api.serializers import *
 
 
 # profile
-def profile_list(request):
-    if request.method == 'GET':
+class ProfileList(APIView):
+    def get(self, request, format=None):
         profiles = Profile.objects.all()
         serializer = ProfileSerializer(profiles, many=True)
         return JsonResponse(serializer.data)
 
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = ProfileSerializer(data=data)
+    def post(self, request, format=None):
+        serializer = ProfileSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# post
-def post_list(request):
-    if request.method == 'GET':
-        posts = Post.objects.all()
-        serializer = ProfileSerializer(posts, many=True)
+class ProfileDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return Profile.objects.get(pk=pk)
+        except Profile.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        profile = self.get_object(pk)
+        serializer = ProfileSerializer(profile)
         return JsonResponse(serializer.data)
 
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = ProfileSerializer(data=data)
+    def put(self, request, pk, format=None):
+        profile = self.get_object(pk)
+        serializer = ProfileSerializer(profile, data=request.data)
+
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        profile = self.get_object(pk)
+        profile.delete()
+        return JsonResponse(status=status.HTTP_204_NO_CONTENT)
 
