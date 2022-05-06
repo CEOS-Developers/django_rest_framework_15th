@@ -260,8 +260,8 @@ DatetimeModel을 상속하는 형태로 변경하면서 오류가 났는지 의�
 
 ## 5주차 과제
 ### 모든 list를 가져오는 API
-API 요청한 URL: http://127.0.0.1:8000/posts/ `GET`
-결과 데이터: 
+- API 요청한 URL: http://127.0.0.1:8000/posts/ `GET`
+- 결과 데이터: 
 ```
 [
     {
@@ -404,8 +404,8 @@ API 요청한 URL: http://127.0.0.1:8000/posts/ `GET`
 ```
 
 ### 특정 데이터를 가져오는 API
-API 요청한 URL: http://127.0.0.1:8000/posts/1 `GET`
-결과 데이터: 
+- API 요청한 URL: http://127.0.0.1:8000/posts/1 `GET`
+- 결과 데이터: 
 ```
 {
     "id": 1,
@@ -436,20 +436,20 @@ API 요청한 URL: http://127.0.0.1:8000/posts/1 `GET`
 ```
 
 ### 새로운 데이터를 생성하는 API
-요청 URL: http://127.0.0.1:8000/posts/ `POST`
-body 데이터의 내용:
-create된 결과:
+- 요청 URL: http://127.0.0.1:8000/posts/ `POST`
+- body 데이터의 내용:
+- create된 결과:
 
 ### 특정 데이터를 업데이트하는 API
-요청 URL: http://127.0.0.1:8000/posts/1 `PUT`
-body 데이터의 내용:
+- 요청 URL: http://127.0.0.1:8000/posts/1 `PUT`
+- body 데이터의 내용:
 ```
 {
     "id": 4,
     "content": "수정 post"
 }
 ```
-update된 결과:
+- update된 결과:
 ```
 {
     "id": 1,
@@ -480,8 +480,8 @@ update된 결과:
 ```
 
 ### 특정 데이터를 삭제하는 API
-요청 URL: http://127.0.0.1:8000/posts/3 `DELETE`
-delete된 결과:
+- 요청 URL: http://127.0.0.1:8000/posts/3 `DELETE`
+- delete된 결과:
 ```
 {
     "status": 204,
