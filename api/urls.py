@@ -5,4 +5,5 @@ urlpatterns = [
     path('api/profiles', views.ProfileList.as_view()),
     path('api/profiles/<int:pk>', views.ProfileDetail.as_view()),
     path('api/posts', views.PostList.as_view()),
+    path('api/posts/<int:pk>', views.PostDetail.as_view())
 ]

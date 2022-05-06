@@ -539,32 +539,63 @@ def profile_list(request):
 - `Profile`을 추가하는 API
 - request.body
 ```
-
+{
+    "profile": 1,
+    "caption": "Today is May 7",
+    "location": "Seoul"
+}
 ```
 - response
 ```
-
+{
+    "profile": 1,
+    "caption": "Today is May 7",
+    "location": "Seoul",
+    "count_like": 0,
+    "count_comment": 0,
+    "archived_flag": false,
+    "hide_count_flag": false,
+    "turnoff_comment_flag": false
+}
 ```
 ---
 
 ### 특정 데이터를 업데이트하는 API
-#### [PUT] api/profiles/1
-- `PK=1` 인 `Profile`을 수정하는 API
+#### [PATCH] api/posts/3
+- `PK=3` 인 `Post`을 수정하는 API
 - request.body
 ```
-
+{
+    "count_like": 200,
+    "count_comment": 100
+}
 ```
 - response
 ```
-
+{
+    "profile": 1,
+    "caption": "Today is May 7",
+    "location": "Seoul",
+    "count_like": 200,
+    "count_comment": 100,
+    "archived_flag": false,
+    "hide_count_flag": false,
+    "turnoff_comment_flag": false
+}
 ```
 ---
 
 ### 특정 데이터를 삭제하는 API
-#### [DELETE] api/profiles/1
-- `PK=1` 인 `Profile`을 삭제하는 API
+#### [DELETE] api/posts/2
+- `PK=2` 인 `Post`를 삭제하는 API
 - response
 ```
+# 삭제 후
+{
+    "code": "200"
+}
+
+# 삭제할 데이터가 없는 경우
 {
     "detail": "찾을 수 없습니다."
 }
@@ -590,6 +621,7 @@ Django의 MVT : client request 처리 과정
 
 ---
 
+---
 ### 간단한 회고
 
 Django의 CBV에 대해 알게 되었다. 스터디 내용 이외에도 공식문서의 튜토리얼을 통해서
