@@ -179,3 +179,81 @@ Actions 탭에서 실행하거나 master에 push 한 뒤 잠시 기다리면 다
 -> 피드백 반영
 erd에 기본 유저 컬럼도 추가, post에 좋아요 카운트 추가, is_deleted 삭제, created updated 상속
 null=True, blank=True는 장고 컨벤션에 따라 blank
+
+<hr>
+
+## Week 4: DRF1-Serializer
+### 데이터 삽입
+사용 모델: File
+
+관련 모델: Post 
+```
+class Post(DatetimeModel):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    content = models.TextField(blank=True)
+    like_count = models.PositiveIntegerField(default=0)
+
+
+class File(models.Model):
+    post = models.ForeignKey(Post, related_name='files', on_delete=models.CASCADE)
+    type = models.CharField(max_length=20)
+    url = models.CharField(max_length=200)
+```
+![image](https://user-images.githubusercontent.com/63996052/161798869-103985c9-5be7-4067-8c41-9ba3c6f4838e.png)
+
+### 모든 데이터를 가져오는 API 만들기
+- URL : `api/files/`
+- Method : `GET`
+- 모든 'File'의 list를 가져오는 API 요청 결과 : 
+```
+[
+    ...,
+    {
+        "id": 5,
+        "post_content": "여섯번째 게시글",
+        "type": "image",
+        "url": "image1",
+        "post": 7
+    },
+    {
+        "id": 6,
+        "post_content": "여섯번째 게시글",
+        "type": "image",
+        "url": "image2",
+        "post": 7
+    },
+    {
+        "id": 7,
+        "post_content": "여섯번째 게시글",
+        "type": "image",
+        "url": "image3",
+        "post": 7
+    },
+    ...
+]
+```
+
+### 새로운 데이터를 create하도록 요청하는 API 만들기
+- URL : `api/files/`
+- Method : `POST`
+- Body : `{"post": 3, "type": "video", "url": "new-video"}`
+- Post를 추가하는 API 요청 결과 :  
+```
+{
+    "id": 11,
+    "post_content": "세번째 게시글",
+    "type": "video",
+    "url": "new-video",
+    "post": 3
+}
+```
+
+### 회고
+![serializer](https://user-images.githubusercontent.com/63996052/161801617-70829f94-9aad-4075-8409-d117e6f8a423.PNG)
+위와 같이 Nested Serializer를 연습하는 과정이 가장 어려웠다.
+
+DatetimeModel을 상속하는 형태로 변경하면서 오류가 났는지 의심해 보았지만, 다른 사람들의 코드를 찾아보니 문제 없음을 알 수 있었다.
+
+다음으로 api.models에 속하지 않아 django의 auth_user 테이블을 상속하면 접근이 되지 않는건가 싶어 User 대신 Profile과 ForeignKey 관계에 놓이도록 코드를 변경하였다.
+
+마찬가지로 해결되지 않아 검색 결과 `related_name='files'`와 같이 Serializer에서 접근할 명칭을 지정해주면 된다는 것을 확인하여 수정하였고, 이후 잘 작동하였다.
