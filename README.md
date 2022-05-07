@@ -302,6 +302,24 @@ class Post(models.Model):
 #### 결과
 ![API_DELETE](https://user-images.githubusercontent.com/68195241/166322236-0fa14fbf-9005-4759-9e02-6f2fbcad7c74.JPG)
 
+
+## 공부한 내용
+
+### Django View
+- Django는 MTV Pattern을 기반으로 함
+- MTV의 V(view)에 해당하는 view.py를 작성하는 방법에는 함수형 뷰(Function-based view)와 클래스형 뷰(Class-based view)가 있음
+- FBV와 CBV는 '작성 방식'이기 때문에 FBV→CBV 또는 CBV→FBV로 바꿔 작성할 수 있음
+
+|       |                FBV (Function Based View)                |                                               CBV (Class Based View)                                               |
+|:-----:|:-------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------:|
+| 작성 방식 |                     함수 형식 ```def```                     |                                                 클래스 형식 ```class```                                                 |
+|  장점   | * 구현 간단<br/> * 가독성 좋음<br/> * 직관적인 코드<br/> * 데코레이터 사용 간단 | * 코드 확장 / 재사용 용이<br/> * Mixin(다중 상속) 같은 객체지향 기술 사용  가능<br/> * 분리된 메소드로 HTTP Method 구분<br/> * 내장 Generic Class View |
+|  단점   |     * 코드 확장 / 재사용 어려움<br/> * 조건문으로 HTTP Method를 구분      | * 가독성 나쁨<br/> * 직관적이지 못한 코드<br/> * 부모 클래스 & Mixin으로 인해 코드 이해가 복잡<br/> * 데코레이터를 사용하기 복잡 (따로 import / 메소드 오버라이드 필요)  |
+
+### 어느 상황에 어떤 View를 사용하는 것이 좋을까?
+- 상속 / 재사용이 많이 필요한 프로젝트 → ```CBV```
+- 여러 폼을 한꺼번에 다뤄야 하는 복잡한 연산이 필요한 프로젝트 → ```FBV```
+
 ***
 
 > ### 회고
