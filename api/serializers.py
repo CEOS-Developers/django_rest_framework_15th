@@ -9,7 +9,7 @@ class FileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = File
-        fields = '__all__'
+        fields = ['id', 'post_content', 'type', 'url']
 
     def get_post_content(self, obj):
         return obj.post.content
@@ -26,4 +26,12 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'content', 'like_count', 'files']
+        fields = ['id', 'content', 'like_count', 'files', 'profile']
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    post = PostSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = '__all__'
