@@ -601,7 +601,6 @@ def profile_list(request):
 }
 ```
 
-사진 첨부
 
 ---
 
@@ -703,9 +702,78 @@ urlpatterns= [
 generic view(View)는 한 번만 상속 받을 수 있다. 나머지는 mixins으로 해야 한다
 
 e.g) View를 상속받은 ProcessFormView와 ListView를 동시에 상속받을 수 X
- 
+
+### REST framework's mixin class
+#### the views by using the mixin classes.
+
+<1> class SnippetList(APIView)
+- get()
+- post()
+
+
+```
+class SnippetList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+	queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+    
+    def get(self, request, *args, **kwargs):
+    	return self.list(request, *args, **kwargs)
+        
+    def post(self, request, *args, **kwargs):
+    	return self.create(request, *args, **kwargs)
+             
+```
+
+mixin class
+- .list()
+- .create()
+
 ---
-  
+	
+<2> class SnippetDetail(APIView)
+- get()
+- put()
+- delete()
+
+```
+class SnippetDetail(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
+	queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+    
+    def get(self, request, *args, **kwargs):
+    	return self.retrieve(reqeust, *args, **kwargs)
+        
+    def put(self, request, *args, **kwargs):
+    	return self.update(request, *args, **kwargs)
+        
+    def delete(self, request, *args, **kwargs):
+    	return self.destroy(request, *args, **kwargs)
+    
+---
+
+mixin class
+- .retrieve()
+- .update()
+- .destroy()
+
+---
+## generic class-based views
+### Mixed-in generic view
+### view + mixin class
+
+```
+class SnippetList(generics.ListCreateAPIView):
+	queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+    
+class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
+	queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+
+```
+	
+---
+	
 ## Decorator
 ### 1. decorator - URLconf
 
