@@ -641,7 +641,7 @@ class MyView(View):
 ```
 - MyView는 django.views의 `class-based views` 상속
   
-  2. urls.py
+2. urls.py
 ```
 from django.urls import path
 from myapp.views import MyView
