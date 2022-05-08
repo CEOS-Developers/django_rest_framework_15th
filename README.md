@@ -347,11 +347,11 @@ class FileSerializer(serializers.ModelSerializer):
 
 ### View
 
-- GET
-<br>
+- GET<br>
   모델 인스턴스들을 받아 serializing 한 JSON 데이터를 JsonResponse()를 통해 반환함
-- POST
-<br>
+
+
+- POST<br>
   사용자가 입력한 JSON 데이터를 JSONParser()를 통해 parse함<br>
   해당 데이터를 serializing 해준 뒤, is_valid() 를 통해 유효한 데이터임을 알아내면 JsonReponse()를 통해 201 상태코드와 함께 JSON 데이터를 반환해줌
   - 만약 유효하지 않은 데이터임이 드러나면 (is_valid()) 에러와 함께 400 상태코드를 반환해줌
@@ -385,7 +385,7 @@ class File(models.Model):
 
 ### 모든 데이터를 가져오는 API
 
-- **URL**: `api/post/`
+- **URL**: `api/posts/`
 - **Method**: `GET`
 
 ```
@@ -440,7 +440,7 @@ class File(models.Model):
 
 ### 새로운 데이터를 create하도록 요청하는 API
 
-- **URL**: `api/post/`
+- **URL**: `api/posts/`
 - **Method**: `POST`
 - **Body**
   ```
@@ -473,3 +473,373 @@ Nested Serializer를 공부하면서 생각보다 에러가 나는 부분들이 
 처음에는 욕심을 내서 profile, file, post, comment 까지 전부 중첩해서 가져올 수 있을 것 같다는 생각에 시도를 하였는데 자잘자잘한 오류가 발생하여 Nested Serializer에 대해 조금 더 공부를 해본 뒤, 다시 시도해 보려고 한다.
 그리고 views에 safe=False 옵션을 주라는 오류가 몇 번 발생해서 해당 부분을 추가하였더니 잘 작동하였다.
 마지막으로 Django Admin을 이번에 나름 적극적으로 활용해봤는데, 정말 편리한 기능인 것 같아서 앞으로 Django를 사용하는 동안 유용하게 활용할 수 있을 것 같다.
+
+
+<br>
+
+## 5주차 DRF2: API View
+
+---
+
+### Django View
+
+장고에서는 기본적으로 `FBV(함수 기반 뷰)`, `CBV(클래스 기반 뷰)` 2가지의 view 방식을 제공함
+
+**`FBV`**
+
+- 함수 기반 뷰라는 말 그대로 직접 함수를 작성하여 request를 처리하는 view 방식
+- if 조건문을 사용해 request 메소드들을 처리해줌
+
+> **장점**
+> - 구현이 쉽고 편리함
+> - 함수로 정의되어 직관적이고 읽고 이해하기 편함
+> - 데코레이터 사용이 간단함
+>
+> **단점**
+> - 코드 확장이나 재사용이 어려움
+
+<br>
+
+**`CBV`**
+
+- django.views.View 클래스를 상속받아 생성함
+- request 메소드가 GET이라면 클래스 내의 get() 메소드를 실행하는 방식으로 처리
+
+> **장점**
+> - 확장, 재사용이 용이함
+> - 다중 상속, Mixin이 가능함
+> - 클래스 안에서 HTTP 메소드가 분리되어 처리됨
+> - 내장 Generic Class View를 사용할 수 있음
+>
+> **단점**
+> - 코드가 직관적이지 않아 읽고 이해하기 어려움
+> - 상속으로 인해 코드를 찾아봐야 함
+> - 데코레이터 사용이 어려움
+
+<br>
+
+> 각각 장단점이 존재하기 때문에 코드 재사용이나 확장이 필수적인 상황에서는 CBV를, 빠른 구현이 필요한 상황에서는 FBV를 사용하는 등 적절하게 view를 구현하는 것이 좋음
+
+---
+
+### DFR API View
+
+DRF가 제공하는 `APIView` 클래스는 장고의 View 클래스를 상속받은 클래스
+
+- **`FBV`** 는 `@api_view` 데코레이터를 사용하고, 데코레이터 안에 HTTP 메소드를 명시하여 해당 뷰로 요청이 들어왔을 때 `request.method`로 구분하여 마찬가지로 if문에 따라 생성한 구문을 실행함
+- **`CBV`** 는 `APIView`를 상속받아 원하는 클래스를 생성하여 클래스 내에 HTTP 메소드를 처리할 함수를 정의하여 사용함
+
+#### Request 객체
+
+- DRF에서 HTTP 요청을 나타내는 객체로서 HttpRequest 객체를 확장한 Request 객체를 사용함
+- `request.data` 속성을 통해 임의의 데이터를 처리하고, POST, PUT, PATCH 메소드에서 동작
+
+#### Response
+
+- DRF에서 요청에 대한 응답을 나타내는 객체로서 Response 클래스를 상속받아 사용 가능함
+- 렌더링 되지 않은 내용을 읽어서 클라이언트가 요청한 content-type으로 자동 렌더링해줌
+
+#### HTTP Status Code
+
+- 뷰에서 HTTP 상태코드를 단순 숫자로 적는 것은 가독성이 떨어지고, 찾아내기 쉽지 않다는 불편함이 존재함
+- DRF에서 status 라는 모듈을 통해 `HTTP_400_BAD_REQUEST`와 같이 상태코드 400을 나타내면서 가독성을 높이고 실수를 줄일 수 있음
+
+---
+
+### API
+
+#### 모든 데이터를 가져오는 API
+
+- **URL**: `api/posts/`
+- **Method**: `GET`
+
+```
+[
+    {
+        "id": 1,
+        "user": 1,
+        "user_name": "세오스",
+        "content": "'세오스'가 쓴 글입니다..!",
+        "like_count": 1,
+        "comment_count": 2,
+        "created_at": "2022-05-06T09:16:33.294686+09:00",
+        "updated_at": "2022-05-06T09:45:03.791325+09:00",
+        "files": [
+            {
+                "id": 1,
+                "type": 0,
+                "path": "path/file/photo/ceos",
+                "post": 1
+            }
+        ],
+        "comments": [
+            {
+                "id": 1,
+                "post": 1,
+                "user": 2,
+                "user_name": "강아지",
+                "content": "좋아요",
+                "created_at": "2022-05-06T09:21:03.163971+09:00",
+                "updated_at": "2022-05-06T09:21:03.164031+09:00"
+            },
+            {
+                "id": 2,
+                "post": 1,
+                "user": 3,
+                "user_name": "사람",
+                "content": "good",
+                "created_at": "2022-05-06T09:21:12.157263+09:00",
+                "updated_at": "2022-05-06T09:21:21.801101+09:00"
+            }
+        ],
+        "likes": [
+            {
+                "id": 1,
+                "post": 1,
+                "user": 3,
+                "user_name": "사람",
+                "created_at": "2022-05-06T09:24:06.153134+09:00",
+                "updated_at": "2022-05-06T09:24:06.153156+09:00"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "user": 2,
+        "user_name": "강아지",
+        "content": "'강아지'가 쓴 글입니다..!",
+        "like_count": 2,
+        "comment_count": 1,
+        "created_at": "2022-05-06T09:16:45.769622+09:00",
+        "updated_at": "2022-05-06T09:45:08.696673+09:00",
+        "files": [
+            {
+                "id": 2,
+                "type": 1,
+                "path": "path/file/video/dog_1",
+                "post": 2
+            },
+            {
+                "id": 3,
+                "type": 1,
+                "path": "path/file/video/dog_2",
+                "post": 2
+            }
+        ],
+        "comments": [
+            {
+                "id": 3,
+                "post": 2,
+                "user": 3,
+                "user_name": "사람",
+                "content": "귀여워요",
+                "created_at": "2022-05-06T09:23:27.272324+09:00",
+                "updated_at": "2022-05-06T09:23:27.272374+09:00"
+            }
+        ],
+        "likes": [
+            {
+                "id": 2,
+                "post": 2,
+                "user": 1,
+                "user_name": "세오스",
+                "created_at": "2022-05-06T09:24:12.020690+09:00",
+                "updated_at": "2022-05-06T09:24:12.020771+09:00"
+            },
+            {
+                "id": 3,
+                "post": 2,
+                "user": 3,
+                "user_name": "사람",
+                "created_at": "2022-05-06T09:24:17.886407+09:00",
+                "updated_at": "2022-05-06T09:24:17.886430+09:00"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "user": 3,
+        "user_name": "사람",
+        "content": "'사람'이 쓴 글입니다..!",
+        "like_count": 0,
+        "comment_count": 0,
+        "created_at": "2022-05-06T09:16:57.585530+09:00",
+        "updated_at": "2022-05-06T09:16:57.585625+09:00",
+        "files": [
+            {
+                "id": 4,
+                "type": 0,
+                "path": "path/file/photo/person",
+                "post": 3
+            }
+        ],
+        "comments": [],
+        "likes": []
+    }
+]
+```
+
+<br>
+
+#### 특정 데이터를 가져오는 API
+
+- **URL**: `api/posts/<int:pk>/`
+- **Method**: `GET`
+
+`api/posts/1/` **결과**
+```
+{
+    "id": 1,
+    "user": 1,
+    "user_name": "세오스",
+    "content": "'세오스'가 쓴 글입니다..!",
+    "like_count": 1,
+    "comment_count": 2,
+    "created_at": "2022-05-06T09:16:33.294686+09:00",
+    "updated_at": "2022-05-06T09:45:03.791325+09:00",
+    "files": [
+        {
+            "id": 1,
+            "type": 0,
+            "path": "path/file/photo/ceos",
+            "post": 1
+        }
+    ],
+    "comments": [
+        {
+            "id": 1,
+            "post": 1,
+            "user": 2,
+            "user_name": "강아지",
+            "content": "좋아요",
+            "created_at": "2022-05-06T09:21:03.163971+09:00",
+            "updated_at": "2022-05-06T09:21:03.164031+09:00"
+        },
+        {
+            "id": 2,
+            "post": 1,
+            "user": 3,
+            "user_name": "사람",
+            "content": "good",
+            "created_at": "2022-05-06T09:21:12.157263+09:00",
+            "updated_at": "2022-05-06T09:21:21.801101+09:00"
+        }
+    ],
+    "likes": [
+        {
+            "id": 1,
+            "post": 1,
+            "user": 3,
+            "user_name": "사람",
+            "created_at": "2022-05-06T09:24:06.153134+09:00",
+            "updated_at": "2022-05-06T09:24:06.153156+09:00"
+        }
+    ]
+}
+```
+
+<br>
+
+#### 새로운 데이터를 생성하는 API
+
+- **URL**: `api/posts/`
+- **Method**: `POST`
+
+- **Body**
+  ```
+  {
+      "user": 2,
+      "content": "'강아지'가 쓴 두 번째 글입니다..!",
+      "like_count": 0,
+      "comment_count": 0
+  }
+  ```
+
+**결과**
+```
+{
+    "id": 5,
+    "user": 2,
+    "user_name": "강아지",
+    "content": "'강아지'가 쓴 두 번째 글입니다..!",
+    "like_count": 0,
+    "comment_count": 0,
+    "created_at": "2022-05-06T11:09:09.344227+09:00",
+    "updated_at": "2022-05-06T11:09:09.344303+09:00",
+    "files": [],
+    "comments": [],
+    "likes": []
+}
+```
+
+<br>
+
+#### 특정 데이터를 업데이트하는 API
+
+- **URL**: `api/posts/<int:pk>/`
+- **Method**: `PUT`
+
+- **Body**
+  ```
+  {
+    "user": 2,
+    "content": "'강아지'가 수정한 글",
+    "like_count": 1,
+    "comment_count": 1
+  }
+  ```
+
+`api/posts/5/` **결과**
+```
+{
+    "id": 5,
+    "user": 2,
+    "user_name": "강아지",
+    "content": "'강아지'가 수정한 글",
+    "like_count": 1,
+    "comment_count": 1,
+    "created_at": "2022-05-06T11:09:09.344227+09:00",
+    "updated_at": "2022-05-06T11:22:42.902466+09:00",
+    "files": [],
+    "comments": [
+        {
+            "id": 4,
+            "post": 5,
+            "user": 1,
+            "user_name": "세오스",
+            "content": "cute",
+            "created_at": "2022-05-06T11:12:53.836951+09:00",
+            "updated_at": "2022-05-06T11:12:53.837036+09:00"
+        }
+    ],
+    "likes": [
+        {
+            "id": 4,
+            "post": 5,
+            "user": 3,
+            "user_name": "사람",
+            "created_at": "2022-05-06T11:12:29.682022+09:00",
+            "updated_at": "2022-05-06T11:12:29.682128+09:00"
+        }
+    ]
+}
+```
+
+<br>
+
+#### 특정 데이터를 삭제하는 API
+
+- **URL**: `api/posts/<int:pk>/`
+- **Method**: `DELETE`
+
+`api/posts/5` **결과**
+
+<img width="908" alt="스크린샷 2022-05-06 오전 11 25 48" src="https://user-images.githubusercontent.com/78442839/167059500-06ebd00c-a438-4404-8c98-1139d3e2b4d1.png">
+
+---
+
+### 회고
+
+view 완성하는 것이 메인인 주차였지만 역시나 이번 주차에도 serializer에 더 시간을 많이 투자한 것 같다. 저번 PR에서는 serializer method field를 이용해 id 필드를 가져오기도 했으나 굳이 pk값인 id 필드를 따로 작업해주지 않아도 모델에 등록되어 있는 필드 이름만 serializer에 제대로 넣어주면 알아서 id 값을 가져온다는 것도 알게되어 serializer 코드 리팩토링을 하게 되었다.<br>
+좋았던 점은 저번 주차에 이어서 이번 주차까지 FBV와 CBV를 모두 써보면서 장단점을 직접 느낄 수 있었던 것 같아 앞으로 적절하게 사용할 수 있을 것 같다.<br>
+작업을 하면서 `def get_object()` 함수의 로직이 스터디 초반에 공부했던 django.shortcuts 모듈의 `get_object_or_404()`와 동일하다는 것이 생각나 해당 함수를 이용해 구현을 해주었다. 
