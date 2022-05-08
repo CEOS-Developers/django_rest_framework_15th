@@ -765,7 +765,51 @@ class ProtectedView(TemplateView):
  class ProtectedView(TemplateView):
  	template_name = 'secret.html'
 ```
+---
+### Python Decorator ?
+- Decorator는 함수를 수정하지 않은 상태에서 추가 기능을 구현할 때 사용
 
+1. CODE 1
+```
+def decorator_function(original_function):
+    def wrapper_function():
+        print('{} 함수가 호출되기전 입니다.'.format(original_function.__name__))
+        return original_function()
+
+    return wrapper_function
+
+
+def display_1():
+    print('display_1 함수가 실행됐습니다.')
+
+
+def display_2():
+    print('display_2 함수가 실행됐습니다.')
+
+
+display_1 = decorator_function(display_1)  # 1
+display_2 = decorator_function(display_2)  # 2
+```
+
+2. CODE 2
+```
+def decorator_function(original_function):
+    def wrapper_function():
+        print('{} 함수가 호출되기전 입니다.'.format(original_function.__name__))
+        return original_function()
+
+    return wrapper_function
+
+
+@decorator_function  # 1
+def display_1():
+    print('display_1 함수가 실행됐습니다.')
+
+
+@decorator_function  # 2
+def display_2():
+    print('display_2 함수가 실행됐습니다.')
+```
 ---
 ---
 ### 간단한 회고
