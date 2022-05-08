@@ -60,7 +60,7 @@
     </ol>
     <h1>3주차 과제</h1>
     <ol>
-      <li><h3><strong>sql 연결<strong></h3></li>
+      <li><h3><strong>sql 연결</strong></h3></li>
       <img src = "./images/mysql.PNG">
      <p>
     <li><h3><strong>인스타그램 모델링과 데이터 작성 </strong></h3></li>
@@ -121,6 +121,107 @@
    <h3><strong><li>소감</li></strong></h3>
 발생한 수많은 에러들을 처리하느라 진땀흘린 과제였습니다. 개인적으로 3주차 과제에 부족한점이 많았고 그로 인한 수정사항들로 인해서 이번 과제에서 굉장히 많은 에러들을 뽑아낸것이 엄청나게 당황스러웠습니다. 또한 몇 몇 에러들은 ERD를 더 섬세하게 했다면 애초에 발생하지 않았을 과제인 것 같아서 아쉬웠습니다. 앞으로 백엔드 개발자로서 ERD와 모델링에 대해 좀 더 섬세히 공부하고 계획할 필요가 있다고 생각하였습니다. api test를 위해 post맨을 사용하였는데, 지금 보시다시피 error들을 회피하여 api test를 하기 위해 너무 많은 default값을 줬고 그로 인해 post 요청에 정말 저거 하나만 때려도 성공하는걸 보고 복잡한 감정이 들었습니다.. 앞으로 열심히 하겠습니다.  
 </ol>  
+ 
+ <br>    
+ <h1><strong>5주차 과제 - drf2 : Api view</strong></h1>
+ <br>
+ <ol>
+  <li><h3><strong>저번 주차 과제의 피드백 사항 정리</strong></h3> 
+     <ul>
+       <li> user - profile, profile - post, user -post 사이의 참조 관계 중복 문제 개선</li>
+       <li>url 설계 시 복수로 하는 사항 수정</li>
+       <li>serilaizer의 기능에 관하여 -> 오직 직렬화만을 담당. 다른 방법으로의 에러 해결</li>
+     </ul>
+  <br>
+  <li><h3><strong>각종 내용들의 정리</strong></h3></li>
+  <strong>저번 주차의 FBV와 CBV의 공통점과 차이점</strong>
+  <ul>
+    <li>공통점 : 어쨌던간 동일한 결과물을 리턴한다</li>
+    <li>차이점 : 가독성, 예외 처리의 방식 등</li>
+  </ul>
+  <br>
+  <li><h3><strong>본 과제 내용</strong></h3></li>
+  적용한 모델 - Profile 모델 사용
+  두 개의 클래스 <strong>ProfileList, ProfileDetail</strong>로 분리
+  <ol>
+    <li>모든 데이터를 가져오는 API 만들기</li>
+    ProfileList.get
+    
+       def get(self, request, format=None):
+        queryset = Profile.objects.all()
+        serializer = ProfileSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+   /api/profiles     <strong>GET</strong>
+    <img src="./images/5getAll.PNG">
+   <br>
+    <li>특정 데이터를 가져오는 API 만들기</li>
+    ProfileDetail.get
+          
+          def get_one(self,pk):
+        try:
+            return Profile.objects.get(pk=pk)
+        except Profile.DoesNotExist:
+            raise Http404
+    
+          def get(self, request, pk):
+            profile = self.get_one(pk);
+            serializer = ProfileSerializer(profile)
+            return Response(serializer.data)
+    
+    
+  /api/profiles/<<int:pk>>/     <strong>GET</strong>
+   <img src="./images/5getOne.PNG">
+    <br>
+    <li>새로운 데이터를 create하도록 요청하는 API 만들기</li>
+    ProfileList.post
+      
+        def post(self, request, format=None):
+          serializer = ProfileSerializer(data=request.data)
+          if serializer.is_valid():
+              serializer.save()
+              return Response(serializer.data, status=status.HTTP_201_CREATED)
+          return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+  /api/profiles     <strong>POST</strong>
+   <img src="./images/5post.PNG">
+   <br>
+   <li>특정 데이터를 업데이트하는 API<li>
+    ProfileDetail.put
+      
+        def put(self, request, pk):
+          profile = self.get_one(pk)
+          serializer = ProfileSerializer(profile, data=request.data)
+          if serializer.is_valid():
+              serializer.save()
+              return Response(serializer.data, status=status.HTTP_201_CREATED)
+          return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+  /api/profiles/<<int:pk>>/     <strong>PUT</strong>
+   <img src = "./images/5put1.PNG">
+    <br>
+   <img src = "./images/5put2.PNG">
+    <br>
+   <img src = "./images/5put3.PNG">
+    <br>
+    <li>특정 데이터를 삭제하는 API</li>
+    ProfileDetail.delete
      
+        def delete(self, request, pk, format=None):
+          profile = self.get_one(pk)
+          profile.delete();
+          return Response(status=status.HTTP_204_NO_CONTENT)
+    
+   /api/profiles/<<int:pk>>/     <strong>DELETE</strong>
+   <img src="./images/5delete1.PNG">
+   <br>
+   <img src="./images/5delete2.PNG">
+   <br>
+   </ol>
+  <li><h3><strong>회고</strong></h3></li>
+  이번 과제를 통해 어느정도 CBV에 대해 학습해 보았는데, 익숙한 방식은 아니지만 생각보다 괜찮은 방식인 것 같았다. 코드의 가독성이 FBV에 비해 확실히 좋은 느낌이었다. 물론 내가 자주 쓰던 다른 프레임워크에서 하는 방식과는 확실히 괴리감이 있지만, 클래스기에 객체 지향의 특징을 더 잘 이용하면 좋은 코드를 짤 수 있을 것 같다
+    
+  </ol>
+ </ol>
   </body>  
 </html>
