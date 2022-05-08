@@ -747,9 +747,8 @@ class SnippetDetail(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.D
     	return self.update(request, *args, **kwargs)
         
     def delete(self, request, *args, **kwargs):
-    	return self.destroy(request, *args, **kwargs)
-    
----
+    	return self.destroy(request, *args, **kwargs) 
+```
 
 mixin class
 - .retrieve()
@@ -792,6 +791,7 @@ urlpatterns = [
 
 ### 2. decorator - class
 1. dispatch()에 decorator 적용
+	
 ```
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
