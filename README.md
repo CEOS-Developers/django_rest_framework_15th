@@ -273,6 +273,10 @@ image file과 video file 중 하나 이상의 file을 첨부해야 한다는 것
 ---
 # 4. DRF1: Serializer
 
+<details>
+<summary> </summary>
+<div markdown="1">      
+
 ## DRF
 Django REST Framework
 
@@ -457,8 +461,172 @@ def profile_list(request):
         return JsonResponse(serializer.errors, status=400)
 ```
 
-## 회고
+</div>
+</details>
 
+---
+
+# 5. DRF2: API View
+
+---
+
+### 모든 list를 가져오는 API
+#### [GET] api/profiles
+- 모든 `Profile`의 list를 가져오는 API
+- response
+```
+[
+    {
+        "user": 2,
+        "name": "oats",
+        "photo": "/media/file/profile/1.PNG",
+        "website": "none",
+        "bio": "none",
+        "public_flag": false,
+        "number_follower": 100,
+        "number_following": 1,
+        "number_posts": 0
+    },
+    {
+        "user": 3,
+        "name": "serial",
+        "photo": "/media/file/profile/1_VyZJzaF.PNG",
+        "website": "none",
+        "bio": "none",
+        "public_flag": false,
+        "number_follower": 150,
+        "number_following": 150,
+        "number_posts": 0
+    },
+    {
+        "user": 4,
+        "name": "croffle",
+        "photo": "/media/file/profile/1_dFcpKvA.PNG",
+        "website": "none",
+        "bio": "none",
+        "public_flag": true,
+        "number_follower": 200,
+        "number_following": 1,
+        "number_posts": 0
+    }
+]
+```
+
+---
+
+### 특정 데이터를 가져오는 API
+#### [GET] api/profiles/1
+- `PK=1` 인 `Profile`을 가져오는 API
+- response
+```
+{
+    "user": 2,
+    "name": "oats",
+    "photo": "/media/file/profile/1.PNG",
+    "website": "none",
+    "bio": "none",
+    "public_flag": false,
+    "number_follower": 100,
+    "number_following": 1,
+    "number_posts": 0
+}
+```
+
+---
+
+### 새로운 데이터를 생성하는 API
+#### [POST] api/profiles
+- `Profile`을 추가하는 API
+- request.body
+```
+{
+    "profile": 1,
+    "caption": "Today is May 7",
+    "location": "Seoul"
+}
+```
+- response
+```
+{
+    "profile": 1,
+    "caption": "Today is May 7",
+    "location": "Seoul",
+    "count_like": 0,
+    "count_comment": 0,
+    "archived_flag": false,
+    "hide_count_flag": false,
+    "turnoff_comment_flag": false
+}
+```
+---
+
+### 특정 데이터를 업데이트하는 API
+#### [PATCH] api/posts/3
+- `PK=3` 인 `Post`을 수정하는 API
+- request.body
+```
+{
+    "count_like": 200,
+    "count_comment": 100
+}
+```
+- response
+```
+{
+    "profile": 1,
+    "caption": "Today is May 7",
+    "location": "Seoul",
+    "count_like": 200,
+    "count_comment": 100,
+    "archived_flag": false,
+    "hide_count_flag": false,
+    "turnoff_comment_flag": false
+}
+```
+---
+
+### 특정 데이터를 삭제하는 API
+#### [DELETE] api/posts/2
+- `PK=2` 인 `Post`를 삭제하는 API
+- response
+```
+# 삭제 후
+{
+    "code": "200"
+}
+
+# 삭제할 데이터가 없는 경우
+{
+    "detail": "찾을 수 없습니다."
+}
+```
+
+사진 첨부
+
+---
+
+### Django MVT
+사진첨부 - MVT Pattern
+
+Django의 MVT : client request 처리 과정
+
+1. `client`로 `request`를 받으면 `URLconf`를 이용하여 `URL`을 분석한다
+2. URL 분석 결과를 통해 해당 `URL에 대한 처리`를 담당할 `View`를 결정한다
+3. `View`는 `view의 로직`을 실행한다
+   ( DB 처리가 필요하면 `Model`을 통해 처리하고 그 결과를 반환받는다 )
+4. `View`는 로직 처리가 끝나면 `Template`을 사용하여 `client`에 전송할 `HTML` 파일을 생성한다
+5. `View`는 `client`에 `response`(HTML 파일) 한다
+
+..
+
+---
+
+---
+### 간단한 회고
+
+Django의 CBV에 대해 알게 되었다. 스터디 내용 이외에도 공식문서의 튜토리얼을 통해서
+mixins 을 알게 되었다. 또한 이것을 View에서 편하게 사용할 수 있는 generic class-based views도 있다는 것을 알게 되었다.
+API 설계가 까다롭게 느껴지지 않았으나, 1) 모델과 모델 사이의 관계가 있다는 것을 놓쳐 중간에 살짝 꼬인 부분이 있었다. 2) Postman으로 DELETE API를 사용하는데, 데이터가 삭제되지만, 원하는 응답이 나오지 않는 부분이 있었다.
 
 
 ---
