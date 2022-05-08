@@ -93,7 +93,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'api.utils.custom_exception_handler'
+}
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 

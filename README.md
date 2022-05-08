@@ -545,3 +545,385 @@ urlpatterns = [
 > API 단 두개만 만들면 된다 생각한 과제였지만 호되게 당해버렸다... 그동안 프로젝트를 쿼리문을 이용해서 만들었었는데 ORM을 직접 사용해보니 생각보다 어려운 점이 많았던 것 같다.
 > Serializer를 선언하면서 테이블 끼리의 참조관계에 대해 굉장히 헷갈렸고 어려움을 겪었다. 실제 쿼리문 작성처럼 생각하면 안된다는 것을 깨달았다. 그리고 처음엔 User 테이블 자체를 참조하려 했지만 여러 오류를 겪고 Profile 테이블 참조로 바꾸었다.
 > Views.py를 작성할 때도 마찬가지였다. Serializer부터 오류가 발생하니 모든게 엉망이였다. 결국 여러 정보들을 찾아보며 해결하였지만 여러 API들을 구현하려면 더 많은 공부가 필요하다는 것을 깨달았다.
+
+----
+
+## CBV, API 추가
+
+### 피드백 반영
+
+#### url수정
+
+```
+# urls.py
+urlpatterns = [
+    path('api/posts/', views.PostView.as_view()),
+    path('api/posts/<int:pk>', views.PostDetailView.as_view()),
+    path('api/profiles', views.ProfileView.as_view()),
+    path('api/profiles/<int:pk>', views.ProfileDetailView.as_view()),
+]
+```
+
+> 수정하면서 Class를 호출하기 위해 as_view()로 호출.
+
+#### serializer field 수정
+
+```
+# serializers.py
+class PostSerializer(serializers.ModelSerializer):
+    author_nickname = serializers.SerializerMethodField(read_only=True)
+    liked_post = LikeSerializer(many=True, read_only=True, allow_null=True, source='liking_set')
+    comment_post = CommentSerializer(many=True, read_only=True, allow_null=True, source='comment_set')
+
+    class Meta:
+        model = Post
+        fields = ['id', 'author_nickname', 'status', 'script', 'type', 'liking_count', 'author', 'location', 'liked_post', 'comment_post', 'created_at', 'updated_at']
+```
+
+> SerializerMethodField, Nested Serializer를 사용할 때 기존 코드인 field = '__all__'로 정의하면 test 과정에서 문제가 발생한다고 한다. => 직접 명시로 수정
+
+
+### FBV -> CBV
+
+#### CBV
+
+```
+# views.py
+class ProfileView(APIView):
+    def get(self):
+        profile_list = Profile.objects.all()
+        serializer = ProfileSerializer(profile_list, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    def post(self, request):
+        data = JSONParser().parse(request)
+        serializer = ProfileSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+        
+```
+
+> 함수 기반 뷰에서 클래스 기반 뷰로 작성.
+
+#### urls.py 업데이트
+```
+# urls.py
+urlpatterns = [
+    path('api/posts/', views.PostView.as_view()),
+    path('api/posts/<int:pk>', views.PostDetailView.as_view()),
+    path('api/profiles', views.ProfileView.as_view()),
+    path('api/profiles/<int:pk>', views.ProfileDetailView.as_view()),
+    path('api/likes/<int:pk>', views.LikeView.as_view()),
+    path('api/comments/<int:pk>', views.CommentView.as_view()),
+]
+```
+
+> 뷰 자체가 클래스이기 때문에 as_view() 메서드를 이용해 접근.
+
+### Custom Exception Handler
+
+```
+# utils.py
+def custom_exception_handler(exc, context):
+    # Call REST framework's default exception handler first,
+    # to get the standard error response.
+    response = exception_handler(exc, context)
+
+    # Now add the HTTP status code to the response.
+    if response is not None:
+        if response.status_code == 400:
+            message = "잘못된 요청입니다."
+        elif response.status_code == 404:
+            message = "데이터를 찾을 수 없습니다."
+        elif response.status_code == 403:
+            message = "해당 권한이 없습니다."
+        response.data = {
+            'status_code': response.status_code,
+            'detail': message
+        }
+
+    return response
+
+```
+
+> 이번 과제에서는 에러 발생 시 응답 컨벤션을 맞춰 보고 싶어서 작성해 보았다.
+> 해당 exception을 터뜨릴 때 넘겨주는 status_code를 바탕으로 message를 작성하여 response에 Json 형식으로 넣어주는 방식으로 만들었다.
+
+* 예시
+> Post의 author(게시자)랑 다른 유저가 수정 API를 요청한 경우.
+
+![스크린샷 2022-05-06 오전 1 14 22](https://user-images.githubusercontent.com/59060780/166967064-d7942995-b412-4dd3-b64a-2e6f7dc17914.png)
+
+> 기존 Post의 author를 수정할 경우 (기존 author:1)
+
+![스크린샷 2022-05-06 오전 1 42 48](https://user-images.githubusercontent.com/59060780/166971907-4499a32c-e77e-4241-a23a-1ad1c728132d.png)
+
+> 존재하지 않는 Post에 접근 할 경우
+
+![스크린샷 2022-05-06 오전 1 43 24](https://user-images.githubusercontent.com/59060780/166971990-02fbdd78-4d02-42bc-b998-808f186b2dd9.png)
+
+
+### API
+
+#### 모든 리스트를 가져오는 API
+> URI: api/posts/
+
+> Method : GET
+
+```
+# JSON
+[
+    {
+        "id": 2,
+        "author_nickname": "sanbonai06",
+        "status": "valid",
+        "script": "test2",
+        "type": "Posting",
+        "author": 1,
+        "location": 1,
+        "created_at": "2022-04-08T21:00:01.300981+09:00",
+        "updated_at": "2022-04-08T21:00:01.301034+09:00",
+        "post_liking": [
+            {
+                "id": 5,
+                "created_at": "2022-05-05T16:45:51.006Z",
+                "updated_at": "2022-05-05T16:45:51.006Z",
+                "status": "valid",
+                "user_id": 2,
+                "post_id": 2
+            },
+            {
+                "id": 6,
+                "created_at": "2022-05-05T16:45:54.733Z",
+                "updated_at": "2022-05-05T16:45:54.733Z",
+                "status": "valid",
+                "user_id": 1,
+                "post_id": 2
+            },
+            {
+                "id": 7,
+                "created_at": "2022-05-05T16:46:22.878Z",
+                "updated_at": "2022-05-05T16:46:22.878Z",
+                "status": "valid",
+                "user_id": 3,
+                "post_id": 2
+            }
+        ],
+        "post_comment": [
+            {
+                "id": 5,
+                "created_at": "2022-05-05T16:46:39.745Z",
+                "updated_at": "2022-05-05T16:46:39.745Z",
+                "status": "valid",
+                "user_id": 1,
+                "post_id": 2,
+                "script": "댓글을 달아보자"
+            },
+            {
+                "id": 6,
+                "created_at": "2022-05-05T16:46:48.655Z",
+                "updated_at": "2022-05-05T16:46:48.656Z",
+                "status": "valid",
+                "user_id": 3,
+                "post_id": 2,
+                "script": "test"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "author_nickname": "sanbonai06",
+        "status": "valid",
+        "script": "updatedPost",
+        "type": "Posting",
+        "author": 1,
+        "location": 1,
+        "created_at": "2022-04-08T22:14:40.392765+09:00",
+        "updated_at": "2022-05-05T02:09:51.760683+09:00",
+        "post_liking": [
+            {
+                "id": 8,
+                "created_at": "2022-05-05T16:50:35.491Z",
+                "updated_at": "2022-05-05T16:50:35.492Z",
+                "status": "valid",
+                "user_id": 3,
+                "post_id": 3
+            }
+        ],
+        "post_comment": []
+    },
+    {
+        "id": 4,
+        "author_nickname": "sanbonai06",
+        "status": "valid",
+        "script": "TESTPost",
+        "type": "Posting",
+        "author": 1,
+        "location": 1,
+        "created_at": "2022-05-05T20:43:19.536727+09:00",
+        "updated_at": "2022-05-05T20:43:19.536838+09:00",
+        "post_liking": [],
+        "post_comment": []
+    }
+]
+```
+
+#### 특정 데이터를 가져오는 API
+> URI: api/posts/<int:pk>
+
+> Method : GET
+
+```
+# JSON
+{
+    "id": 2,
+    "author_nickname": "sanbonai06",
+    "status": "valid",
+    "script": "test2",
+    "type": "Posting",
+    "author": 1,
+    "location": 1,
+    "created_at": "2022-04-08T21:00:01.300981+09:00",
+    "updated_at": "2022-04-08T21:00:01.301034+09:00",
+    "post_liking": [
+        {
+            "id": 5,
+            "created_at": "2022-05-05T16:45:51.006Z",
+            "updated_at": "2022-05-05T16:45:51.006Z",
+            "status": "valid",
+            "user_id": 2,
+            "post_id": 2
+        },
+        {
+            "id": 6,
+            "created_at": "2022-05-05T16:45:54.733Z",
+            "updated_at": "2022-05-05T16:45:54.733Z",
+            "status": "valid",
+            "user_id": 1,
+            "post_id": 2
+        },
+        {
+            "id": 7,
+            "created_at": "2022-05-05T16:46:22.878Z",
+            "updated_at": "2022-05-05T16:46:22.878Z",
+            "status": "valid",
+            "user_id": 3,
+            "post_id": 2
+        }
+    ],
+    "post_comment": [
+        {
+            "id": 5,
+            "created_at": "2022-05-05T16:46:39.745Z",
+            "updated_at": "2022-05-05T16:46:39.745Z",
+            "status": "valid",
+            "user_id": 1,
+            "post_id": 2,
+            "script": "댓글을 달아보자"
+        },
+        {
+            "id": 6,
+            "created_at": "2022-05-05T16:46:48.655Z",
+            "updated_at": "2022-05-05T16:46:48.656Z",
+            "status": "valid",
+            "user_id": 3,
+            "post_id": 2,
+            "script": "test"
+        }
+    ]
+}
+
+```
+
+> Post에 연결된 댓글과 좋아요에 관한 정보들을 엮기 위해서 prefetch_realated()라는 함수를 배웠다.
+
+```
+class PostSerializer(serializers.ModelSerializer):
+    author_nickname = serializers.SerializerMethodField(read_only=True)
+    post_liking = serializers.SerializerMethodField()
+    post_comment = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Post
+        fields = ['id', 'author_nickname', 'status', 'script', 'type', 'author', 'location',
+                  'created_at', 'updated_at', 'post_liking', 'post_comment']
+
+    def get_author_nickname(self, obj):
+        return obj.author.nickname
+
+    def get_post_liking(self, obj):
+        return list(Liking.objects.filter(post_id=obj.id).prefetch_related('post').values())
+
+    def get_post_comment(self, obj):
+        return list(Comment.objects.filter(post_id=obj.id).prefetch_related('post').values())
+```        
+
+> prefetch_related('post') : 해당 테이블에서 row들을 가져올 때 모델별로 쿼리를 실행해서 따로 쿼리셋을 가져옴.
+> > 객체를 Json으로 직렬화하기 위해 list(.values())로 묶어줬다.
+
+
+#### 새로운 데이터 삽입 API
+> URI: api/posts/
+
+> Method: POST
+
+![스크린샷 2022-05-06 오전 1 58 01](https://user-images.githubusercontent.com/59060780/166974470-cc0a2dfe-cc1f-40c4-b3c1-3604d70bccd9.png)
+
+
+#### 특정 데이터 업데이트 API
+> URI: api/posts/<int:pk>
+
+> Method: PUT
+
+* 실패시
+```
+# 잘못된 요청
+{
+    "status_code": 400,
+    "detail": "잘못된 요청입니다."
+}
+
+# 해당 게시글에 수정 권한이 없는경우 (후에 로그인 시 반환하는 JWT 토큰을 통해 인증할 예정 현재는 id값으로 함)
+{
+    "status_code": 403,
+    "detail": "해당 권한이 없습니다."
+}
+
+# 해당 게시글을 못 찾는 경우
+{
+    "status_code": 404,
+    "detail": "데이터를 찾을 수 없습니다."
+}
+```
+
+* 성공시
+
+
+![스크린샷 2022-05-06 오전 2 01 43](https://user-images.githubusercontent.com/59060780/166975118-6a0359e3-4e7d-4850-a263-44214747e360.png)
+
+
+#### 특정 데이터 삭제 API
+
+> URI: api/posts/<int:pk>
+> Method: DELETE
+
+* 권한이 없는 유저가 삭제 API에 접근했을 경우
+
+
+![스크린샷 2022-05-06 오전 2 09 56](https://user-images.githubusercontent.com/59060780/166976394-53032986-ff7b-405d-8ced-a9ab6d4d4d8e.png)
+
+
+* 성공시
+
+
+![스크린샷 2022-05-06 오전 2 12 16](https://user-images.githubusercontent.com/59060780/166976778-5d649999-646e-47a2-ad7f-cad1f83d716d.png)
+
+
+
+### 회고
+
+> 함수 기반 뷰에서 클래스 기반 뷰로 바꾸면서 확실히 클래스 기반으로 코드를 짜는 것이 재사용성이 좋고 장점들이 많다는 것을 알게되었다. API를 작성하면서 Validation 처리를 생략하기가 찜찜해서
+> 기본적인 Validation 처리를 넣어주었다. 그 과정에서 JWT를 사용해보려 했지만 공부 시간이 부족해서 사용하지는 못했다. DRF 두 번째 과제를 진행하다 보니 어느새 장고가 눈에 익어서
+> 생각보다는 수월하게 진행 할 수 있었던 과제였다. 
