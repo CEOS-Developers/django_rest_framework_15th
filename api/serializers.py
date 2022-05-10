@@ -5,11 +5,11 @@ from django.contrib.auth.models import User
 
 
 class FileSerializer(serializers.ModelSerializer):
-    post_content = serializers.SerializerMethodField()
+    # post_content = serializers.SerializerMethodField()
 
     class Meta:
         model = File
-        fields = ['id', 'post_content', 'type', 'url']
+        fields = ['id', 'type', 'url']
 
     def get_post_content(self, obj):
         return obj.post.content
