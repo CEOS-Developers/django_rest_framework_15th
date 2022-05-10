@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinLengthValidator
 
 
 class DatetimeModel(models.Model):
@@ -19,7 +20,7 @@ class Profile(models.Model):
 
 class Post(DatetimeModel):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='post')
-    content = models.TextField(blank=True)
+    content = models.TextField(blank=True, validators=[MinLengthValidator(2, '2글자 이상 입력하세요.')])
     like_count = models.PositiveIntegerField(default=0)
 
 
