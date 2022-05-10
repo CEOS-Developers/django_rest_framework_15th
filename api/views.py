@@ -24,7 +24,7 @@ class FileViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     filterset_class = FileFilter
 
 
-class PostUpdatePermission(permissions.BasePermission):
+class PostPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method == 'GET':
             return True
@@ -35,4 +35,4 @@ class PostUpdatePermission(permissions.BasePermission):
 class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     queryset = Post.objects.all()
-    permission_classes = [PostUpdatePermission,]
+    permission_classes = [PostPermission,]
