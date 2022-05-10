@@ -258,7 +258,9 @@ DatetimeModel을 상속하는 형태로 변경하면서 오류가 났는지 의�
 
 마찬가지로 해결되지 않아 검색 결과 `related_name='files'`와 같이 Serializer에서 접근할 명칭을 지정해주면 된다는 것을 확인하여 수정하였고, 이후 잘 작동하였다.
 
-## 5주차 과제
+<hr>
+
+## Week 5: DRF2-API View
 ### 모든 list를 가져오는 API
 - API 요청한 URL: http://127.0.0.1:8000/posts/ `GET`
 - 결과 데이터: 
@@ -517,3 +519,116 @@ DatetimeModel을 상속하는 형태로 변경하면서 오류가 났는지 의�
 
 ### 간단한 회고
 저번에 겪었던 related_name 문제로 인해 사용하고자 하는 class에서 related_name들을 미리 지정을 해주고 migrate한뒤 코드를 작성하였다. 그럼에도 불구하고 이번 주차 과제를 하다보니 여전히 related_name과 Serializer에 대한 완전한 이해가 되지 않은 것 같아 아쉬웠다. 공부가 더 필요할 것 같다.
+
+<hr>
+
+## Week 6: DRF3-ViewSet & Filter & Permission & Validation
+### ViewSet Refactoring
+- ViewSet으로 리팩토팅
+- Router 사용해 url 매핑
+
+![image](https://user-images.githubusercontent.com/63996052/167603147-7d87e4dd-6934-4ff2-bbdc-8a85cfdc8198.png)
+
+### Filter
+```url = filters.CharFilter(field_name='url', lookup_expr='icontains')```
+
+http://127.0.0.1:8000/files?url=hi `GET`
+
+![image](https://user-images.githubusercontent.com/63996052/167616156-0ec754b1-436d-4842-a116-b11be979928e.png)
+
+#### method 사용
+```
+type = filters.CharFilter(method='filter_by_type')
+
+def filter_by_type(self, queryset, name, value):
+    filtered_queryset = queryset.filter(type=value)
+    return filtered_queryset
+ ```
+ 
+http://127.0.0.1:8000/files?type=video `GET`
+
+![image](https://user-images.githubusercontent.com/63996052/167617892-6b92d391-08a4-43e5-873e-843d12d7c18b.png)
+
+
+http://127.0.0.1:8000/files?type=image `GET`
+
+![image](https://user-images.githubusercontent.com/63996052/167618086-1ed5703a-d12c-4034-a20d-c6aeabc9554d.png) 
+
+### Permission
+```
+class PostUpdatePermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'GET':
+            return True
+        else:
+            return request.user.is_authenticated
+          
+          
+class PostViewSet(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+    permission_classes = [PostUpdatePermission,]
+```
+➡️ 게시글 조회는 누구나 가능하도록 하였지만, 새 게시글 등록은 인증된 사용자에 한해 가능하도록 함.
+
+
+http://127.0.0.1:8000/posts/ `GET`
+
+![image](https://user-images.githubusercontent.com/63996052/167647222-3f2aa731-0393-4971-ae7e-20ed875b4a45.png)
+
+http://127.0.0.1:8000/posts/ `POST`
+
+```
+{
+    "content": "권한 테스트",
+    "like_count": 0,
+    "files": [],
+    "profile": 1
+}
+```
+
+![image](https://user-images.githubusercontent.com/63996052/167647106-ba1f372f-b524-4105-89dc-9149d40dfa24.png)
+
+### Validation
+```
+from django.core.validators import MinLengthValidator
+
+class Post(DatetimeModel):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='post')
+    content = models.TextField(blank=True, validators=[MinLengthValidator(2, '2글자 이상 입력하세요.')])
+    like_count = models.PositiveIntegerField(default=0)
+```
+➡️ Built-in validator를 사용해서 포스트를 생성할 때 최소 2글자 이상이여야 유효하도록 검사하고, 조건을 만족할 경우에만 새 post를 등록할 수 있도록 제한한다.
+
+http://127.0.0.1:8000/posts/ `POST`
+
+```
+{
+    "content": "앗",
+    "like_count": 0,
+    "files": [],
+    "profile": 1
+}
+```
+
+![image](https://user-images.githubusercontent.com/63996052/167667684-63d78894-722b-4584-a25d-e8b2088702aa.png)
+
+### 공부한 내용 정리
+**유효성을 검사하는 다양한 방법**
+
+- **Field-level Validation**: db로 따지면 테이블의 컬럼 단위의 value에 대하여 유효성 검사
+- **Object-level Validation**: db로 따지면 테이블 단위의 object에 대하여 유효성 검사
+- **Validator 함수를 통한 Validation**: 함수의 파라미터가 조건에 맞지 않을 때 에러 발생
+- **클래스 내 clean 등 멤버 함수로 유효성 검사 및 값 변경**: 리턴 값을 통해 값을 반환
+- 다양한 유효성 검사가 필요한 경우 validators.py에 따로 작성하여 사용하는 것이 좋을 듯 하다.
+
+위처럼 다양한 방법들 중 해당 과제에서는 Validator 함수 중 Built-in Validator 함수인 `MinLengthValidator`를 사용했다.
+이 함수를 models.py의 content에 적용하여, 게시글(post)의 내용(content)이 두 글자 이상일 때만 생성이 가능하도록 하였다.
+뿐만 아니라, Permission을 통해 인증된 사용자만 접근할 수 있도록 구현되었다.
+
+따라서, 로그인한 사용자가 2글자 이상의 글을 작성했을 때만 게시글이 등록되어 무작위로 의미 없는 게시글들이 등록되는 현상을 방지할 수 있다.
+
+### 간단한 회고
+이번 주차 과제를 통해 장고가 제공하는 여러 기능들이 서버 구현의 비용을 엄청나게 줄여준다는 점을 깨달았다. 이전까지는 조금 비효율적이라고 생각했던 부분들이 많이 해결 되었다는 느낌이 들었다.
+
+다만 Permission을 사용함으로 인해서, 게시글에 대하여 조회 외의 다른 기능들이 제대로 작동하는지 포스트맨에서 직접 확인하기 어려웠다. 인증되지 않은 사용자에 대해 에러 메시지를 뱉기는 하지만, 반대로 인증이 되었을 때도 post, put, delete 같은 기능들이 잘 작동하는지 확인하고 싶다는 생각이 들었고, postman에 직접 auth를 주입하는 방법에 대한 공부가 필요하다고 느꼈다.
