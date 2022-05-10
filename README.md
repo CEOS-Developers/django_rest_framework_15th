@@ -258,7 +258,9 @@ DatetimeModel을 상속하는 형태로 변경하면서 오류가 났는지 의�
 
 마찬가지로 해결되지 않아 검색 결과 `related_name='files'`와 같이 Serializer에서 접근할 명칭을 지정해주면 된다는 것을 확인하여 수정하였고, 이후 잘 작동하였다.
 
-## 5주차 과제
+<hr>
+
+## Week 5: DRF2-API View
 ### 모든 list를 가져오는 API
 - API 요청한 URL: http://127.0.0.1:8000/posts/ `GET`
 - 결과 데이터: 
@@ -517,3 +519,50 @@ DatetimeModel을 상속하는 형태로 변경하면서 오류가 났는지 의�
 
 ### 간단한 회고
 저번에 겪었던 related_name 문제로 인해 사용하고자 하는 class에서 related_name들을 미리 지정을 해주고 migrate한뒤 코드를 작성하였다. 그럼에도 불구하고 이번 주차 과제를 하다보니 여전히 related_name과 Serializer에 대한 완전한 이해가 되지 않은 것 같아 아쉬웠다. 공부가 더 필요할 것 같다.
+
+<hr>
+
+## Week 6: DRF3-ViewSet & Filter & Permission & Validation
+### ViewSet Refactoring
+- ViewSet으로 리팩토팅
+- Router 사용해 url 매핑
+
+![image](https://user-images.githubusercontent.com/63996052/167603147-7d87e4dd-6934-4ff2-bbdc-8a85cfdc8198.png)
+
+### Filter
+```url = filters.CharFilter(field_name='url', lookup_expr='icontains')```
+
+http://127.0.0.1:8000/files?url=hi `GET`
+
+![image](https://user-images.githubusercontent.com/63996052/167616156-0ec754b1-436d-4842-a116-b11be979928e.png)
+
+#### method 사용
+```
+type = filters.CharFilter(method='filter_by_type')
+
+def filter_by_type(self, queryset, name, value):
+    filtered_queryset = queryset.filter(type=value)
+    return filtered_queryset
+ ```
+ 
+http://127.0.0.1:8000/files?type=video `GET`
+
+![image](https://user-images.githubusercontent.com/63996052/167617892-6b92d391-08a4-43e5-873e-843d12d7c18b.png)
+
+
+http://127.0.0.1:8000/files?type=image `GET`
+
+![image](https://user-images.githubusercontent.com/63996052/167618086-1ed5703a-d12c-4034-a20d-c6aeabc9554d.png) 
+
+### Permission
+
+### Validation
+
+### 공부한 내용 정리
+새로 알게된 점, 정리 하고 싶은 개념, 궁금한점 등을 정리해 주세요
+
+### 간단한 회고
+과제 시 어려웠던 점이나 느낀 점, 좋았던 점 등을 간단히 적어주세요!
+
+
+
