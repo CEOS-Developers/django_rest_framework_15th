@@ -1,8 +1,8 @@
-from django.urls import path
-from api import views
+from rest_framework import routers
+from .views import FileViewSet, PostViewSet
 
-urlpatterns = [
-    path('files/', views.FileList.as_view()),
-    path('posts/', views.PostList.as_view()),
-    path('posts/<int:pk>', views.PostDetail.as_view())
-]
+router = routers.DefaultRouter()
+router.register(r'files', FileViewSet)
+router.register(r'posts', PostViewSet)
+
+urlpatterns = router.urls
