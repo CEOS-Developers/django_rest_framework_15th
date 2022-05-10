@@ -555,14 +555,80 @@ http://127.0.0.1:8000/files?type=image `GET`
 ![image](https://user-images.githubusercontent.com/63996052/167618086-1ed5703a-d12c-4034-a20d-c6aeabc9554d.png) 
 
 ### Permission
+```
+class PostUpdatePermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'GET':
+            return True
+        else:
+            return request.user.is_authenticated
+          
+          
+class PostViewSet(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+    permission_classes = [PostUpdatePermission,]
+```
+➡️ 게시글 조회는 누구나 가능하도록 하였지만, 새 게시글 등록은 인증된 사용자에 한해 가능하도록 함.
+
+
+http://127.0.0.1:8000/posts/ `GET`
+
+![image](https://user-images.githubusercontent.com/63996052/167647222-3f2aa731-0393-4971-ae7e-20ed875b4a45.png)
+
+http://127.0.0.1:8000/posts/ `POST`
+
+```
+{
+    "content": "권한 테스트",
+    "like_count": 0,
+    "files": [],
+    "profile": 1
+}
+```
+
+![image](https://user-images.githubusercontent.com/63996052/167647106-ba1f372f-b524-4105-89dc-9149d40dfa24.png)
 
 ### Validation
+```
+from django.core.validators import MinLengthValidator
+
+class Post(DatetimeModel):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='post')
+    content = models.TextField(blank=True, validators=[MinLengthValidator(2, '2글자 이상 입력하세요.')])
+    like_count = models.PositiveIntegerField(default=0)
+```
+➡️ Built-in validator를 사용해서 포스트를 생성할 때 최소 2글자 이상이여야 유효하도록 검사하고, 조건을 만족할 경우에만 새 post를 등록할 수 있도록 제한한다.
+
+http://127.0.0.1:8000/posts/ `POST`
+
+```
+{
+    "content": "앗",
+    "like_count": 0,
+    "files": [],
+    "profile": 1
+}
+```
+
+![image](https://user-images.githubusercontent.com/63996052/167667684-63d78894-722b-4584-a25d-e8b2088702aa.png)
 
 ### 공부한 내용 정리
-새로 알게된 점, 정리 하고 싶은 개념, 궁금한점 등을 정리해 주세요
+**유효성을 검사하는 다양한 방법**
+
+- **Field-level Validation**: db로 따지면 테이블의 컬럼 단위의 value에 대하여 유효성 검사
+- **Object-level Validation**: db로 따지면 테이블 단위의 object에 대하여 유효성 검사
+- **Validator 함수를 통한 Validation**: 함수의 파라미터가 조건에 맞지 않을 때 에러 발생
+- **클래스 내 clean 등 멤버 함수로 유효성 검사 및 값 변경**: 리턴 값을 통해 값을 반환
+- 다양한 유효성 검사가 필요한 경우 validators.py에 따로 작성하여 사용하는 것이 좋을 듯 하다.
+
+위처럼 다양한 방법들 중 해당 과제에서는 Validator 함수 중 Built-in Validator 함수인 `MinLengthValidator`를 사용했다.
+이 함수를 models.py의 content에 적용하여, 게시글(post)의 내용(content)이 두 글자 이상일 때만 생성이 가능하도록 하였다.
+뿐만 아니라, Permission을 통해 인증된 사용자만 접근할 수 있도록 구현되었다.
+
+따라서, 로그인한 사용자가 2글자 이상의 글을 작성했을 때만 게시글이 등록되어 무작위로 의미 없는 게시글들이 등록되는 현상을 방지할 수 있다.
 
 ### 간단한 회고
-과제 시 어려웠던 점이나 느낀 점, 좋았던 점 등을 간단히 적어주세요!
+이번 주차 과제를 통해 장고가 제공하는 여러 기능들이 서버 구현의 비용을 엄청나게 줄여준다는 점을 깨달았다. 이전까지는 조금 비효율적이라고 생각했던 부분들이 많이 해결 되었다는 느낌이 들었다.
 
-
-
+다만 Permission을 사용함으로 인해서, 게시글에 대하여 조회 외의 다른 기능들이 제대로 작동하는지 포스트맨에서 직접 확인하기 어려웠다. 인증되지 않은 사용자에 대해 에러 메시지를 뱉기는 하지만, 반대로 인증이 되었을 때도 post, put, delete 같은 기능들이 잘 작동하는지 확인하고 싶다는 생각이 들었고, postman에 직접 auth를 주입하는 방법에 대한 공부가 필요하다고 느꼈다.
