@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from api.models import *
 
@@ -6,22 +7,18 @@ class FollowingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Following
-        fields = ['id', 'follower', 'following', 'following_info']
+        fields = ['id', 'follower', 'following']
 
 
 class LikingSerializer(serializers.ModelSerializer):
     user_nickname = serializers.SerializerMethodField()
-    created_at = serializers.SerializerMethodField()
 
     class Meta:
         model = Liking
-        fields = ['post', 'user', 'user_nickname', 'created_at']
+        fields = ['post', 'user', 'user_nickname']
 
     def get_user_nickname(self, obj):
         return obj.user.nickname
-
-    def get_created_at(self, obj):
-        return Liking.objects.get(pk=obj.id).created_at.strftime("%Y-%m-%d %H:%M:%S")
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -51,6 +48,11 @@ class PostSerializer(serializers.ModelSerializer):
     post_comment = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
+
+    def validate(self, data):
+        if data['type'] not in ['Posting', 'Story']:
+            raise serializers.ValidationError('게시글 종류는 Posting, Story 중 하나여야 합니다.')
+        return data
 
     class Meta:
         model = Post

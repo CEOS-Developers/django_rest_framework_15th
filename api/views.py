@@ -1,5 +1,7 @@
+from django.http import JsonResponse
+
 from api.serializers import *
-from rest_framework import viewsets
+from rest_framework import viewsets, exceptions
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet, filters
 from api.permissions import *
 
@@ -37,6 +39,14 @@ class LikingFilter(FilterSet):
         fields = ['author', 'post_id']
 
 
+class CommentFilter(FilterSet):
+    post = filters.NumberFilter(field_name='post_id')
+
+    class Meta:
+        model = Comment
+        fields = ['post']
+
+
 class ProfileFilter(FilterSet):
     nickname = filters.CharFilter(field_name='nickname', lookup_expr='icontains')
 
@@ -48,6 +58,13 @@ class ProfileFilter(FilterSet):
 class FollowingViewSet(viewsets.ModelViewSet):
     serializer_class = FollowingSerializer
     queryset = Following.objects.all()
+    permission_classes = [FollowingCheck]
+
+    def perform_create(self, serializer):
+        if self.request.data['following'] == self.request.data['follower']:
+            raise exceptions.ValidationError(detail='자기 자신을 팔로우 할 수는 없습니다.')
+        else:
+            serializer.save()
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -58,14 +75,32 @@ class PostViewSet(viewsets.ModelViewSet):
     filter_class = PostFilter
 
     def perform_update(self, serializer):
-        serializer.save(author_id=self.request.headers['userId'])
+        serializer.save(author_id=int(self.request.headers['userId']))
 
 
 class LikingViewSet(viewsets.ModelViewSet):
     serializer_class = LikingSerializer
     queryset = Liking.objects.all()
+    permission_classes = [LikingCheck]
     filter_backends = [DjangoFilterBackend]
     filter_class = LikingFilter
+
+    def perform_create(self, serializer):
+        post_id = self.request.data['post']
+        user_id = self.request.data['user']
+        check_like = Liking.objects.filter(post_id=post_id, user_id=user_id)
+        if len(check_like) != 0:
+            raise exceptions.ValidationError(detail='해당 유저는 이미 좋아요를 누른 상태입니다.')
+        else:
+            serializer.save()
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+    permission_classes = [CommentCheck]
+    filter_backends = [DjangoFilterBackend]
+    filter_class = CommentFilter
 
 
 class ProfileViewSet(viewsets.ModelViewSet):

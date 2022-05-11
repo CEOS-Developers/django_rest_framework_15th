@@ -9,6 +9,7 @@ router.register(r'posts', PostViewSet)
 router.register(r'likings', LikingViewSet)
 router.register(r'profiles', ProfileViewSet)
 router.register(r'followings', FollowingViewSet)
+router.register(r'comments', CommentViewSet)
 urlpatterns = router.urls
 
 #
