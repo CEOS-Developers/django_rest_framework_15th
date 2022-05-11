@@ -927,3 +927,211 @@ class PostSerializer(serializers.ModelSerializer):
 > 함수 기반 뷰에서 클래스 기반 뷰로 바꾸면서 확실히 클래스 기반으로 코드를 짜는 것이 재사용성이 좋고 장점들이 많다는 것을 알게되었다. API를 작성하면서 Validation 처리를 생략하기가 찜찜해서
 > 기본적인 Validation 처리를 넣어주었다. 그 과정에서 JWT를 사용해보려 했지만 공부 시간이 부족해서 사용하지는 못했다. DRF 두 번째 과제를 진행하다 보니 어느새 장고가 눈에 익어서
 > 생각보다는 수월하게 진행 할 수 있었던 과제였다. 
+
+
+## ViewSet, Filtering, Permission, Validtion
+
+### ViewSet으로 리팩토링
+
+```
+# views.py
+class LikingViewSet(viewsets.ModelViewSet):
+    serializer_class = LikingSerializer
+    queryset = Liking.objects.all()
+    permission_classes = [LikingCheck]
+    filter_backends = [DjangoFilterBackend]
+    filter_class = LikingFilter
+
+    def perform_create(self, serializer):
+        post_id = self.request.data['post']
+        user_id = self.request.data['user']
+        check_like = Liking.objects.filter(post_id=post_id, user_id=user_id)
+        if len(check_like) != 0:
+            raise exceptions.ValidationError(detail='해당 유저는 이미 좋아요를 누른 상태입니다.')
+        else:
+            serializer.save()
+```
+
+```
+# urls.py
+
+
+router = routers.DefaultRouter()
+router.register(r'posts', PostViewSet)
+router.register(r'likings', LikingViewSet)
+router.register(r'profiles', ProfileViewSet)
+router.register(r'followings', FollowingViewSet)
+router.register(r'comments', CommentViewSet)
+urlpatterns = router.urls
+
+```
+
+
+
+> 기존 CBV를 ViewSet으로 리팩토링, url 매핑 정보도 router를 이용하여 바꿔 줌
+
+
+### Filtering
+
+```
+# views.py
+
+class PostFilter(FilterSet):
+    author = filters.NumberFilter(field_name='author')
+    post_type = filters.CharFilter(field_name='type')
+    liking_count = filters.NumberFilter(field_name='liking_count')
+    location = filters.NumberFilter(field_name='location_id')
+    nickname = filters.CharFilter(field_name='author_id', lookup_expr="nickname__icontains")
+    ordering = filters.OrderingFilter(
+        fields=(
+            ('author', 'userId'),
+            ('created_at', 'date'),
+            ('liking_count', 'like')
+        )
+    )
+
+    class Meta:
+        model = Post
+        fields = ['author', 'post_type', 'liking_count', 'location_id', 'nickname']
+
+```
+
+* 인스타그램에서 실제로 많이 사용하는 닉네임으로 검색 기능 구현
+
+
+![스크린샷 2022-05-12 오전 2 15 53](https://user-images.githubusercontent.com/59060780/167908558-c1701ac9-6ec9-433f-bea4-c0ee1311227d.png)
+
+
+> lookup_expr="nickname__icontains" 를 이용하여 외래키로 연결된 컬럼들 까지도 정규표현식을 이용한 검색 처럼 구현 할 수 있다
+
+
+* 게시글 최신순으로 Sorting
+
+
+![스크린샷 2022-05-12 오전 2 18 17](https://user-images.githubusercontent.com/59060780/167908928-c619a278-59c9-4963-a245-805dce4380e6.png)
+
+
+> created_at 컬럼을 date로 매핑 해주고 해당 컬럼 기준으로 ordering 가능
+> 위 사진의 -date처럼 역순 정렬도 가능하다
+
+
+### Permission
+
+```
+# permissions.py
+
+class PostCheck(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        else:
+            return int(request.headers['userId']) == obj.author_id
+            
+```
+
+> request 메서드가 SAFE_MOTHODS (GET, HEAD, OPTIONS)가 아니라면 유저의 권한이 필요하다 판단하여 요청 헤더의 userId를 참고하여 권한 부여
+> > 기존에 구상한 방식은 JWT를 이용해 profile_id를 뽑아 와서 검사를 하려 했지만 JWT 구현까지 하기엔 시간이 없어서 다음에 하기로,,,
+
+* 권한 오류 시 에러 응답
+
+```
+# JSON
+
+{
+    "status_code": 403,
+    "message": "해당 권한이 없습니다.",
+    "detail": {
+        "detail": "자격 인증데이터(authentication credentials)가 제공되지 않았습니다."
+    }
+}
+
+```
+
+### Validation
+
+#### object-level
+
+```
+# serializers.py
+
+class PostSerializer(serializers.ModelSerializer):
+    author_nickname = serializers.SerializerMethodField(read_only=True)
+    post_liking = serializers.SerializerMethodField()
+    post_comment = serializers.SerializerMethodField()
+    created_at = serializers.SerializerMethodField()
+    updated_at = serializers.SerializerMethodField()
+
+    def validate(self, data):
+        if data['type'] not in ['Posting', 'Story']:
+            raise serializers.ValidationError('게시글 종류는 Posting, Story 중 하나여야 합니다.')
+        return data
+        
+```
+
+
+> Post의 type 컬럼 내용을 Posting, Story로 제한 해 주었다.
+
+* 해당 Validation 처리 시 응답 
+
+![스크린샷 2022-05-12 오전 2 28 08](https://user-images.githubusercontent.com/59060780/167910571-9f2b4c3d-3555-49bf-b6a2-62ecf7270dd8.png)
+
+
+#### Logical-Validation
+
+```
+# views.py
+
+class FollowingViewSet(viewsets.ModelViewSet):
+    serializer_class = FollowingSerializer
+    queryset = Following.objects.all()
+    permission_classes = [FollowingCheck]
+
+    def perform_create(self, serializer):
+        if self.request.data['following'] == self.request.data['follower']:
+            raise exceptions.ValidationError(detail='자기 자신을 팔로우 할 수는 없습니다.')
+        else:
+            serializer.save()
+
+```
+
+
+> Follow를 이어주는 API에서 자기 자신을 팔로우 할 경우를 막기 위해서 Validation 처리 해주었다.
+
+* 해당 Validation 처리 시 응답 
+
+![스크린샷 2022-05-12 오전 2 31 41](https://user-images.githubusercontent.com/59060780/167911187-480a3d12-75ba-49eb-8e94-8d830a988c4a.png)
+
+
+```
+# views.py
+
+class LikingViewSet(viewsets.ModelViewSet):
+    serializer_class = LikingSerializer
+    queryset = Liking.objects.all()
+    permission_classes = [LikingCheck]
+    filter_backends = [DjangoFilterBackend]
+    filter_class = LikingFilter
+
+    def perform_create(self, serializer):
+        post_id = self.request.data['post']
+        user_id = self.request.data['user']
+        check_like = Liking.objects.filter(post_id=post_id, user_id=user_id)
+        if len(check_like) != 0:
+            raise exceptions.ValidationError(detail='해당 유저는 이미 좋아요를 누른 상태입니다.')
+        else:
+            serializer.save()
+
+
+```
+
+
+> 좋아요 API에서 이미 좋아요를 누른 상태면 Validation 처리 해주었다
+
+* 해당 Validation 처리 시 응답 
+
+![스크린샷 2022-05-12 오전 2 36 14](https://user-images.githubusercontent.com/59060780/167911943-06bad514-29ed-4142-944e-771a3623f4e5.png)
+
+
+### 회고
+
+> 개인적으로 Viewset에 혐오감이 들게 된 과제였다. 전 주차 과제인 CBV로 진행했다면 가능했을 로직들이 계속 실패했다. 특히, 좋아요 눌렀을 때 해당 게시글 엔트리의 liking_count 컬럼을 자동으로 올리는 로직을 만들려 했으나 계속 실패해서 블로그를 찾아 보니, ViewSet 특성 상 두개 이상의 Serializer에 접근이 안된다고 한다.... 혹시 모르니 더 찾아 보고 꼭 해결해 보고 싶다.
