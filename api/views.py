@@ -6,11 +6,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 class PostFilter(FilterSet):
-    user = filters.CharFilter(field_name='user')
+    user = filters.CharFilter(method='filter_user')  # method
 
-    class Meta:
-        model = Post
-        fields = ['user']
+    def filter_user(self, queryset, name, value):
+        filtered_queryset = queryset.filter(user=value)
+        return filtered_queryset
 
 
 class CommentFilter(FilterSet):

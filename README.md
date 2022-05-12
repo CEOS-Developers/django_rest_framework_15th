@@ -588,4 +588,25 @@ class PostFilter(FilterSet):
 ```
 
 ### 회고
+우선 ViewSet을 이용하여 views.py를 리팩토링하니 코드가 매우 간결해져서 좋았다.  
+그렇기 때문에 저번에 구현하지 못했던 Comments 관련 API도 만들었다. Good!  
+Comments 관련 API를 추가해도 코드가 이전보다 훨씬 간결하다..  
+
+그리고 Comments 관련 API 를 만들다가..  
+Comment Serializer에 어떤 post에 대한 comment 인지 알리기 위해..  
+post에 대한 정보가 있었어야 했는데 없었다!!  
+그래서 급하게 Serializer를 수정했지만,, 역시 Test를 해보지 않으면..  
+오류가 나도 모를 수 있다는 걸 다시 한 번 느꼈다..  
+Test의 소중함...  
+
+
+그리고 FilterSet 을 적용할 때 처음에  
+1)특정 기간 동안 2)특정 user가 올린 post  
+를 필터링하는 필터.. 를 만들려다.. 어디선가.. 꼬여서 우선  
+user id 별로 post를 필터링하는 필터와,  
+post id별로 comment를 필터링하는 필터를 만들었다.  
+알다가도 모를 장고.. ㅠ ㅠ
+
+permission과 validation 부분은 구현하지 못했는데  
+더 공부해서 이 부분까지 구현하고 싶다!!
 
