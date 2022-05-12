@@ -493,15 +493,84 @@ from rest_framework import routers
 from .views import *
 
 router = routers.DefaultRouter()
-router.register(r'posts/', PostViewSet)
-router.register(r'comments/', CommentViewSet)
+router.register(r'posts', PostViewSet)
+router.register(r'comments', CommentViewSet)
 
 urlpatterns = router.urls
 ```
 
 ## Filtering
+DRF ViewSet에서 필터링 기능을 쉽게 사용할 수 있도록 FilterSet을 제공한다.  
+FilterSet을 사용하기 위해 `pip install django-filter`를 했다.  
+그리고 user id를 필터링 할 수 있도록 했다.
+```
+from django_filters.rest_framework import FilterSet, filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 
+class PostFilter(FilterSet):
+    user = filters.CharFilter(field_name='user')
+
+    class Meta:
+        model = Post
+        fields = ['user']
+```
+###user id가 6인 user의 게시글을 가져오는 API
+- **URL**: `/api/posts/?user=6/`  
+- **Method**: `GET`
+```
+[
+    {
+        "id": 5,
+        "user": 6,
+        "content": "네번째 글",
+        "create_date": "2022-04-29"
+    },
+    {
+        "id": 6,
+        "user": 6,
+        "content": "다섯번째 글",
+        "create_date": "2022-05-05"
+    },
+    {
+        "id": 7,
+        "user": 6,
+        "content": "여섯번째 글",
+        "create_date": "2022-05-05"
+    }
+]
+```
+
+그리고 추가한 Comment 관련 API도 잘 수행하는 것을 볼 수 있다.  
+### Comments를 새로 추가하는 API
+- **URL**: `api/comments/`  
+- **Method**: `POST`
+- **Body**:`{"post":3, "content": "퍼가요~"}`
+```
+{
+        "post": 3,
+        "content": "퍼가요~",
+        "create_date": "2022-05-12"
+    }
+```
+
+### 모든 Comments를 가져오는 API
+- **URL**: `api/comments/`  
+- **Method**: `GET`
+```
+[
+    {
+        "post": 5,
+        "content": "comment Test",
+        "create_date": "2022-04-29"
+    },
+    {
+        "post": 3,
+        "content": "퍼가요~",
+        "create_date": "2022-05-12"
+    }
+]
+```
 
 
 
