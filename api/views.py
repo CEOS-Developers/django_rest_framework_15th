@@ -10,4 +10,4 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    queryset = Post.objects.all()
+    queryset = Comment.objects.all()

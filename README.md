@@ -464,6 +464,8 @@ ViewSet 은 CBV 가 아닌 헬퍼클래스로 두 가지 종류가 있다.
 - viewsets.ReadOnlyModelViewSet : 목록 조회, 특정 레코드 조회
 - viewsets.ModelViewSet : 목록 조회, 특정 레코드 생성/조회/수정/삭제 (Retrieve, List, Create, Destroy, Update)
 
+## ViewSet
+
 이러쿵 저러쿵 직접 만들어보자!!  
 `views.py` 를 아래와 같이 리팩토링 했다.  
 ```
@@ -496,6 +498,8 @@ router.register(r'comments/', CommentViewSet)
 
 urlpatterns = router.urls
 ```
+
+## Filtering
 
 
 
