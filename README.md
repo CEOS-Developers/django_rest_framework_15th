@@ -541,17 +541,32 @@ class PostFilter(FilterSet):
 ]
 ```
 
+###Comment의 post id가 3인 댓글을 가져오는 API
+- **URL**: `/api/posts/?post=3/`  
+- **Method**: `GET`
+```
+[
+    {
+        "post": 3,
+        "content": "퍼가요~",
+        "create_date": "2022-05-12"
+    }
+]
+```
+
 그리고 추가한 Comment 관련 API도 잘 수행하는 것을 볼 수 있다.  
 ### Comments를 새로 추가하는 API
 - **URL**: `api/comments/`  
 - **Method**: `POST`
 - **Body**:`{"post":3, "content": "퍼가요~"}`
 ```
-{
+[
+    {
         "post": 3,
         "content": "퍼가요~",
         "create_date": "2022-05-12"
     }
+]
 ```
 
 ### 모든 Comments를 가져오는 API
@@ -572,5 +587,5 @@ class PostFilter(FilterSet):
 ]
 ```
 
-
+### 회고
 

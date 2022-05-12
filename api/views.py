@@ -13,6 +13,14 @@ class PostFilter(FilterSet):
         fields = ['user']
 
 
+class CommentFilter(FilterSet):
+    post = filters.NumberFilter(field_name='post')
+
+    class Meta:
+        model = Comment
+        fields = ['post']
+
+
 class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     queryset = Post.objects.all()
@@ -23,3 +31,5 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CommentFilter
