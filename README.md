@@ -441,3 +441,63 @@ FBV 방식으로 구현을 해보며 더 공부를 하고싶다.
 
 참고한 공식문서 : https://www.django-rest-framework.org/tutorial/3-class-based-views/  
 
+# 6주차 : DRF3 - ViewSet & Filter & Permission & Validation
+현재 만들어둔 CBV를 보면, 하나의 URL에 하나의 VIEW만 매칭이 가능하다.  
+이 APIView에는 일정한 패턴이 있는데..! (get, post ...)  
+DRF에는 APIView를 패턴화한  generics, 그리고 generics를 구조화한 viewsets가 있다.  
+정리해보면 아래와 같다.  
+1. **DRF화 = django view -> rest_framework APIView**  
+2. **패턴화 = APIView -> Generic Views**  
+하나의 URL에 HTTP Method 각각의 뷰 처리가 가능
+- generics.CreateAPIView : 생성
+- generics.ListAPIView : 목록
+- generics.RetrieveAPIView : 조회
+- generics.DestroyAPIView : 삭제
+- generics.UpdateAPIView : 수정
+- generics.RetrieveUpdateAPIView : 조회/수정
+- generics.RetrieveDestroyAPIView : 조회/삭제
+- generics.ListCreateAPIView : 목록/생성
+- generics.RetrieveUpdateDestroyAPIView : 조회/수정/삭제
+3. **구조화 = Generic Views -> Viewsets**  
+ViewSet 은 CBV 가 아닌 헬퍼클래스로 두 가지 종류가 있다.  
+여러 개의 URL 패턴에 여러 개의 HTTP Method 를 사용한 여러 개의 뷰 처리가 가능  
+- viewsets.ReadOnlyModelViewSet : 목록 조회, 특정 레코드 조회
+- viewsets.ModelViewSet : 목록 조회, 특정 레코드 생성/조회/수정/삭제 (Retrieve, List, Create, Destroy, Update)
+
+이러쿵 저러쿵 직접 만들어보자!!  
+`views.py` 를 아래와 같이 리팩토링 했다.  
+```
+from api.serializers import *
+from api.models import *
+from rest_framework import viewsets
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    queryset = Post.objects.all()
+```
+원래 Post 관련된 API만 있었는데 코드가 간결해진 기념으로  
+Comment와 관련된 API도 만들어보았다!  
+오류없이 실행되길!  
+
+`urls.py`는 아래와 같이 수정했다.  
+```
+from rest_framework import routers
+from .views import *
+
+router = routers.DefaultRouter()
+router.register(r'posts/', PostViewSet)
+router.register(r'comments/', CommentViewSet)
+
+urlpatterns = router.urls
+```
+
+
+
+
+
