@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MaxLengthValidator
 
 
 class DateTime(models.Model):
@@ -12,7 +13,7 @@ class DateTime(models.Model):
 
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	name = models.CharField(max_length=20)
+	name = models.CharField(max_length=20, validators=[MaxLengthValidator(20, "20자 이상 작성할 수 없습니다")])
 	site = models.CharField(max_length=300, null=True, blank=True)
 	bio = models.TextField(null=True, blank=True)
 	profile_img = models.CharField(max_length=300, null=True, blank=True)
@@ -33,7 +34,7 @@ class Post(DateTime):
 
 class File(models.Model):
 	post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='files')
-	type = models.PositiveIntegerField() # 0: photo, 1: video
+	type = models.PositiveIntegerField() # 0: photo, 1: video, etc..
 	path = models.CharField(max_length=300)
 
 

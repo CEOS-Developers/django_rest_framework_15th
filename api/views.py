@@ -1,5 +1,5 @@
 from api.serializers import *
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, permissions
 from django_filters.rest_framework import FilterSet, filters, DjangoFilterBackend
 
 
@@ -23,16 +23,39 @@ class FileViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 	filterset_class = FileFilter
 
 
+class AuthorPermission(permissions.BasePermission):
+	def has_permission(self, request, view):
+		if request.method == 'POST':
+			return request.data['user'] == int(request.headers['user'])
+		else:
+			return True
+
+	def has_object_permission(self, request, view, obj):
+		if request.method in permissions.SAFE_METHODS: # 조회 요청
+			return True
+		return request.data['user'] == int(request.headers['user'])
+
+
 class PostViewSet(viewsets.ModelViewSet):
 	serializer_class = PostSerializer
 	queryset = Post.objects.all()
+	permission_classes = [AuthorPermission]
+
+
+class ProfilePermission(permissions.BasePermission):
+	def has_object_permission(self, request, view, obj):
+		if request.method in permissions.SAFE_METHODS:
+			return True
+		return obj.id == int(request.headers['user'])
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
 	serializer_class = ProfileSerializer
 	queryset = Profile.objects.all()
+	permission_classes = [ProfilePermission]
 
 
 class CommentViewSet(viewsets.ModelViewSet):
 	serializer_class = CommentSerializer
 	queryset = Comment.objects.all()
+	permission_classes = [AuthorPermission]
