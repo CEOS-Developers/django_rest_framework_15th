@@ -601,12 +601,13 @@ def profile_list(request):
 }
 ```
 
-사진 첨부
 
 ---
 
 ### Django MVT
-사진첨부 - MVT Pattern
+
+![mvt패턴](https://user-images.githubusercontent.com/77188666/167294573-b81df4a6-01d3-45a5-bd9e-2f36ec6b57b6.png)
+
 
 Django의 MVT : client request 처리 과정
 
@@ -617,10 +618,267 @@ Django의 MVT : client request 처리 과정
 4. `View`는 로직 처리가 끝나면 `Template`을 사용하여 `client`에 전송할 `HTML` 파일을 생성한다
 5. `View`는 `client`에 `response`(HTML 파일) 한다
 
-..
+---
+  
+## Class-based views
+- `HTTP methods` (GET, POST, etc.)를 seperate methods로 처리
+- reusable components에 `mixins` (multiple inheritance) 사용 가능
 
 ---
+  
+## How to CBV -1
+  1. view.py
+```
+from django.http import HttpResponse
+from django.views import View
 
+class MyView(View):
+	def get(self, request):
+    	...
+        ...
+        return HttpResponse('result')
+```
+- MyView는 django.views의 `class-based views` 상속
+  
+2. urls.py
+```
+from django.urls import path
+from myapp.views import MyView
+
+urlpatterns = [
+	path('about/', MyView.as_view()),
+ ]
+```
+  
+#### class-based views
+
+- method : as_view() 
+: return = a function ( request의 a URL matching에 따라서 호출 )
+
+1. setup()
+2. dispatch() : request의 HTTP method (GET, POST, PUT, DELETE, ..) 결정
+3. MyView function 내부 matching method 에게 넘긴다
+4. matching 되는 HTTP method가 없을 때 -> `HttpResponseNotAllowed` 
+
+---
+  
+## How to CBV -2
+### 1. subclassing, overriding
+  
+GreetingView
+```
+from django.http import HttpResponse
+from django.views import View
+
+class GreetingView(View):
+	greeting = "Good Day"
+    
+    def get(self, request):
+    	return HttpResponse(self.greeting)
+```
+
+MorningGreetingView 는 GreetingView를 상속
+```
+class MorningGreetingView(GreetingView):
+	greeting = "Morning to ya"
+```
+
+### 2. as_view의 parameter (keyword arguments)
+  
+MorningGreetingView class 따로 만들지 X
+
+URLconf에서 GreetingView.as_view()에 keyword arguments 넣은 거로 사용
+  
+```
+urlpatterns= [
+	path('about/', GreetingView.as_view(greeting="G' day")),
+]
+```
+  
+---
+  
+## mixins
+- 다중 상속
+generic view(View)는 한 번만 상속 받을 수 있다. 나머지는 mixins으로 해야 한다
+
+e.g) View를 상속받은 ProcessFormView와 ListView를 동시에 상속받을 수 X
+
+### REST framework's mixin class
+#### the views by using the mixin classes.
+
+<1> class SnippetList(APIView)
+- get()
+- post()
+
+
+```
+class SnippetList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+	queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+    
+    def get(self, request, *args, **kwargs):
+    	return self.list(request, *args, **kwargs)
+        
+    def post(self, request, *args, **kwargs):
+    	return self.create(request, *args, **kwargs)
+             
+```
+
+mixin class
+- .list()
+- .create()
+
+---
+	
+<2> class SnippetDetail(APIView)
+- get()
+- put()
+- delete()
+
+```
+class SnippetDetail(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
+	queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+    
+    def get(self, request, *args, **kwargs):
+    	return self.retrieve(reqeust, *args, **kwargs)
+        
+    def put(self, request, *args, **kwargs):
+    	return self.update(request, *args, **kwargs)
+        
+    def delete(self, request, *args, **kwargs):
+    	return self.destroy(request, *args, **kwargs) 
+```
+
+mixin class
+- .retrieve()
+- .update()
+- .destroy()
+
+---
+## generic class-based views
+### Mixed-in generic view
+### view + mixin class
+
+```
+class SnippetList(generics.ListCreateAPIView):
+	queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+    
+class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
+	queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+
+```
+	
+---
+	
+## Decorator
+### 1. decorator - URLconf
+
+```
+from django.contrib.auth.decorators import login_required, permission_required
+from django.views.generic import TemplateView
+
+from .views import VoteView
+
+urlpatterns = [
+	path('about/', login_required(TemplateView.as_view(template_name="secret.html"))),
+    path('vote/', permission_required('polls.can_vote')(VoteViews.as_view())),
+    
+    ]
+```
+
+### 2. decorator - class
+1. dispatch()에 decorator 적용
+	
+```
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView
+
+class ProtectedView(TemplateView):
+	template_name ='secret.html'
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+    	return super().dispatch(*args, **kwargs)
+        
+
+```
+2. `method_decorator` 사용 = function decorator -> method decorator 로 바꿔줌
+
+```
+@method_decorator(login_required, name= 'dispatch')
+class ProtectedView(TemplateView):
+	template_name = 'secret.html'
+    
+```
+
+3. method_decorator()를 여러 번 사용해야 할 때 -> list 사용
+ 
+ [ BEFORE ] : list 사용X  
+```
+ @method_decorator(never_cache, name='dispatch')
+ @method_decorator(login_required, name='dispatch')
+ class ProtectedView(TemplateView):
+ 	template_name = 'secret.html'
+```
+ 
+ [ AFTER ] : list 사용 O  
+```
+ decorators = [never_cache, login_required]
+ 
+ @method_decorator(decorators, name='dispatch')
+ class ProtectedView(TemplateView):
+ 	template_name = 'secret.html'
+```
+---
+### Python Decorator ?
+- Decorator는 함수를 수정하지 않은 상태에서 추가 기능을 구현할 때 사용
+
+1. CODE 1
+```
+def decorator_function(original_function):
+    def wrapper_function():
+        print('{} 함수가 호출되기전 입니다.'.format(original_function.__name__))
+        return original_function()
+
+    return wrapper_function
+
+
+def display_1():
+    print('display_1 함수가 실행됐습니다.')
+
+
+def display_2():
+    print('display_2 함수가 실행됐습니다.')
+
+
+display_1 = decorator_function(display_1)  # 1
+display_2 = decorator_function(display_2)  # 2
+```
+
+2. CODE 2
+```
+def decorator_function(original_function):
+    def wrapper_function():
+        print('{} 함수가 호출되기전 입니다.'.format(original_function.__name__))
+        return original_function()
+
+    return wrapper_function
+
+
+@decorator_function  # 1
+def display_1():
+    print('display_1 함수가 실행됐습니다.')
+
+
+@decorator_function  # 2
+def display_2():
+    print('display_2 함수가 실행됐습니다.')
+```
+---
 ---
 ### 간단한 회고
 
