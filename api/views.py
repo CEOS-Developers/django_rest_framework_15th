@@ -8,7 +8,7 @@ from api.permissions import *
 
 class PostFilter(FilterSet):
     author = filters.NumberFilter(field_name='author')
-    post_type = filters.CharFilter(field_name='type')
+    post_type = filters.CharFilter(method='type_filter')
     liking_count = filters.NumberFilter(field_name='liking_count')
     location = filters.NumberFilter(field_name='location_id')
     nickname = filters.CharFilter(field_name='author_id', lookup_expr="nickname__icontains")
@@ -19,6 +19,10 @@ class PostFilter(FilterSet):
             ('liking_count', 'like')
         )
     )
+
+    def type_filter(self, queryset, name, value):
+        filtered_queryset = queryset.filter(type=value)
+        return filtered_queryset
 
     class Meta:
         model = Post
