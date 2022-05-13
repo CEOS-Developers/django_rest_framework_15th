@@ -1049,6 +1049,21 @@ class PostCheck(permissions.BasePermission):
 
 ### Validation
 
+#### 공부한 내용
+
+* Field Level Validation: 한 테이블의 컬럼 단위로 value를 검사하여 유효성을 검증
+* Object Level Validation: 한 테이블 단위로 유효성을 검증
+* validators.py를 작성하여 유효성 검증 메서드들을 묶어서 관리 할 수도 있다. 
+* 에러 발생 시 ValidationError를 발생시켜 에러 처리 해줄 수 있음 
+```
+#예시
+raise serializers.ValidationError('게시글 종류는 Posting, Story 중 하나여야 합니다.')
+```
+
+* 이미 구현되어 제공되는 여러 Validator 메서드들이 많이 있지만 직접 처리해보고 싶어서 구현해보았다.
+
+
+
 #### object-level
 
 ```
@@ -1134,4 +1149,4 @@ class LikingViewSet(viewsets.ModelViewSet):
 
 ### 회고
 
-> 개인적으로 Viewset에 혐오감이 들게 된 과제였다. 전 주차 과제인 CBV로 진행했다면 가능했을 로직들이 계속 실패했다. 특히, 좋아요 눌렀을 때 해당 게시글 엔트리의 liking_count 컬럼을 자동으로 올리는 로직을 만들려 했으나 계속 실패해서 블로그를 찾아 보니, ViewSet 특성 상 두개 이상의 Serializer에 접근이 안된다고 한다.... 혹시 모르니 더 찾아 보고 꼭 해결해 보고 싶다.
+> 개인적으로 Viewset에 적응을 잘 못했던 것 같다. 전 주차 과제인 CBV로 진행했다면 가능했을 로직들이 계속 실패했다. 특히, 좋아요 눌렀을 때 해당 게시글 엔트리의 liking_count 컬럼을 자동으로 올리는 로직을 만들려 했으나 계속 실패해서 블로그를 찾아 보니, ViewSet 특성 상 두개 이상의 Serializer에 접근이 안된다고 한다... 그리고 url 매핑 방식을 router를 사용하다 보니 path variable에 접근 하는법을 몰라 구현하고 싶었던 Validator 중 못 만든 것들이 있었다. 혹시 모르니 더 찾아 보고 꼭 해결해 보고 싶다.
