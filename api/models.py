@@ -12,7 +12,7 @@ class DateTime(models.Model):
 
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	name = models.CharField(max_length=20, unique=True)
+	name = models.CharField(max_length=20)
 	site = models.CharField(max_length=300, null=True, blank=True)
 	bio = models.TextField(null=True, blank=True)
 	profile_img = models.CharField(max_length=300, null=True, blank=True)
