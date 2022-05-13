@@ -843,3 +843,108 @@ DRF가 제공하는 `APIView` 클래스는 장고의 View 클래스를 상속받
 view 완성하는 것이 메인인 주차였지만 역시나 이번 주차에도 serializer에 더 시간을 많이 투자한 것 같다. 저번 PR에서는 serializer method field를 이용해 id 필드를 가져오기도 했으나 굳이 pk값인 id 필드를 따로 작업해주지 않아도 모델에 등록되어 있는 필드 이름만 serializer에 제대로 넣어주면 알아서 id 값을 가져온다는 것도 알게되어 serializer 코드 리팩토링을 하게 되었다.<br>
 좋았던 점은 저번 주차에 이어서 이번 주차까지 FBV와 CBV를 모두 써보면서 장단점을 직접 느낄 수 있었던 것 같아 앞으로 적절하게 사용할 수 있을 것 같다.<br>
 작업을 하면서 `def get_object()` 함수의 로직이 스터디 초반에 공부했던 django.shortcuts 모듈의 `get_object_or_404()`와 동일하다는 것이 생각나 해당 함수를 이용해 구현을 해주었다. 
+
+
+<br>
+
+## 6주차 DRF3: ViewSet & Filter & Permission & Validation
+
+---
+
+### 1. ViewSet으로 리팩토링
+
+APIView를 ViewSet으로 리팩토링
+
+```
+from rest_framework import viewsets
+
+class PostViewSet(viewsets.ModelViewSet):
+	serializer_class = PostSerializer
+	queryset = Post.objects.all()
+```
+<img width="786" alt="스크린샷 2022-05-13 오후 8 30 03" src="https://user-images.githubusercontent.com/78442839/168296713-6d1bb11b-13fd-4e23-be17-3d4347e66fe1.png">
+
+### 2. Filter 기능 구현
+
+list view에 대해 filter 기능 구현
+
+- `field_name`에 대한 filter
+```
+from django_filters.rest_framework import FilterSet, filters
+
+class FileFilter(FilterSet):
+	path = filters.CharFilter(field_name='path')
+
+	class Meta:
+		model = File
+		fields = ['path']
+```
+
+<img width="785" alt="스크린샷 2022-05-13 오후 8 30 42" src="https://user-images.githubusercontent.com/78442839/168298018-10ca598a-ece0-4ed0-a2e4-2f1d3fd1f1d8.png">
+
+- `method`를 이용한 filter
+```
+from django_filters.rest_framework import FilterSet, filters
+
+class FileFilter(FilterSet):
+	type = filters.NumberFilter(method='filter_type')
+
+	def filter_type(self, queryset, name, value):
+		filtered_queryset = queryset.filter(type=value)
+		return filtered_queryset
+```
+
+<img width="785" alt="스크린샷 2022-05-13 오후 8 31 20" src="https://user-images.githubusercontent.com/78442839/168298513-f195efd6-ce58-42f3-b9e3-a7aab40e7db0.png">
+
+### 3. Permission 기능 구현
+
+- list view에 대해 `POST` 요청인 경우 Permission 로직 실행
+```
+from rest_framework import permissions
+
+class AuthorPermission(permissions.BasePermission):
+	def has_permission(self, request, view):
+		if request.method == 'POST':
+			return request.data['user'] == int(request.headers['user'])
+		else:
+			return True
+```
+`request.body`
+```
+{
+    "user": 2,
+    "content": "'강아지'가 쓴 두 번째 글입니다..!",
+    "like_count": 0,
+    "comment_count": 0
+}
+```
+
+<img width="787" alt="스크린샷 2022-05-13 오후 8 32 01" src="https://user-images.githubusercontent.com/78442839/168299739-4d30c434-532d-4d67-a1e8-849d9277ca79.png">
+
+- object view에 대해 조회 요청이 아닌 경우 Permission 로직 실행
+```
+from rest_framework import permissions
+
+class AuthorPermission(permissions.BasePermission):
+	def has_object_permission(self, request, view, obj):
+		if request.method in permissions.SAFE_METHODS: # 조회 요청
+			return True
+		return request.data['user'] == int(request.headers['user'])
+```
+
+<img width="786" alt="스크린샷 2022-05-13 오후 8 43 09" src="https://user-images.githubusercontent.com/78442839/168300149-9b020c76-e5d0-43ad-b339-aa8d94c85b7a.png">
+
+### 4. Validation 구현
+
+```
+from django.core.validators import MaxLengthValidator
+
+class Profile(models.Model):
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	name = models.CharField(max_length=20, validators=[MaxLengthValidator(20, "20자 이상 작성할 수 없습니다")])
+```
+
+<img width="786" alt="스크린샷 2022-05-13 오후 10 37 27" src="https://user-images.githubusercontent.com/78442839/168300517-1d735a9a-8ccd-464d-924b-04eb903c6951.png">
+
+---
+
