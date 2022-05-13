@@ -948,3 +948,177 @@ class Profile(models.Model):
 
 ---
 
+### ViewSet
+
+- `APIView` django view → rest_framework APIView
+  - 하나의 url에 하나의 뷰 처리<br>
+
+
+- `Generic Views` APIView → Generic Views
+  - 하나의 url에 대해 HTTP 메소드를 다르게 사용해 여러 개의 뷰 처리<br>
+
+
+- `Viewsets` Generic Views → Viewsets
+  - 여러 개의 url 패턴에 대해 여러 개의 HTTP 메소드 사용해 여러 개의 뷰 처리
+
+#### ModelViewSet
+
+- `create` POST
+- `list` GET - 리스트
+- `retrieve` GET - Detail(object)
+- `update` PUT - Detail(object)
+- `partial_update` PATCH - Detail(object)
+- `destroy` DELETE - Detail(object)
+
+```
+from rest_framework import viewsets
+
+class ModelNameViewSet(viewsets.ModelViewSet):
+	serializer_class = ModelNameSerializer
+	queryset = ModelName.objects.all()
+```
+
+**Router 사용해 url 매핑**
+```
+from rest_framework import routers
+from .views import ModelNameViewSet
+
+router = routers.DefaultRouter()
+router.register(r'model_name', ModelNameViewSet)   # register()함으로써 두 개의 url 생성
+
+urlpatterns = router.urls
+```
+
+- List, Create → `model_name/`
+- Retrieve, Update, Destroy → `model_name/<int:pk>/`<br>
+
+
+- `routers.DefaultRouter()`로 리스트와 object에 관한 두 개의 url 생성
+- `router.register`로 url과 viewset 매핑
+
+---
+
+### Filtering
+
+#### FilterSet
+
+filtering 작업(query set에서 특정 옵션을 만족하는 query set을 고르는 작업)을 손쉽게 사용하도록 DRF에서 제공하는 속성
+
+```
+class PostFilter(FilterSet):
+    class Meta:
+        model = Post
+        fields = ['author', 'content', 'upload_date']
+        order_by = ['upload_date']
+```
+
+- `FilterSet` 을 상속해 Filter를 위한 클래스를 선언
+  - filtering 할 모델 정의 후, 사용할 `fields` 정의
+  - `exclude`, `order_by`, `together` 등 적용 가능
+- 기존 모델의 필드 값과의 일치여부만 파악하는 filter의 경우 `filterset_fields` 라는 속성을 통해 구현
+
+#### Filter Method
+
+filtering 되는 data의 형식에 따라 다양한 filter 존재(CharFilter, BooleanFilter 등)
+
+```
+class F(FilterSet):
+    id__in = NumberInFilter(field_name='id', lookup_expr='in')
+
+    class Meta:
+        model = User
+```
+
+- `name` 필드 이름 필터링
+- `lookup_expr` 필터링할 때 필드를 가져옴
+  - __ 구문을 이용해 model 필드를 필터링할 수 있음<br>
+    ex.) year__gt
+
+#### Customized Filter Method
+
+```
+class FileFilter(FilterSet):
+	def filter_type(self, queryset, name, value):
+		filtered_queryset = queryset.filter(type=value)
+		return filtered_queryset
+```
+
+- 해당 list view를 포함하는 viewset의 `filterset_class` 속성에 지정
+
+---
+
+### Permission
+
+어떤 API에 대한 접근 권한
+
+```
+from rest_framework import permissions
+
+class Permission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.is_authenticated
+    
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return obj.user == request.user
+```
+
+has_permission 을 통해 인증된 유저들만이 목록 조회, 생성을 할 수 있도록 허용<br>
+
+has_object_permission 을 통해 조회 요청을 제외한 PUT, DELETE 요청일 경우, 작성자에 한해 수정, 삭제를 할 수 있도록 허용
+
+- `has_permission` 해당 뷰에 대한 요청이 들어올 때마다 항상 실행
+- `has_object_permission` 해당 뷰에서 특정 object에 접근하는 순간을 위해 권한을 확인해줌
+  - `has_permission`을 우선 실행한 뒤, 통과된 API에 한해 실행<br>
+
+
+- `SAFE_METHODS`는 GET, HEAD, OPTIONS와 같은 조회 요청을 뜻함
+
+---
+
+### Validation
+
+#### Field-level validation
+
+```
+def validate_title(self, value):
+    if 'django' not in value.lower():
+        raise serializers.ValidationError("Blog post is not about Django")
+    return value
+```
+
+validate_<field_name> 메소드를 통해 검증된 값을 반환하거나 `serializers.ValidationError`를 발생시킴
+
+#### Object-level validation
+
+```
+def validate(self, data):
+    if data['start'] > data['finish']:
+        raise serializers.ValidationError("finish must occur after start")
+    return data
+```
+
+validate 메소드를 통해 object에 대하여 검증된 값을 반환하거나 에러 발생시킴
+
+#### Validators
+
+Field에 Built-in validators 속성을 포함하여 검증
+
+```
+from django.core.validators import MaxLengthValidator
+
+class Profile(models.Model):
+	name = models.CharField(max_length=20, validators=[MaxLengthValidator(20, "20자 이상 작성할 수 없습니다")])
+```
+
+- unique 옵션 검증을 위한 다양한 `UniqueValidator`도 제공
+
+---
+
+### 회고
+
+이번 주차까지 스터디를 하면서 장고에서 정말 다양한 기능을 제공하고 있다는 것을 알 수 있었다. 아직 공부하지 못한 부분들도 많지만 이번 주차에 공부한 내용들만 잘 공부해도 훨씬 편리하게 개발할 수 있을 것 같다는 생각이 들었다.
+Permission과 Validation 부분이 특히 제공하는 기능도 많고 그에 따라 내가 커스텀할 수 있는 범위도 넓어서 더 제대로 공부해보고 싶다는 생각이 들었다. 
+Permission 코드에서 request.user.is_authenticated나 obj.user와 같이 작성했을 때, 현재는 인증 후 제대로 동작하지 않는 것을 알 수 있었다. 에러를 띄우는 경우도 문제 없었고, request.user.is_authenticated나 obj.user를 request.data['user']로 바꾸면 이상없이 작동한 것으로 보아 아직 더 공부하고 작업해야 할 부분이 남은 것 같았다.
+장고 인증에 대해서 공부한 뒤 다시 시도해보고 싶다는 생각이 들었다.
