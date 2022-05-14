@@ -1,5 +1,4 @@
 from django.http import JsonResponse, Http404
-from rest_framework import status, mixins
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from api.models import Profile, Post
@@ -8,38 +7,34 @@ from django_filters.rest_framework import FilterSet, filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 
-# Viewset
 # Profile
 class ProfileViewset(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
 
 
-# Filter
+# Post
 class PostFilter(FilterSet):
-    """Filter for Posts by if posts are archived or not"""
-    profile = filters.CharFilter(field_name='profile', method='filter_profile')
-    archived = filters.BooleanFilter(field_name='archived_flag', method='filter_archived')
+    profile = filters.NumberFilter(field_name='profile')    # post 작성한 profile
+    location = filters.CharFilter(field_name='location')    # post location tag
+    archived = filters.BooleanFilter(field_name='archived_flag', method='filter_archived')  # post 보관 유/무
 
     class Meta:
         model = Post
-        fields = ['profile', 'archived_flag']
+        fields = ['profile', 'location', 'archived_flag']
 
     def filter_archived(self, queryset, name, value):
         lookup = '__'.join([name, 'isnull'])
         return queryset.filter(**{lookup: False})
 
-    def filter_profile(self, queryset, name, value):
-        return queryset.filter(**{
-            name: value,
-        })
 
-
-# Post
-class PostViewset(mixins.ListModelMixin, viewsets.GenericViewSet):
+class PostViewset(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
     filter_backends = [DjangoFilterBackend]
     filterset_class = PostFilter
-    filterset_fields = ['profile', 'archived_flag']
+
+
 
 
 # APIView
