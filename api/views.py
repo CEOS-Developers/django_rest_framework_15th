@@ -3,7 +3,10 @@ from api.serializers import *
 from rest_framework import viewsets
 from django_filters.rest_framework import FilterSet, filters
 from django_filters.rest_framework import DjangoFilterBackend
+
+from django.utils import timezone
 import datetime
+import pytz
 
 
 class PostFilter(FilterSet):
@@ -15,8 +18,9 @@ class PostFilter(FilterSet):
 		fields = '__all__'
 
 	def filter_is_recently_modified(self, queryset, name, value):
-		end_date = datetime.datetime.today().replace(minute=0, second=0, microsecond=0)
-		start_date = end_date - datetime.timedelta(hours=6)	# 최근 6시간 이내에 수정된 포스트
+		end_date = timezone.localtime(timezone.now()).replace(tzinfo=pytz.timezone('Asia/Seoul'))
+		start_date = end_date + datetime.timedelta(-6)	# 최근 6시간 이내에 수정된 포스트
+
 		return queryset.filter(modified_at__range=(start_date, end_date))
 
 class PostViewSet(viewsets.ModelViewSet):
