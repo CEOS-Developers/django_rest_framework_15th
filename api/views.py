@@ -8,24 +8,41 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 # Profile
+class ProfileFilter(FilterSet):
+    user = filters.NumberFilter(field_name='user')  # profile 사용자
+    name = filters.CharFilter(field_name='name', method='filter_name')  # profile name
+
+    class Meta:
+        model = Post
+        fields = ['user', 'name']
+
+    def filter_name(self, queryset, name, value):
+        return queryset.filter(**{
+            name: value,
+        })
+
+
 class ProfileViewset(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
     queryset = Profile.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProfileFilter
 
 
 # Post
 class PostFilter(FilterSet):
     profile = filters.NumberFilter(field_name='profile')    # post 작성한 profile
-    location = filters.CharFilter(field_name='location')    # post location tag
-    archived = filters.BooleanFilter(field_name='archived_flag', method='filter_archived')  # post 보관 유/무
+    location = filters.CharFilter(field_name='location', method='filter_location')  # post location tag
+    archived = filters.BooleanFilter(field_name='archived_flag')  # post 보관 유/무
 
     class Meta:
         model = Post
         fields = ['profile', 'location', 'archived_flag']
 
-    def filter_archived(self, queryset, name, value):
-        lookup = '__'.join([name, 'isnull'])
-        return queryset.filter(**{lookup: False})
+    def filter_location(self, queryset, name, value):
+        return queryset.filter(**{
+            name: value,
+        })
 
 
 class PostViewset(viewsets.ModelViewSet):

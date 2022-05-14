@@ -15,7 +15,7 @@ class Profile(CommonInfo):                                              # 프로
     user = models.OneToOneField(User, on_delete=models.CASCADE)         # FK (user_id)
     name = models.CharField(max_length=30)                              # 이름
     photo = models.FileField(upload_to='file/profile/', null=True)      # 프로필 사진 저장 위치
-    website = models.CharField(max_length=320)                          # Website
+    website = models.CharField(max_length=320, null=True)               # Website
     bio = models.CharField(max_length=150)                              # Bio
     public_flag = models.BooleanField(default=False)                    # 공개 계정
     number_follower = models.IntegerField(default=0)                    # 팔로워 수
