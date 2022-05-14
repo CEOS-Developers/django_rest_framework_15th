@@ -6,13 +6,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 class PostFilter(FilterSet):
-	user = filters.CharFilter(field_name='user')
+	user = filters.NumberFilter(field_name='user')
 
 	class Meta:
 		model = Post
-		fields = ['user']
-
+		fields = '__all__'
 
 class PostViewSet(viewsets.ModelViewSet):
 	serializer_class = PostSerializer
 	queryset = Post.objects.all()
+	filter_backends = [DjangoFilterBackend]
+	filterset_class = PostFilter
