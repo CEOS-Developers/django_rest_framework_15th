@@ -6,8 +6,8 @@ from .views import *
 # Viewset
 
 router = routers.DefaultRouter()
-router.register(r'Profile', ProfileViewset)
-router.register(r'Post', PostViewset)
+router.register(r'profiles', ProfileViewset)
+router.register(r'posts', PostViewset)
 
 urlpatterns = router.urls
 
