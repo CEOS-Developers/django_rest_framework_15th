@@ -1,6 +1,16 @@
 from api.models import *
 from api.serializers import *
 from rest_framework import viewsets
+from django_filters.rest_framework import FilterSet, filters
+from django_filters.rest_framework import DjangoFilterBackend
+
+
+class PostFilter(FilterSet):
+	user = filters.CharFilter(field_name='user')
+
+	class Meta:
+		model = Post
+		fields = ['user']
 
 
 class PostViewSet(viewsets.ModelViewSet):
