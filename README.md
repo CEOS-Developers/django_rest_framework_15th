@@ -453,8 +453,29 @@ class PostFilter(FilterSet):
 ## [3] 공부한 내용
 
 ### Viewset
+- 단일 클래스에 관련 있는 view들을 결합한 ```ViewSet```(view들의 집합)
+- ```.get()```이나 ```.post()``` 같은 메소드 핸들러 대신 ```.list()```나 ```.create()``` 같은 액션을 제공함
+- url의 ```Viewset```에 view들을 명시적으로 등록하는 것보다 ```router``` 클래스를 통해 등록하는 것이 좋음
+
+#### 종류
+<b>GenericViewSet</b>
+  - 기본만 제공
+  - ```get_object```, ```get_queryset```, etc.
+
+<b>ModelViewSet</b>
+  - 다양한 액션 제공
+  - ```.list()```, ```.retrieve()```, ```.create()```, ```.update()```, ```.partial_update()```, ```.destroy()```
+
+<b>ReadyOnlyModelViewSet</b>
+  - 'read-only'인 액션만 제공
+  - ```.list()``` , ```.retrieve()```
 
 ### Filter
+- 어떤 query set에 대해 조건을 지정하여(필터), 해당 조건에 맞는 query set을 만들어내는 것
+
+#### 구현에 실질적으로 참고한 링크 
+###### ~~정리하기에는 너무 많았다...~~
+  - https://django-filter.readthedocs.io/en/stable/ref/filters.html
 
 ***
 
