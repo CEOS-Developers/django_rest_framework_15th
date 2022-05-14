@@ -1,10 +1,27 @@
 from django.http import JsonResponse, Http404
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework import viewsets
 from api.models import Profile, Post
 from api.serializers import *
 
 
+# Viewset
+
+# Profile
+class ProfileViewset(viewsets.ModelViewSet):
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
+
+
+# Post
+class PostViewset(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+
+
+# APIView
+'''
 # profile
 class ProfileList(APIView):
     def get(self, request, format=None):
@@ -87,3 +104,4 @@ class PostDetail(APIView):
         post = self.get_object(pk)
         post.delete()
         return JsonResponse({"code": "200"}, status=status.HTTP_204_NO_CONTENT, safe=False)
+'''
