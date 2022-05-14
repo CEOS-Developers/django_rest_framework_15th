@@ -132,6 +132,96 @@
        <li>url 설계 시 복수로 하는 사항 수정</li>
        <li>serilaizer의 기능에 관하여 -> 오직 직렬화만을 담당. 다른 방법으로의 에러 해결</li>
      </ul>
+  <br>
+  <li><h3><strong>각종 내용들의 정리</strong></h3></li>
+  <strong>저번 주차의 FBV와 CBV의 공통점과 차이점</strong>
+  <ul>
+    <li>공통점 : 어쨌던간 동일한 결과물을 리턴한다</li>
+    <li>차이점 : 가독성, 예외 처리의 방식 등</li>
+  </ul>
+  <br>
+  <li><h3><strong>본 과제 내용</strong></h3></li>
+  적용한 모델 - Profile 모델 사용
+  두 개의 클래스 <strong>ProfileList, ProfileDetail</strong>로 분리
+  <ol>
+    <li>모든 데이터를 가져오는 API 만들기</li>
+    ProfileList.get
+    
+       def get(self, request, format=None):
+        queryset = Profile.objects.all()
+        serializer = ProfileSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+   /api/profiles     <strong>GET</strong>
+    <img src="./images/5getAll.PNG">
+   <br>
+    <li>특정 데이터를 가져오는 API 만들기</li>
+    ProfileDetail.get
+          
+          def get_one(self,pk):
+        try:
+            return Profile.objects.get(pk=pk)
+        except Profile.DoesNotExist:
+            raise Http404
+    
+          def get(self, request, pk):
+            profile = self.get_one(pk);
+            serializer = ProfileSerializer(profile)
+            return Response(serializer.data)
+    
+    
+  /api/profiles/<<int:pk>>/     <strong>GET</strong>
+   <img src="./images/5getOne.PNG">
+    <br>
+    <li>새로운 데이터를 create하도록 요청하는 API 만들기</li>
+    ProfileList.post
+      
+        def post(self, request, format=None):
+          serializer = ProfileSerializer(data=request.data)
+          if serializer.is_valid():
+              serializer.save()
+              return Response(serializer.data, status=status.HTTP_201_CREATED)
+          return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+  /api/profiles     <strong>POST</strong>
+   <img src="./images/5post.PNG">
+   <br>
+   <li>특정 데이터를 업데이트하는 API<li>
+    ProfileDetail.put
+      
+        def put(self, request, pk):
+          profile = self.get_one(pk)
+          serializer = ProfileSerializer(profile, data=request.data)
+          if serializer.is_valid():
+              serializer.save()
+              return Response(serializer.data, status=status.HTTP_201_CREATED)
+          return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+  /api/profiles/<<int:pk>>/     <strong>PUT</strong>
+   <img src = "./images/5put1.PNG">
+    <br>
+   <img src = "./images/5put2.PNG">
+    <br>
+   <img src = "./images/5put3.PNG">
+    <br>
+    <li>특정 데이터를 삭제하는 API</li>
+    ProfileDetail.delete
+     
+        def delete(self, request, pk, format=None):
+          profile = self.get_one(pk)
+          profile.delete();
+          return Response(status=status.HTTP_204_NO_CONTENT)
+    
+   /api/profiles/<<int:pk>>/     <strong>DELETE</strong>
+   <img src="./images/5delete1.PNG">
+   <br>
+   <img src="./images/5delete2.PNG">
+   <br>
+   </ol>
+  <li><h3><strong>회고</strong></h3></li>
+  이번 과제를 통해 어느정도 CBV에 대해 학습해 보았는데, 익숙한 방식은 아니지만 생각보다 괜찮은 방식인 것 같았다. 코드의 가독성이 FBV에 비해 확실히 좋은 느낌이었다. 물론 내가 자주 쓰던 다른 프레임워크에서 하는 방식과는 확실히 괴리감이 있지만, 클래스기에 객체 지향의 특징을 더 잘 이용하면 좋은 코드를 짤 수 있을 것 같다
+    
+  </ol>
  </ol>
   </body>  
 </html>
