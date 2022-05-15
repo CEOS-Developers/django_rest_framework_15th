@@ -222,6 +222,76 @@
   이번 과제를 통해 어느정도 CBV에 대해 학습해 보았는데, 익숙한 방식은 아니지만 생각보다 괜찮은 방식인 것 같았다. 코드의 가독성이 FBV에 비해 확실히 좋은 느낌이었다. 물론 내가 자주 쓰던 다른 프레임워크에서 하는 방식과는 확실히 괴리감이 있지만, 클래스기에 객체 지향의 특징을 더 잘 이용하면 좋은 코드를 짤 수 있을 것 같다
     
   </ol>
+  <h1><strong>6주차 DRF3 : ViewSet & Filter & Permission & Validation</strong></h3>
+  <ol>
+  <li><h3><strong>viewSet</strong></h3></li>
+  <ul>
+  <li>viewSet을 이용한 리팩토링 - ProfileViewSet
+      
+    class ProfileViewSet(ModelViewSet):
+        serializer_class = ProfileSerializer
+        queryset = Profile.objects.all()
+  
+
+viewSet을 통해 두 줄로 코드를 정리한 부분이 인상적이다.
+</li>
+  
+<li>router 설정.
+      from rest_framework.routers import DefaultRouter
+
+    router = DefaultRouter()
+    router.register('api/profiles', views.ProfileViewSet)
+
+    urlpatterns = [
+        path('', include(router.urls)),
+    ]
+  
+기존의 as_view() 방식 대신 router를 이용하여 훨씬 깔끔한 코드. 여기서는 저번 코드와 uri를 같게 하느라 api/profiles 사용함
+</li></ul>
+  
+  
+ <li><h3><strong>filtering</strong></h3></li>
+  <ul>
+      <li>profileViewSet 코드에 filtering 부분 추가</li>
+    
+              class ProfileViewSet(ModelViewSet):
+                serializer_class = ProfileSerializer
+                queryset = Profile.objects.all()
+                filter_backends = [DjangoFilterBackend]
+                filterset_class = ProfileFilter
+      
+      
+<li>views.py에 profileFilter 함수를 작성 (FilterSet 상속)</li>
+    
+        class ProfileFilter(django_filters.FilterSet):
+          nickname = django_filters.CharFilter(field_name='nickname', lookup_expr="contains")
+          image = django_filters.BooleanFilter(field_name="profileImg", method='filter_image')
+
+        class Meta:
+            model = Profile
+            fields = ['nickname', 'profileImg']
+
+          def filter_image(self,queryset, profileImg , value):
+              if value:
+                  return queryset.filter(profileImg__isnull=True)
+              else:
+                  return queryset.filter(profile__isnull=False)
+      
+  </ul>
+  <li><h3><strong>permission</strong></h3></li>
+    <ul>존재하는 permission class 들에 대해 알아보기
+      <li>AllowAny : 인증 상관없이 뷰 호출</li>
+      <li>IsAuthenticated : 인증된 유저에게만 뷰 호출 </li>
+      <li>IsAuthenticatedOrReadOnly : 비인증 유저는 읽기만 가능</li>
+      <li>그 밖에 IsAdminUser, DjangoModelPermissons, DjangoModelPermissionsOrAnonReadOnly, DjangoObjectPermissons 등 존재</li></ul>
+      
+      profileviewSet에 permission 추가
+          permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]     
+ <li><h3><strong>회고</strong></h3></li>
+  이번 과제에선 viewSet을 사용하였다. 지금까지는 어찌되었던간 각각 요청과 처리를 내가 직접 어떻게 처리를 했다면, 장고에서는 viewSet이 처리를 해 주어 고작 두 줄 정도의 코드로 각종 요청에 대한 응답을 할 수 있다는 것이 정말 놀라웠다. 점점 주차가 지날수록 코드의 가독성과 간결성이 좋아지며 발전해감을 느꼈다. filtering또한 손쉽게 list에서 필터를 거쳐서 원하는 정보를 뽑아내게 해 주는데, 내가 아직 RDBMS가 익숙하지는 않아서 모델간의 관계에 따라 필터링하고 그러는게 어색했지만 공부하면서 즐거웠다. 또한 접근성에 대해서도 permission을 잘 제공해준다고 생각하였다. validation에 대해서는 적용하지 못하였지만, 공부를 더 한다면 제대로 적용해보고 싶다. 
+   
  </ol>
   </body>  
 </html>
