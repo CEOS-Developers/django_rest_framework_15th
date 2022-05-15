@@ -27,7 +27,7 @@ class LikeSerializer(serializers.ModelSerializer):
 class FileSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = File
-		fields = '__all__'
+		fields = ['id', 'post', 'type', 'path']
 
 
 class PostSerializer(serializers.ModelSerializer):
