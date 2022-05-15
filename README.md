@@ -252,13 +252,13 @@ url : `api/posts/` POST
 
 
 ### 특정 데이터를 업데이트하는 API
-url : `api/items/<int:pk>/` PUT
+url : `api/posts/<int:pk>/` PUT
 
 <img width="1362" alt="스크린샷 2022-05-06 오후 11 30 19" src="https://user-images.githubusercontent.com/88263178/167153712-f86c8d88-2e71-43f2-9f60-50c3882111db.png">
 
 
 ### 특정 데이터를 삭제하는 API
-url : `api/items/<int:pk>/` DELETE
+url : `api/posts/<int:pk>/` DELETE
 
 <img width="1358" alt="스크린샷 2022-05-06 오후 11 30 36" src="https://user-images.githubusercontent.com/88263178/167153755-a4a2f39b-daf7-4113-87c0-c545306159ae.png">
 
