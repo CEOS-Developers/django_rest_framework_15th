@@ -1,45 +1,30 @@
 from api.models import *
 from api.serializers import *
-from django.http import Http404
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import viewsets
+from django_filters.rest_framework import FilterSet, filters
+from django_filters.rest_framework import DjangoFilterBackend
+
+from django.utils import timezone
+import datetime
+import pytz
 
 
-class PostList(APIView):
-    def get(self, request, format=None):
-        posts = Post.objects.all()
-        serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
+class PostFilter(FilterSet):
+	user = filters.NumberFilter(field_name='user')
+	is_recently_modified = filters.BooleanFilter(method='filter_is_recently_modified')
 
-    def post(self, request, format=None):
-        serializer = PostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+	class Meta:
+		model = Post
+		fields = '__all__'
 
-class PostDetail(APIView):
-    def get_object(self, pk):
-        try:
-            return Post.objects.get(pk=pk)
-        except Post.DoesNotExist:
-            raise Http404
+	def filter_is_recently_modified(self, queryset, name, value):
+		end_date = timezone.localtime(timezone.now()).replace(tzinfo=pytz.timezone('Asia/Seoul'))
+		start_date = end_date + datetime.timedelta(-6)	# 최근 6시간 이내에 수정된 포스트
 
-    def get(self, request, pk, format="json"):
-        post = self.get_object(pk)
-        serializer = PostSerializer(post)
-        return Response(serializer.data)
+		return queryset.filter(modified_at__range=(start_date, end_date))
 
-    def put(self, request, pk, format=None):
-        post = self.get_object(pk)
-        serializer = PostSerializer(post, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        post = self.get_object(pk)
-        post.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class PostViewSet(viewsets.ModelViewSet):
+	serializer_class = PostSerializer
+	queryset = Post.objects.all()
+	filter_backends = [DjangoFilterBackend]
+	filterset_class = PostFilter

@@ -324,3 +324,163 @@ class Post(models.Model):
 
 > ### 회고
 > 뭔가 너무 예상보다 날로 먹은 과제 같아서 고민이 많았지만....? 공식 문서의 CBV 내용을 읽어보고 참고하니 이번에는 그다지 어렵지 않게 완료해서 얼떨떨합니다...! 남은 기간은 공부한 내용을 정리하며 알차게 보내려고 합니다.
+
+***
+
+# Week6 : DRF3-ViewSet & Filter & Permission & Validation
+
+## [1] Viewset으로 리팩토링
+
+- import ```viewsets```
+- ```APIView``` PostList & PostDetail → ```Viewset``` PostViewSet
+```python
+from api.models import *
+from api.serializers import *
+from rest_framework import viewsets
+
+
+class PostViewSet(viewsets.ModelViewSet):
+	serializer_class = PostSerializer
+	queryset = Post.objects.all()
+```
+
+## [2] Filter 기능 구현
+
+### 0. 모든 데이터
+- ```변경사항``` filter 테스트를 위해 "여섯번째 포스트"를 추가함
+```json
+[
+    {
+        "id": 4,
+        "user": 3,
+        "content": "첫번째 포스트",
+        "created_at": "2022-04-09T05:58:15.047992+09:00",
+        "modified_at": "2022-04-09T05:58:15.047992+09:00"
+    },
+    {
+        "id": 5,
+        "user": 4,
+        "content": "두번째 포스트",
+        "created_at": "2022-04-09T05:58:36.441409+09:00",
+        "modified_at": "2022-04-09T05:58:36.441409+09:00"
+    },
+    {
+        "id": 6,
+        "user": 5,
+        "content": "세번째 포스트",
+        "created_at": "2022-04-09T05:58:46.633393+09:00",
+        "modified_at": "2022-04-09T05:58:46.633393+09:00"
+    },
+    {
+        "id": 7,
+        "user": 5,
+        "content": "네번째 포스트",
+        "created_at": "2022-05-03T04:24:02.893540+09:00",
+        "modified_at": "2022-05-03T05:24:03.217081+09:00"
+    },
+    {
+        "id": 9,
+        "user": 3,
+        "content": "여섯번째 포스트",
+        "created_at": "2022-05-15T03:04:45.963518+09:00",
+        "modified_at": "2022-05-15T03:04:45.963518+09:00"
+    }
+]
+```
+
+### 1. 특정 user의 post만 걸러내는 filter
+```python
+class PostFilter(FilterSet):
+    user = filters.NumberFilter(field_name='user')
+
+    class Meta:
+		model = Post
+		fields = '__all__'
+```
+- URL : ```api/posts/?user=3```
+- Method : ```GET```
+#### 결과 코드
+```json
+[
+    {
+        "id": 4,
+        "user": 3,
+        "content": "첫번째 포스트",
+        "created_at": "2022-04-09T05:58:15.047992+09:00",
+        "modified_at": "2022-04-09T05:58:15.047992+09:00"
+    },
+    {
+        "id": 9,
+        "user": 3,
+        "content": "여섯번째 포스트",
+        "created_at": "2022-05-15T03:04:45.963518+09:00",
+        "modified_at": "2022-05-15T03:04:45.963518+09:00"
+    }
+]
+```
+
+### 2. 최근 6시간 이내에 수정된 post만 걸러내는 filter
+```python
+import datetime
+
+class PostFilter(FilterSet):
+    is_recently_modified = filters.BooleanFilter(method='filter_is_recently_modified')
+
+    class Meta:
+	    model = Post
+	    fields = '__all__'
+
+    def filter_is_recently_modified(self, queryset, name, value):
+	    end_date = datetime.datetime.today().replace(minute=0, second=0, microsecond=0)
+	    start_date = end_date - datetime.timedelta(hours=6)	# 최근 6시간 이내에 수정된 포스트
+	    return queryset.filter(modified_at__range=(start_date, end_date))
+```
+- URL : ```api/posts/?is_recently_modified=true```
+- Method : ```GET```
+#### 결과 코드
+```json
+[
+    {
+        "id": 9,
+        "user": 3,
+        "content": "여섯번째 포스트",
+        "created_at": "2022-05-15T03:04:45.963518+09:00",
+        "modified_at": "2022-05-15T03:04:45.963518+09:00"
+    }
+]
+```
+
+## [3] 공부한 내용
+
+### Viewset
+- 단일 클래스에 관련 있는 view들을 결합한 ```ViewSet```(view들의 집합)
+- ```.get()```이나 ```.post()``` 같은 메소드 핸들러 대신 ```.list()```나 ```.create()``` 같은 액션을 제공함
+- url의 ```Viewset```에 view들을 명시적으로 등록하는 것보다 ```router``` 클래스를 통해 등록하는 것이 좋음
+
+#### 종류
+<b>GenericViewSet</b>
+  - 기본만 제공
+  - ```get_object```, ```get_queryset```, etc.
+
+<b>ModelViewSet</b>
+  - 다양한 액션 제공
+  - ```.list()```, ```.retrieve()```, ```.create()```, ```.update()```, ```.partial_update()```, ```.destroy()```
+
+<b>ReadyOnlyModelViewSet</b>
+  - 'read-only'인 액션만 제공
+  - ```.list()``` , ```.retrieve()```
+
+### Filter
+- 어떤 query set에 대해 조건을 지정하여(필터), 해당 조건에 맞는 query set을 만들어내는 것
+
+#### 구현에 실질적으로 참고한 링크 
+###### ~~정리하기에는 너무 많았다...~~
+  - https://django-filter.readthedocs.io/en/stable/ref/filters.html
+
+***
+
+> ### 회고
+> 처음에 requirements.txt를 업데이트해보려다가 오류가 생겨 서버를 실행시킬 수 없었고, method에 대해 작성한 함수가 옳지 못해 제대로 된 결과물이 나오지 않아 시간이 많이 걸렸습니다...
+> 그리고 원래는 created_at과 modified_at을 비교해서 post가 수정되었는지를 필터로 걸러내고 싶었는데 그것에는 실패하고 대신 최근(6시간)에 수정된 post를 알아내는 필터를 구현하는 것으로 마무리지어 공부를 더 해보고 싶습니다.
+> 
+> +) 아무 문제 구현을 완료한 줄 착각하고 있었지만... is_recently_modified를 true로 해두어도, false로 해두어도 결과가 같음을 발견해서 다시 머리를 굴리고 있습니다...
