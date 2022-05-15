@@ -1,47 +1,35 @@
-from django.http import Http404
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from api.serializers import *
 from api.models import *
-from rest_framework import status
+from rest_framework import viewsets
+from django_filters.rest_framework import FilterSet, filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 
-class PostList(APIView):
-    def get(self, request, format=None):
-        posts = Post.objects.all()
-        serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
+class PostFilter(FilterSet):
+    user = filters.CharFilter(method='filter_user')  # method
 
-    def post(self, request, format=None):
-        serializer = PostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class PostDetail(APIView):
-    def get_object(self, pk):
-        try:
-            return Post.objects.get(pk=pk)
-        except Post.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        posts = self.get_object(pk)
-        serializer = PostSerializer(posts)
-        return Response(serializer.data)
-
-    def put(self, request, pk, format=None):
-        posts = self.get_object(pk)
-        serializer = PostSerializer(posts, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        posts = self.get_object(pk)
-        posts.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def filter_user(self, queryset, name, value):
+        filtered_queryset = queryset.filter(user=value)
+        return filtered_queryset
 
 
+class CommentFilter(FilterSet):
+    post = filters.NumberFilter(field_name='post')
+
+    class Meta:
+        model = Comment
+        fields = ['post']
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PostFilter
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CommentFilter

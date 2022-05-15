@@ -441,3 +441,172 @@ FBV 방식으로 구현을 해보며 더 공부를 하고싶다.
 
 참고한 공식문서 : https://www.django-rest-framework.org/tutorial/3-class-based-views/  
 
+# 6주차 : DRF3 - ViewSet & Filter & Permission & Validation
+현재 만들어둔 CBV를 보면, 하나의 URL에 하나의 VIEW만 매칭이 가능하다.  
+이 APIView에는 일정한 패턴이 있는데..! (get, post ...)  
+DRF에는 APIView를 패턴화한  generics, 그리고 generics를 구조화한 viewsets가 있다.  
+정리해보면 아래와 같다.  
+1. **DRF화 = django view -> rest_framework APIView**  
+2. **패턴화 = APIView -> Generic Views**  
+하나의 URL에 HTTP Method 각각의 뷰 처리가 가능
+- generics.CreateAPIView : 생성
+- generics.ListAPIView : 목록
+- generics.RetrieveAPIView : 조회
+- generics.DestroyAPIView : 삭제
+- generics.UpdateAPIView : 수정
+- generics.RetrieveUpdateAPIView : 조회/수정
+- generics.RetrieveDestroyAPIView : 조회/삭제
+- generics.ListCreateAPIView : 목록/생성
+- generics.RetrieveUpdateDestroyAPIView : 조회/수정/삭제
+3. **구조화 = Generic Views -> Viewsets**  
+ViewSet 은 CBV 가 아닌 헬퍼클래스로 두 가지 종류가 있다.  
+여러 개의 URL 패턴에 여러 개의 HTTP Method 를 사용한 여러 개의 뷰 처리가 가능  
+- viewsets.ReadOnlyModelViewSet : 목록 조회, 특정 레코드 조회
+- viewsets.ModelViewSet : 목록 조회, 특정 레코드 생성/조회/수정/삭제 (Retrieve, List, Create, Destroy, Update)
+
+## ViewSet
+
+이러쿵 저러쿵 직접 만들어보자!!  
+`views.py` 를 아래와 같이 리팩토링 했다.  
+```
+from api.serializers import *
+from api.models import *
+from rest_framework import viewsets
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    queryset = Post.objects.all()
+```
+원래 Post 관련된 API만 있었는데 코드가 간결해진 기념으로  
+Comment와 관련된 API도 만들어보았다!  
+오류없이 실행되길!  
+
+`urls.py`는 아래와 같이 수정했다.  
+```
+from rest_framework import routers
+from .views import *
+
+router = routers.DefaultRouter()
+router.register(r'posts', PostViewSet)
+router.register(r'comments', CommentViewSet)
+
+urlpatterns = router.urls
+```
+
+## Filtering
+DRF ViewSet에서 필터링 기능을 쉽게 사용할 수 있도록 FilterSet을 제공한다.  
+FilterSet을 사용하기 위해 `pip install django-filter`를 했다.  
+그리고 user id를 필터링 할 수 있도록 했다.
+```
+from django_filters.rest_framework import FilterSet, filters
+from django_filters.rest_framework import DjangoFilterBackend
+
+
+class PostFilter(FilterSet):
+    user = filters.CharFilter(field_name='user')
+
+    class Meta:
+        model = Post
+        fields = ['user']
+```
+###user id가 6인 user의 게시글을 가져오는 API
+- **URL**: `/api/posts/?user=6/`  
+- **Method**: `GET`
+```
+[
+    {
+        "id": 5,
+        "user": 6,
+        "content": "네번째 글",
+        "create_date": "2022-04-29"
+    },
+    {
+        "id": 6,
+        "user": 6,
+        "content": "다섯번째 글",
+        "create_date": "2022-05-05"
+    },
+    {
+        "id": 7,
+        "user": 6,
+        "content": "여섯번째 글",
+        "create_date": "2022-05-05"
+    }
+]
+```
+
+###Comment의 post id가 3인 댓글을 가져오는 API
+- **URL**: `/api/posts/?post=3/`  
+- **Method**: `GET`
+```
+[
+    {
+        "post": 3,
+        "content": "퍼가요~",
+        "create_date": "2022-05-12"
+    }
+]
+```
+
+그리고 추가한 Comment 관련 API도 잘 수행하는 것을 볼 수 있다.  
+### Comments를 새로 추가하는 API
+- **URL**: `api/comments/`  
+- **Method**: `POST`
+- **Body**:`{"post":3, "content": "퍼가요~"}`
+```
+[
+    {
+        "post": 3,
+        "content": "퍼가요~",
+        "create_date": "2022-05-12"
+    }
+]
+```
+
+### 모든 Comments를 가져오는 API
+- **URL**: `api/comments/`  
+- **Method**: `GET`
+```
+[
+    {
+        "post": 5,
+        "content": "comment Test",
+        "create_date": "2022-04-29"
+    },
+    {
+        "post": 3,
+        "content": "퍼가요~",
+        "create_date": "2022-05-12"
+    }
+]
+```
+
+### 회고
+우선 ViewSet을 이용하여 views.py를 리팩토링하니 코드가 매우 간결해져서 좋았다.  
+그렇기 때문에 저번에 구현하지 못했던 Comments 관련 API도 만들었다. Good!  
+Comments 관련 API를 추가해도 코드가 이전보다 훨씬 간결하다..  
+
+그리고 Comments 관련 API 를 만들다가..  
+Comment Serializer에 어떤 post에 대한 comment 인지 알리기 위해..  
+post에 대한 정보가 있었어야 했는데 없었다!!  
+그래서 급하게 Serializer를 수정했지만,, 역시 Test를 해보지 않으면..  
+오류가 나도 모를 수 있다는 걸 다시 한 번 느꼈다..  
+Test의 소중함...  
+
+
+그리고 FilterSet 을 적용할 때 처음에  
+1)특정 기간 동안 2)특정 user가 올린 post  
+를 필터링하는 필터.. 를 만들려다.. 어디선가.. 꼬여서 우선  
+user id 별로 post를 필터링하는 필터와,  
+post id별로 comment를 필터링하는 필터를 만들었다.  
+알다가도 모를 장고.. ㅠ ㅠ
+
+permission과 validation 부분은 구현하지 못했는데  
+더 공부해서 이 부분까지 구현하고 싶다!!
+
