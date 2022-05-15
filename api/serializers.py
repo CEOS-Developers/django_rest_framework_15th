@@ -1,15 +1,13 @@
 from rest_framework import serializers
-
 from api.models import *
-from django.contrib.auth.models import User
 
 
 class FileSerializer(serializers.ModelSerializer):
-    post_content = serializers.SerializerMethodField()
+    # post_content = serializers.SerializerMethodField()
 
     class Meta:
         model = File
-        fields = ['id', 'post_content', 'type', 'url']
+        fields = ['id', 'type', 'url']
 
     def get_post_content(self, obj):
         return obj.post.content
@@ -19,6 +17,12 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['id', 'content']
+
+
+def validate_semicolon(value):
+    if ";" in value:
+        raise serializers.ValidationError(";은 내용에 포함할 수 없습니다.")
+    return value
 
 
 class PostSerializer(serializers.ModelSerializer):
