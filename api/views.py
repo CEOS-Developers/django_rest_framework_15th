@@ -1,44 +1,63 @@
-from django.http import Http404
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from .serializers import *
 from .models import *
+from .serializers import *
+from rest_framework import viewsets
+from rest_framework import permissions
+from django_filters.rest_framework import FilterSet, filters
+from django_filters.rest_framework import DjangoFilterBackend
 
-class PostList(APIView):
-    def get(self, request, format=None):
-        posts=Post.objects.all()
-        serializer=PostSerializer(posts, many=True)
-        return Response(serializer.data)
 
-    def post(self, request, format=None):
-        serializer=PostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class PostPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.method in permissions.SAFE_METHODS
 
-class PostDetail(APIView):
-    def get_object(self, pk):
-        try:
-            return Post.objects.get(pk=pk)
-        except Post.DoesNotExist:
-            raise Http404
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return obj.user == request.user
 
-    def get(self, request, pk, format=None):
-        post = self.get_object(pk)
-        serializer = PostSerializer(post)
-        return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
-        post = self.get_object(pk)
-        serializer = PostSerializer(post, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class ProfilePermission(permissions.BasePermission):
+#     def has_object_permission(self, request, view, obj):
+#         return obj.user == request.user
 
-    def delete(self, request, pk, format=None):
-        post = self.get_object(pk)
-        post.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class PostFilter(FilterSet):
+    user = filters.NumberFilter(field_name='user')
+    like_count = filters.NumberFilter(field_name='like_count', lookup_expr='gt')
+
+    class Meta:
+        model = Post
+        fields = ['user', 'like_count']
+
+
+class ProfileFilter(FilterSet):
+    username = filters.CharFilter(field_name='user__username', lookup_expr='contains')
+    image = filters.BooleanFilter(field_name='image_url', method='filter_image')
+
+    class Meta:
+        model = Profile
+        fields = ['username', 'image']
+
+    def filter_image(self, queryset, name, value):
+        if value:
+            filtered_queryset = queryset.exclude(image_url__exact='')
+        else:
+            filtered_queryset = queryset.filter(image_url__exact='')
+        return filtered_queryset
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filter_class = PostFilter
+    permission_classes = (PostPermission,)
+
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filter_class = ProfileFilter
+    # permission_classes = (ProfilePermission,)
+
