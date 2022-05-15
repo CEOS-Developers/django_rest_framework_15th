@@ -15,7 +15,8 @@ def custom_exception_handler(exc, context):
             message = "해당 권한이 없습니다."
         response.data = {
             'status_code': response.status_code,
-            'detail': message
+            'message': message,
+            'detail': response.data
         }
 
     return response
