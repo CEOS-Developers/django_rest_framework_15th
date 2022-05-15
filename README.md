@@ -468,6 +468,10 @@ def profile_list(request):
 
 # 5. DRF2: API View
 
+<details>
+<summary> </summary>
+<div markdown="1">    
+
 ---
 
 ### 모든 list를 가져오는 API
@@ -888,3 +892,102 @@ API 설계가 까다롭게 느껴지지 않았으나, 1) 모델과 모델 사이
 
 
 ---
+
+</div>
+</details>
+
+---
+
+# 6. DRF3: ViewSet & Filter & Permission & Validation
+
+---
+
+#### DRF2 - feedback
+1) {"code":"200"} 말고 {"msg": "delete_success"}
+2) get_object_or_404
+
+---
+
+### Viewset
+
+- views.py
+
+1) ProfileViewset
+```
+class ProfileViewset(viewsets.ModelViewSet):
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProfileFilter
+
+```
+
+2) PostViewset
+
+```
+class PostViewset(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PostFilter
+```
+
+
+- urls.py
+```
+router = routers.DefaultRouter()
+router.register(r'profiles', ProfileViewset)
+router.register(r'posts', PostViewset)
+
+urlpatterns = router.urls
+```
+
+---
+
+### filter
+
+- views.py
+
+1. ProfileFilter
+
+```
+class ProfileFilter(FilterSet):
+    user = filters.NumberFilter(field_name='user')  # profile 사용자
+    name = filters.CharFilter(field_name='name', method='filter_name')  # profile name
+
+    class Meta:
+        model = Post
+        fields = ['user', 'name']
+
+    def filter_name(self, queryset, name, value):
+        return queryset.filter(**{
+            name: value,
+        })
+```
+
+2. PostFilter
+
+```
+class PostFilter(FilterSet):
+    profile = filters.NumberFilter(field_name='profile')    # post 작성한 profile
+    location = filters.CharFilter(field_name='location', method='filter_location')  # post location tag
+    archived = filters.BooleanFilter(field_name='archived_flag')  # post 보관 유/무
+
+```
+
+```
+    class Meta:
+        model = Post
+        fields = ['profile', 'location', 'archived_flag']
+
+```
+method를 이용하여 구현
+```
+    def filter_location(self, queryset, name, value):
+        return queryset.filter(**{
+            name: value,
+        })
+```
+---
+#### 회고
+ViewSet, Filter에 대해 공부하는 시간을 가졌다.

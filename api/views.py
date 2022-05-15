@@ -1,10 +1,61 @@
 from django.http import JsonResponse, Http404
-from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework import viewsets
 from api.models import Profile, Post
 from api.serializers import *
+from django_filters.rest_framework import FilterSet, filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 
+# Profile
+class ProfileFilter(FilterSet):
+    user = filters.NumberFilter(field_name='user')  # profile 사용자
+    name = filters.CharFilter(field_name='name', method='filter_name')  # profile name
+
+    class Meta:
+        model = Post
+        fields = ['user', 'name']
+
+    def filter_name(self, queryset, name, value):
+        return queryset.filter(**{
+            name: value,
+        })
+
+
+class ProfileViewset(viewsets.ModelViewSet):
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProfileFilter
+
+
+# Post
+class PostFilter(FilterSet):
+    profile = filters.NumberFilter(field_name='profile')    # post 작성한 profile
+    location = filters.CharFilter(field_name='location', method='filter_location')  # post location tag
+    archived = filters.BooleanFilter(field_name='archived_flag')  # post 보관 유/무
+
+    class Meta:
+        model = Post
+        fields = ['profile', 'location', 'archived_flag']
+
+    def filter_location(self, queryset, name, value):
+        return queryset.filter(**{
+            name: value,
+        })
+
+
+class PostViewset(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PostFilter
+
+
+
+
+# APIView
+'''
 # profile
 class ProfileList(APIView):
     def get(self, request, format=None):
@@ -87,3 +138,4 @@ class PostDetail(APIView):
         post = self.get_object(pk)
         post.delete()
         return JsonResponse({"code": "200"}, status=status.HTTP_204_NO_CONTENT, safe=False)
+'''
